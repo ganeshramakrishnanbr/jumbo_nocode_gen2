@@ -91,6 +91,8 @@ export const SectionManager: React.FC<SectionManagerProps> = ({
     });
   };
 
+  const isDefaultSection = (sectionId: string) => sectionId === 'default';
+
   return (
     <div className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 transition-colors">
       {/* Section Tabs */}
@@ -117,28 +119,30 @@ export const SectionManager: React.FC<SectionManagerProps> = ({
               {section.required && (
                 <span className="text-red-500 text-xs">*</span>
               )}
-              {section.id !== 'default' && (
-                <div className="flex items-center space-x-1 ml-2">
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleEdit(section);
-                    }}
-                    className="p-1 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 rounded transition-colors"
-                  >
-                    <Edit3 className="w-3 h-3" />
-                  </button>
+              <div className="flex items-center space-x-1 ml-2">
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleEdit(section);
+                  }}
+                  className="p-1 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 rounded transition-colors"
+                  title={isDefaultSection(section.id) ? "Rename section" : "Edit section"}
+                >
+                  <Edit3 className="w-3 h-3" />
+                </button>
+                {!isDefaultSection(section.id) && (
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
                       onDeleteSection(section.id);
                     }}
                     className="p-1 text-gray-400 dark:text-gray-500 hover:text-red-600 dark:hover:text-red-400 rounded transition-colors"
+                    title="Delete section"
                   >
                     <Trash2 className="w-3 h-3" />
                   </button>
-                </div>
-              )}
+                )}
+              </div>
             </button>
           ))}
         </div>
@@ -157,7 +161,10 @@ export const SectionManager: React.FC<SectionManagerProps> = ({
         <div className="border-t border-gray-200 dark:border-gray-700 p-6 bg-gray-50 dark:bg-gray-800 transition-colors">
           <form onSubmit={handleSubmit} className="max-w-2xl">
             <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4 transition-colors">
-              {editingSection ? 'Edit Section' : 'Create New Section'}
+              {editingSection ? 
+                (isDefaultSection(editingSection) ? 'Rename Section' : 'Edit Section') : 
+                'Create New Section'
+              }
             </h3>
             
             <div className="grid grid-cols-2 gap-4">
@@ -222,17 +229,31 @@ export const SectionManager: React.FC<SectionManagerProps> = ({
                 </div>
               </div>
 
-              <div>
-                <label className="flex items-center space-x-2">
-                  <input
-                    type="checkbox"
-                    checked={formData.required}
-                    onChange={(e) => setFormData({ ...formData, required: e.target.checked })}
-                    className="rounded border-gray-300 dark:border-gray-600 text-blue-600 focus:ring-blue-500 bg-white dark:bg-gray-700"
-                  />
-                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300 transition-colors">Required Section</span>
-                </label>
-              </div>
+              {/* Only show required checkbox for non-default sections or when creating new sections */}
+              {(!editingSection || !isDefaultSection(editingSection)) && (
+                <div>
+                  <label className="flex items-center space-x-2">
+                    <input
+                      type="checkbox"
+                      checked={formData.required}
+                      onChange={(e) => setFormData({ ...formData, required: e.target.checked })}
+                      className="rounded border-gray-300 dark:border-gray-600 text-blue-600 focus:ring-blue-500 bg-white dark:bg-gray-700"
+                    />
+                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300 transition-colors">Required Section</span>
+                  </label>
+                </div>
+              )}
+
+              {/* Show info for default section */}
+              {editingSection && isDefaultSection(editingSection) && (
+                <div className="col-span-2">
+                  <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700 rounded-md p-3">
+                    <p className="text-sm text-blue-800 dark:text-blue-300">
+                      <strong>Note:</strong> This is the default section. You can rename it and change its appearance, but it cannot be deleted or marked as required.
+                    </p>
+                  </div>
+                </div>
+              )}
             </div>
 
             <div className="flex items-center space-x-3 mt-6">
@@ -240,7 +261,10 @@ export const SectionManager: React.FC<SectionManagerProps> = ({
                 type="submit"
                 className="px-4 py-2 bg-blue-600 dark:bg-blue-700 text-white rounded-lg hover:bg-blue-700 dark:hover:bg-blue-600 transition-colors"
               >
-                {editingSection ? 'Update Section' : 'Create Section'}
+                {editingSection ? 
+                  (isDefaultSection(editingSection) ? 'Rename Section' : 'Update Section') : 
+                  'Create Section'
+                }
               </button>
               <button
                 type="button"

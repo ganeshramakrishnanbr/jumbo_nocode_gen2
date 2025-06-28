@@ -223,8 +223,8 @@ Each control must support configuration through:
 - Configure section properties (color, icon, description)
 - Visual section grouping with tabs
 - Section templates
-- Default section protection
-- Edit and delete sections (except default)
+- Default section protection (cannot be deleted but can be renamed)
+- Edit and rename sections including the default "General Information" section
 
 #### 2.6.3 Preview Mode Interface
 - **Tab-Based Navigation**:
@@ -318,6 +318,35 @@ Each control must support configuration through:
 - **Form Building Modes**: Show all controls (Import, Export, Save, Tier selection)
 - **Theme Toggle**: Always visible across all modes
 - **Professional Appearance**: Clean, focused interface for each mode
+
+### 2.11 Advanced Control Features
+
+#### 2.11.1 Control Dependencies
+- **Conditional Logic**: Controls can depend on other control values
+- **Dependency Types**: Equals, not equals, contains, greater than, less than, is empty, is not empty
+- **Visual Indicators**: Clear indication of conditional controls
+- **Real-time Updates**: Dependencies work immediately in preview mode
+- **First Control Protection**: First control in each section is always visible
+
+#### 2.11.2 Control Management
+- **Delete Functionality**: Safe deletion with first-control protection
+- **Required Field Indicators**: Red asterisk positioned before label text
+- **Visual Feedback**: Hover states, selection indicators, and action buttons
+- **Database Integration**: All changes persisted to SQLite database
+
+### 2.12 Section Customization
+
+#### 2.12.1 Default Section Management
+- **Rename Capability**: Users can rename the "General Information" section
+- **Protection**: Default section cannot be deleted but can be fully customized
+- **Visual Indicators**: Clear distinction between default and custom sections
+- **Customization Options**: Name, description, color, icon can all be modified
+
+#### 2.12.2 Custom Section Features
+- **Full CRUD Operations**: Create, read, update, delete for custom sections
+- **Visual Customization**: Color coding, icon selection, and styling options
+- **Ordering**: Drag and drop section reordering
+- **Validation**: Section-level validation rules and requirements
 
 ## 3. Non-Functional Requirements
 
@@ -492,6 +521,8 @@ Each control must support configuration through:
 - Database operations complete successfully
 - Data persists across browser sessions
 - Theme switching works seamlessly
+- Control dependencies function properly
+- Section renaming works for all sections including default
 
 ### 8.2 Performance Success
 - Application loads within 3 seconds
@@ -510,6 +541,7 @@ Each control must support configuration through:
 - Accessible to users with disabilities
 - Reliable data persistence and recovery
 - Context-appropriate interface controls
+- Flexible section customization
 
 ### 8.4 Data Integrity Success
 - No data loss during operations
@@ -521,4 +553,4 @@ Each control must support configuration through:
 
 ---
 
-This requirements specification serves as the foundation for the Jumbo No-Code Builder application with SQLite integration, comprehensive control library, theme support, and conditional interface controls, ensuring all stakeholders have a clear understanding of the system's capabilities, constraints, and success criteria including comprehensive data persistence and user experience requirements.
+This requirements specification serves as the foundation for the Jumbo No-Code Builder application with SQLite integration, comprehensive control library, theme support, conditional interface controls, advanced control features, and section management capabilities, ensuring all stakeholders have a clear understanding of the system's capabilities, constraints, and success criteria including comprehensive data persistence and user experience requirements.

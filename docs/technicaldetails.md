@@ -381,6 +381,7 @@ export const CONTROL_CATEGORIES = [
 - Drag handles and reordering
 - Selection states and action buttons
 - Property-based rendering
+- Required field indicators with proper positioning
 
 **Control Rendering Examples**:
 ```typescript
@@ -446,14 +447,35 @@ const renderControl = () => {
 - Dark mode support
 
 #### Enhanced SectionManager Component (`src/components/SectionManager.tsx`)
-**Responsibility**: Section CRUD operations with enhanced UI
+**Responsibility**: Section CRUD operations with enhanced UI and rename capability
 **Features**:
 - Section creation with customizable properties
 - Section editing and deletion
+- Default section rename capability
 - Visual section indicators with colors and icons
 - Database-backed operations
 - Error handling and validation
 - Dark mode support
+- Protected default section (cannot be deleted but can be renamed)
+
+**Default Section Management**:
+```typescript
+const isDefaultSection = (sectionId: string) => sectionId === 'default';
+
+// Conditional delete button rendering
+{!isDefaultSection(section.id) && (
+  <button
+    onClick={(e) => {
+      e.stopPropagation();
+      onDeleteSection(section.id);
+    }}
+    className="p-1 text-gray-400 dark:text-gray-500 hover:text-red-600 dark:hover:text-red-400 rounded transition-colors"
+    title="Delete section"
+  >
+    <Trash2 className="w-3 h-3" />
+  </button>
+)}
+```
 
 ## 5. Control System Implementation
 
@@ -522,6 +544,78 @@ case 'multiSelectiveGrid':
       </table>
     </div>
   );
+```
+
+### 5.3 Control Dependencies System
+
+#### Conditional Visibility Logic
+```typescript
+const isControlVisible = (control: DroppedControl): boolean => {
+  if (!control.properties.dependencies || control.properties.dependencies.length === 0) {
+    return true;
+  }
+
+  return control.properties.dependencies.every((dep: any) => {
+    const dependentValue = formData[dep.controlId];
+    
+    switch (dep.condition) {
+      case 'equals': return dependentValue === dep.value;
+      case 'not_equals': return dependentValue !== dep.value;
+      case 'contains': return dependentValue && dependentValue.toString().includes(dep.value);
+      case 'greater_than': return Number(dependentValue) > Number(dep.value);
+      case 'less_than': return Number(dependentValue) < Number(dep.value);
+      case 'is_empty': return !dependentValue || dependentValue === '';
+      case 'is_not_empty': return dependentValue && dependentValue !== '';
+      default: return true;
+    }
+  });
+};
+```
+
+#### Dependency Management Interface
+```typescript
+// Enhanced Properties Panel with dependency configuration
+const availableControlsForDependencies = droppedControls.filter(control => 
+  control.id !== selectedControl?.id && control.y === 0 // Only first control can be independent
+);
+
+// Dependency configuration UI
+<div className="space-y-3">
+  {selectedControl.properties.dependencies?.map((dependency: any, index: number) => (
+    <div key={index} className="border border-gray-200 dark:border-gray-600 rounded-md p-3 space-y-2">
+      <select // Control selection
+        value={dependency.controlId}
+        onChange={(e) => updateDependency(index, 'controlId', e.target.value)}
+      >
+        {availableControlsForDependencies.map(control => (
+          <option key={control.id} value={control.id}>
+            {control.properties.label || control.name}
+          </option>
+        ))}
+      </select>
+      
+      <select // Condition type
+        value={dependency.condition}
+        onChange={(e) => updateDependency(index, 'condition', e.target.value)}
+      >
+        <option value="equals">Equals</option>
+        <option value="not_equals">Not Equals</option>
+        <option value="contains">Contains</option>
+        <option value="greater_than">Greater Than</option>
+        <option value="less_than">Less Than</option>
+        <option value="is_empty">Is Empty</option>
+        <option value="is_not_empty">Is Not Empty</option>
+      </select>
+      
+      <input // Value input
+        type="text"
+        value={dependency.value}
+        onChange={(e) => updateDependency(index, 'value', e.target.value)}
+        placeholder="Enter value..."
+      />
+    </div>
+  ))}
+</div>
 ```
 
 ## 6. State Management with Database Integration
@@ -618,6 +712,23 @@ export interface ControlType {
   description: string;
   properties: ControlProperty[];
   tierRestriction?: CustomerTier[]; // Optional tier restrictions
+}
+
+// Enhanced section type with rename capability
+export interface Section {
+  id: string;
+  name: string;
+  color: string;
+  icon: string;
+  description: string;
+  order: number;
+  required: boolean;
+  controls: DroppedControl[];
+  validation: {
+    isValid: boolean;
+    requiredFields: number;
+    completedFields: number;
+  };
 }
 ```
 
@@ -727,6 +838,19 @@ interface ControlPlugin {
 }
 ```
 
+#### Enhanced Section Management
+```typescript
+// Future section template system
+interface SectionTemplate {
+  id: string;
+  name: string;
+  description: string;
+  sections: Omit<Section, 'id' | 'controls' | 'validation'>[];
+  controls: ControlType[];
+  category: string;
+}
+```
+
 ---
 
-This technical documentation provides a comprehensive overview of the Jumbo No-Code Builder's implementation with SQLite integration, complete control library, theme system, conditional interface controls, and enhanced user experience features, serving as a reference for developers working on the project and stakeholders interested in the technical aspects of this professional-grade form building platform.
+This technical documentation provides a comprehensive overview of the Jumbo No-Code Builder's implementation with SQLite integration, complete control library, theme system, conditional interface controls, advanced control features, section management with rename capability, and enhanced user experience features, serving as a reference for developers working on the project and stakeholders interested in the technical aspects of this professional-grade form building platform.

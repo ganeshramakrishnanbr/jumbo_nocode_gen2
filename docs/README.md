@@ -69,12 +69,12 @@ Professional-grade form controls across 9 categories:
 
 #### Address Controls (7 controls)
 - **Address Line 1**: Primary address field
-- **Address Line 2**: Secondary address field
+- **Address Line 2**: Secondary address field (apartment, suite)
 - **City**: City name with auto-complete
 - **State/Province**: Dropdown or text input
 - **ZIP/Postal Code**: Format validation by country
-- **Country**: Country selection with flags
-- **Complete Address Block**: Combined address control
+- **Country**: Country selection dropdown
+- **Complete Address Block**: Combined address control with all fields
 
 #### Layout & Display Controls (5 controls)
 - **Label/Heading**: Customizable text headings
@@ -96,6 +96,9 @@ Professional-grade form controls across 9 categories:
 - **Database Persistence**: All data stored in SQLite for reliability
 - **Loading States**: Professional loading indicators and error handling
 - **Conditional Interface**: Context-sensitive controls (dashboard vs. form building)
+- **Control Dependencies**: Advanced conditional logic for dynamic form behavior
+- **Section Management**: Create, edit, rename, and delete form sections
+- **Required Field Indicators**: Clear visual indication with proper asterisk positioning
 
 ## 🛠️ Technical Stack
 
@@ -268,6 +271,12 @@ CREATE TABLE controls (
 3. Add custom CSS in `src/index.css` for advanced styling
 4. Update component styles using Tailwind dark mode classes
 
+### Section Management
+1. **Default Section Customization**: Rename the "General Information" section to match your form's purpose
+2. **Custom Sections**: Create additional sections with custom names, colors, and icons
+3. **Section Protection**: Default section cannot be deleted but can be fully customized
+4. **Visual Indicators**: Clear distinction between default and custom sections
+
 ## 📊 Performance
 
 ### Optimization Features
@@ -348,4 +357,4 @@ The application is designed to support analytics integration for:
 
 ---
 
-**Note**: This is a production-ready implementation of the Jumbo No-Code Builder platform with comprehensive features, persistent storage, complete control library, theme support, and enterprise-level capabilities. The SQLite integration ensures reliable data persistence while maintaining excellent performance and user experience across all 40+ form controls and advanced features.
+**Note**: This is a production-ready implementation of the Jumbo No-Code Builder platform with comprehensive features, persistent storage, complete control library, theme support, section management with rename capability, and enterprise-level capabilities. The SQLite integration ensures reliable data persistence while maintaining excellent performance and user experience across all 40+ form controls and advanced features.
