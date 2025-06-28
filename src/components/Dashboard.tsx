@@ -1,10 +1,16 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Questionnaire, DashboardStats, CustomerTier } from '../types';
 import { 
   Plus, Search, Filter, MoreVertical, Eye, Edit3, Copy, Trash2,
   BarChart3, Users, Clock, CheckCircle, AlertCircle, FileText,
   TrendingUp, Calendar, Activity
 } from 'lucide-react';
+import { 
+  getQuestionnaires, 
+  insertQuestionnaire, 
+  deleteQuestionnaire as deleteQuestionnaireDB,
+  initializeDatabase 
+} from '../lib/db';
 
 interface DashboardProps {
   currentTier: CustomerTier;
@@ -20,6 +26,17 @@ export const Dashboard: React.FC<DashboardProps> = ({
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<'All' | 'Active' | 'Inactive' | 'Draft'>('All');
   const [showCreateForm, setShowCreateForm] = useState(false);
+  const [questionnaires, setQuestionnaires] = useState<Questionnaire[]>([]);
+  const [dashboardStats, setDashboardStats] = useState<DashboardStats>({
+    totalQuestionnaires: 0,
+    activeQuestionnaires: 0,
+    inactiveQuestionnaires: 0,
+    draftQuestionnaires: 0,
+    totalResponses: 0,
+    averageCompletionRate: 0,
+    recentActivity: []
+  });
+  const [isLoading, setIsLoading] = useState(true);
   const [newQuestionnaire, setNewQuestionnaire] = useState({
     name: '',
     description: '',
@@ -27,89 +44,79 @@ export const Dashboard: React.FC<DashboardProps> = ({
     category: 'General'
   });
 
-  // Mock data - in real app this would come from API/database
-  const dashboardStats: DashboardStats = {
-    totalQuestionnaires: 12,
-    activeQuestionnaires: 8,
-    inactiveQuestionnaires: 2,
-    draftQuestionnaires: 2,
-    totalResponses: 1247,
-    averageCompletionRate: 78.5,
-    recentActivity: [
-      { id: '1', type: 'created', questionnaireName: 'Customer Feedback Survey', timestamp: '2 hours ago', user: 'John Doe' },
-      { id: '2', type: 'updated', questionnaireName: 'Employee Onboarding', timestamp: '4 hours ago', user: 'Jane Smith' },
-      { id: '3', type: 'published', questionnaireName: 'Product Review Form', timestamp: '1 day ago', user: 'Mike Johnson' }
-    ]
+  // Load questionnaires from database
+  useEffect(() => {
+    const loadQuestionnaires = async () => {
+      try {
+        setIsLoading(true);
+        
+        // Ensure database is initialized
+        await initializeDatabase();
+        
+        // Fetch questionnaires
+        const fetchedQuestionnaires = await getQuestionnaires();
+        setQuestionnaires(fetchedQuestionnaires);
+        
+        // Calculate dashboard stats
+        const stats = calculateDashboardStats(fetchedQuestionnaires);
+        setDashboardStats(stats);
+      } catch (error) {
+        console.error('Failed to load questionnaires:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadQuestionnaires();
+  }, []);
+
+  const calculateDashboardStats = (questionnaires: Questionnaire[]): DashboardStats => {
+    const totalQuestionnaires = questionnaires.length;
+    const activeQuestionnaires = questionnaires.filter(q => q.status === 'Active').length;
+    const inactiveQuestionnaires = questionnaires.filter(q => q.status === 'Inactive').length;
+    const draftQuestionnaires = questionnaires.filter(q => q.status === 'Draft').length;
+    
+    const totalResponses = questionnaires.reduce((sum, q) => sum + q.analytics.totalResponses, 0);
+    const averageCompletionRate = questionnaires.length > 0 
+      ? questionnaires.reduce((sum, q) => sum + q.analytics.completionRate, 0) / questionnaires.length 
+      : 0;
+
+    // Generate recent activity from questionnaires
+    const recentActivity = questionnaires
+      .sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime())
+      .slice(0, 5)
+      .map((q, index) => ({
+        id: `activity-${index}`,
+        type: q.status === 'Draft' ? 'created' as const : 'updated' as const,
+        questionnaireName: q.name,
+        timestamp: getRelativeTime(q.updatedAt),
+        user: q.createdBy
+      }));
+
+    return {
+      totalQuestionnaires,
+      activeQuestionnaires,
+      inactiveQuestionnaires,
+      draftQuestionnaires,
+      totalResponses,
+      averageCompletionRate: Math.round(averageCompletionRate * 10) / 10,
+      recentActivity
+    };
   };
 
-  const questionnaires: Questionnaire[] = [
-    {
-      id: '1',
-      name: 'US State Demographics Survey',
-      description: 'Comprehensive demographic survey for US states',
-      purpose: 'Collect demographic data across different US states',
-      category: 'Demographics',
-      status: 'Active',
-      version: '2.1.0',
-      createdAt: '2025-01-15',
-      updatedAt: '2025-01-25',
-      createdBy: 'John Doe',
-      tier: 'platinum',
-      sections: [],
-      controls: [],
-      analytics: {
-        totalResponses: 342,
-        completionRate: 85.2,
-        averageTime: 8.5,
-        lastResponse: '2 hours ago'
-      },
-      versions: []
-    },
-    {
-      id: '2',
-      name: 'Customer Satisfaction Survey',
-      description: 'Monthly customer satisfaction tracking',
-      purpose: 'Track customer satisfaction metrics monthly',
-      category: 'Customer Experience',
-      status: 'Active',
-      version: '1.3.0',
-      createdAt: '2025-01-10',
-      updatedAt: '2025-01-20',
-      createdBy: 'Jane Smith',
-      tier: 'gold',
-      sections: [],
-      controls: [],
-      analytics: {
-        totalResponses: 156,
-        completionRate: 72.8,
-        averageTime: 5.2,
-        lastResponse: '1 hour ago'
-      },
-      versions: []
-    },
-    {
-      id: '3',
-      name: 'Employee Onboarding Form',
-      description: 'New employee information collection',
-      purpose: 'Streamline new employee onboarding process',
-      category: 'HR',
-      status: 'Draft',
-      version: '1.0.0',
-      createdAt: '2025-01-22',
-      updatedAt: '2025-01-26',
-      createdBy: 'Mike Johnson',
-      tier: 'silver',
-      sections: [],
-      controls: [],
-      analytics: {
-        totalResponses: 0,
-        completionRate: 0,
-        averageTime: 0,
-        lastResponse: 'Never'
-      },
-      versions: []
-    }
-  ];
+  const getRelativeTime = (dateString: string): string => {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffInHours = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60));
+    
+    if (diffInHours < 1) return 'Less than an hour ago';
+    if (diffInHours < 24) return `${diffInHours} hour${diffInHours > 1 ? 's' : ''} ago`;
+    
+    const diffInDays = Math.floor(diffInHours / 24);
+    if (diffInDays < 7) return `${diffInDays} day${diffInDays > 1 ? 's' : ''} ago`;
+    
+    return date.toLocaleDateString();
+  };
 
   const filteredQuestionnaires = questionnaires.filter(q => {
     const matchesSearch = q.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -118,12 +125,76 @@ export const Dashboard: React.FC<DashboardProps> = ({
     return matchesSearch && matchesStatus;
   });
 
-  const handleCreateQuestionnaire = (e: React.FormEvent) => {
+  const handleCreateQuestionnaire = async (e: React.FormEvent) => {
     e.preventDefault();
-    // In real app, this would create the questionnaire and redirect to design mode
-    console.log('Creating questionnaire:', newQuestionnaire);
-    setShowCreateForm(false);
-    onCreateQuestionnaire();
+    
+    try {
+      const newQuestionnaireData: Omit<Questionnaire, 'sections' | 'controls' | 'versions'> = {
+        id: `questionnaire-${Date.now()}`,
+        name: newQuestionnaire.name,
+        description: newQuestionnaire.description,
+        purpose: newQuestionnaire.purpose,
+        category: newQuestionnaire.category,
+        status: 'Draft',
+        version: '1.0.0',
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        createdBy: 'Current User',
+        tier: currentTier,
+        analytics: {
+          totalResponses: 0,
+          completionRate: 0,
+          averageTime: 0,
+          lastResponse: 'Never'
+        }
+      };
+
+      // Insert into database
+      await insertQuestionnaire(newQuestionnaireData);
+      
+      // Reload questionnaires
+      const updatedQuestionnaires = await getQuestionnaires();
+      setQuestionnaires(updatedQuestionnaires);
+      
+      // Update stats
+      const stats = calculateDashboardStats(updatedQuestionnaires);
+      setDashboardStats(stats);
+      
+      // Reset form and close modal
+      setNewQuestionnaire({
+        name: '',
+        description: '',
+        purpose: '',
+        category: 'General'
+      });
+      setShowCreateForm(false);
+      
+      // Navigate to design mode
+      onCreateQuestionnaire();
+    } catch (error) {
+      console.error('Failed to create questionnaire:', error);
+    }
+  };
+
+  const handleDeleteQuestionnaire = async (id: string) => {
+    if (!confirm('Are you sure you want to delete this questionnaire? This action cannot be undone.')) {
+      return;
+    }
+
+    try {
+      // Delete from database
+      await deleteQuestionnaireDB(id);
+      
+      // Reload questionnaires
+      const updatedQuestionnaires = await getQuestionnaires();
+      setQuestionnaires(updatedQuestionnaires);
+      
+      // Update stats
+      const stats = calculateDashboardStats(updatedQuestionnaires);
+      setDashboardStats(stats);
+    } catch (error) {
+      console.error('Failed to delete questionnaire:', error);
+    }
   };
 
   const getStatusColor = (status: string) => {
@@ -143,6 +214,17 @@ export const Dashboard: React.FC<DashboardProps> = ({
       case 'bronze': return 'bg-orange-100 dark:bg-orange-900 text-orange-700 dark:text-orange-300';
     }
   };
+
+  if (isLoading) {
+    return (
+      <div className="flex-1 bg-gray-50 dark:bg-gray-800 flex items-center justify-center transition-colors">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600 dark:text-gray-300 transition-colors">Loading dashboard...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex-1 bg-gray-50 dark:bg-gray-800 overflow-auto transition-colors">
@@ -250,61 +332,80 @@ export const Dashboard: React.FC<DashboardProps> = ({
               </div>
 
               <div className="divide-y divide-gray-200 dark:divide-gray-700">
-                {filteredQuestionnaires.map((questionnaire) => (
-                  <div key={questionnaire.id} className="p-6 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
-                    <div className="flex items-start justify-between">
-                      <div className="flex-1">
-                        <div className="flex items-center space-x-3 mb-2">
-                          <h3 className="text-lg font-medium text-gray-900 dark:text-white transition-colors">{questionnaire.name}</h3>
-                          <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(questionnaire.status)} transition-colors`}>
-                            {questionnaire.status}
-                          </span>
-                          <span className={`px-2 py-1 rounded-full text-xs font-medium ${getTierColor(questionnaire.tier)} transition-colors`}>
-                            {questionnaire.tier}
-                          </span>
+                {filteredQuestionnaires.length === 0 ? (
+                  <div className="p-8 text-center">
+                    <FileText className="w-12 h-12 text-gray-400 dark:text-gray-500 mx-auto mb-4" />
+                    <h3 className="text-lg font-medium text-gray-600 dark:text-gray-300 mb-2 transition-colors">
+                      {questionnaires.length === 0 ? 'No Questionnaires Yet' : 'No Matching Questionnaires'}
+                    </h3>
+                    <p className="text-gray-500 dark:text-gray-400 transition-colors">
+                      {questionnaires.length === 0 
+                        ? 'Create your first questionnaire to get started.'
+                        : 'Try adjusting your search or filter criteria.'
+                      }
+                    </p>
+                  </div>
+                ) : (
+                  filteredQuestionnaires.map((questionnaire) => (
+                    <div key={questionnaire.id} className="p-6 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1">
+                          <div className="flex items-center space-x-3 mb-2">
+                            <h3 className="text-lg font-medium text-gray-900 dark:text-white transition-colors">{questionnaire.name}</h3>
+                            <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(questionnaire.status)} transition-colors`}>
+                              {questionnaire.status}
+                            </span>
+                            <span className={`px-2 py-1 rounded-full text-xs font-medium ${getTierColor(questionnaire.tier)} transition-colors`}>
+                              {questionnaire.tier}
+                            </span>
+                          </div>
+                          <p className="text-gray-600 dark:text-gray-300 mb-3 transition-colors">{questionnaire.description}</p>
+                          <div className="flex items-center space-x-6 text-sm text-gray-500 dark:text-gray-400 transition-colors">
+                            <span className="flex items-center space-x-1">
+                              <Users className="w-4 h-4" />
+                              <span>{questionnaire.analytics.totalResponses} responses</span>
+                            </span>
+                            <span className="flex items-center space-x-1">
+                              <BarChart3 className="w-4 h-4" />
+                              <span>{questionnaire.analytics.completionRate}% completion</span>
+                            </span>
+                            <span className="flex items-center space-x-1">
+                              <Clock className="w-4 h-4" />
+                              <span>{questionnaire.analytics.averageTime}m avg time</span>
+                            </span>
+                            <span className="flex items-center space-x-1">
+                              <Calendar className="w-4 h-4" />
+                              <span>v{questionnaire.version}</span>
+                            </span>
+                          </div>
                         </div>
-                        <p className="text-gray-600 dark:text-gray-300 mb-3 transition-colors">{questionnaire.description}</p>
-                        <div className="flex items-center space-x-6 text-sm text-gray-500 dark:text-gray-400 transition-colors">
-                          <span className="flex items-center space-x-1">
-                            <Users className="w-4 h-4" />
-                            <span>{questionnaire.analytics.totalResponses} responses</span>
-                          </span>
-                          <span className="flex items-center space-x-1">
-                            <BarChart3 className="w-4 h-4" />
-                            <span>{questionnaire.analytics.completionRate}% completion</span>
-                          </span>
-                          <span className="flex items-center space-x-1">
-                            <Clock className="w-4 h-4" />
-                            <span>{questionnaire.analytics.averageTime}m avg time</span>
-                          </span>
-                          <span className="flex items-center space-x-1">
-                            <Calendar className="w-4 h-4" />
-                            <span>v{questionnaire.version}</span>
-                          </span>
+                        
+                        <div className="flex items-center space-x-2">
+                          <button
+                            onClick={() => onEditQuestionnaire(questionnaire.id)}
+                            className="p-2 text-gray-400 dark:text-gray-500 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900 rounded-lg transition-colors"
+                            title="Edit"
+                          >
+                            <Edit3 className="w-4 h-4" />
+                          </button>
+                          <button className="p-2 text-gray-400 dark:text-gray-500 hover:text-green-600 dark:hover:text-green-400 hover:bg-green-50 dark:hover:bg-green-900 rounded-lg transition-colors" title="Preview">
+                            <Eye className="w-4 h-4" />
+                          </button>
+                          <button className="p-2 text-gray-400 dark:text-gray-500 hover:text-purple-600 dark:hover:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-900 rounded-lg transition-colors" title="Duplicate">
+                            <Copy className="w-4 h-4" />
+                          </button>
+                          <button 
+                            onClick={() => handleDeleteQuestionnaire(questionnaire.id)}
+                            className="p-2 text-gray-400 dark:text-gray-500 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900 rounded-lg transition-colors" 
+                            title="Delete"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
                         </div>
-                      </div>
-                      
-                      <div className="flex items-center space-x-2">
-                        <button
-                          onClick={() => onEditQuestionnaire(questionnaire.id)}
-                          className="p-2 text-gray-400 dark:text-gray-500 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900 rounded-lg transition-colors"
-                          title="Edit"
-                        >
-                          <Edit3 className="w-4 h-4" />
-                        </button>
-                        <button className="p-2 text-gray-400 dark:text-gray-500 hover:text-green-600 dark:hover:text-green-400 hover:bg-green-50 dark:hover:bg-green-900 rounded-lg transition-colors" title="Preview">
-                          <Eye className="w-4 h-4" />
-                        </button>
-                        <button className="p-2 text-gray-400 dark:text-gray-500 hover:text-purple-600 dark:hover:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-900 rounded-lg transition-colors" title="Duplicate">
-                          <Copy className="w-4 h-4" />
-                        </button>
-                        <button className="p-2 text-gray-400 dark:text-gray-500 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900 rounded-lg transition-colors" title="Delete">
-                          <Trash2 className="w-4 h-4" />
-                        </button>
                       </div>
                     </div>
-                  </div>
-                ))}
+                  ))
+                )}
               </div>
             </div>
           </div>
@@ -318,29 +419,36 @@ export const Dashboard: React.FC<DashboardProps> = ({
               </h2>
             </div>
             <div className="p-6">
-              <div className="space-y-4">
-                {dashboardStats.recentActivity.map((activity) => (
-                  <div key={activity.id} className="flex items-start space-x-3">
-                    <div className={`p-2 rounded-lg ${
-                      activity.type === 'created' ? 'bg-green-100 dark:bg-green-900' :
-                      activity.type === 'updated' ? 'bg-blue-100 dark:bg-blue-900' :
-                      activity.type === 'published' ? 'bg-purple-100 dark:bg-purple-900' :
-                      'bg-gray-100 dark:bg-gray-700'
-                    } transition-colors`}>
-                      {activity.type === 'created' && <Plus className="w-4 h-4 text-green-600 dark:text-green-300" />}
-                      {activity.type === 'updated' && <Edit3 className="w-4 h-4 text-blue-600 dark:text-blue-300" />}
-                      {activity.type === 'published' && <CheckCircle className="w-4 h-4 text-purple-600 dark:text-purple-300" />}
+              {dashboardStats.recentActivity.length === 0 ? (
+                <div className="text-center py-8">
+                  <Activity className="w-8 h-8 text-gray-400 dark:text-gray-500 mx-auto mb-2" />
+                  <p className="text-gray-500 dark:text-gray-400 text-sm transition-colors">No recent activity</p>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {dashboardStats.recentActivity.map((activity) => (
+                    <div key={activity.id} className="flex items-start space-x-3">
+                      <div className={`p-2 rounded-lg ${
+                        activity.type === 'created' ? 'bg-green-100 dark:bg-green-900' :
+                        activity.type === 'updated' ? 'bg-blue-100 dark:bg-blue-900' :
+                        activity.type === 'published' ? 'bg-purple-100 dark:bg-purple-900' :
+                        'bg-gray-100 dark:bg-gray-700'
+                      } transition-colors`}>
+                        {activity.type === 'created' && <Plus className="w-4 h-4 text-green-600 dark:text-green-300" />}
+                        {activity.type === 'updated' && <Edit3 className="w-4 h-4 text-blue-600 dark:text-blue-300" />}
+                        {activity.type === 'published' && <CheckCircle className="w-4 h-4 text-purple-600 dark:text-purple-300" />}
+                      </div>
+                      <div className="flex-1">
+                        <p className="text-sm text-gray-900 dark:text-white transition-colors">
+                          <span className="font-medium">{activity.user}</span> {activity.type} 
+                          <span className="font-medium"> {activity.questionnaireName}</span>
+                        </p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400 transition-colors">{activity.timestamp}</p>
+                      </div>
                     </div>
-                    <div className="flex-1">
-                      <p className="text-sm text-gray-900 dark:text-white transition-colors">
-                        <span className="font-medium">{activity.user}</span> {activity.type} 
-                        <span className="font-medium"> {activity.questionnaireName}</span>
-                      </p>
-                      <p className="text-xs text-gray-500 dark:text-gray-400 transition-colors">{activity.timestamp}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         </div>
