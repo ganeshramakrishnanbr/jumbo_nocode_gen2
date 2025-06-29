@@ -127,27 +127,27 @@ export const JSONViewer: React.FC<JSONViewerProps> = ({
   };
 
   return (
-    <div className="flex-1 bg-white flex flex-col">
+    <div className="flex-1 bg-white dark:bg-gray-800 flex flex-col transition-colors">
       {/* Header */}
-      <div className="border-b border-gray-200 px-6 py-4">
+      <div className="border-b border-gray-200 dark:border-gray-700 px-6 py-4 transition-colors">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-lg font-semibold text-gray-900">JSON Configuration</h2>
-            <p className="text-sm text-gray-500">
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white transition-colors">JSON Configuration</h2>
+            <p className="text-sm text-gray-500 dark:text-gray-400 transition-colors">
               Real-time generated form definition and tier configuration
             </p>
           </div>
           <div className="flex items-center space-x-2">
             <button
               onClick={copyToClipboard}
-              className="flex items-center px-3 py-2 text-sm bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors"
+              className="flex items-center px-3 py-2 text-sm bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-lg transition-colors"
             >
               <Copy className="w-4 h-4 mr-2" />
               Copy
             </button>
             <button
               onClick={downloadJSON}
-              className="flex items-center px-3 py-2 text-sm bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
+              className="flex items-center px-3 py-2 text-sm bg-blue-600 dark:bg-blue-700 hover:bg-blue-700 dark:hover:bg-blue-600 text-white rounded-lg transition-colors"
             >
               <Download className="w-4 h-4 mr-2" />
               Download
@@ -158,14 +158,14 @@ export const JSONViewer: React.FC<JSONViewerProps> = ({
 
       {/* JSON Content */}
       <div className="flex-1 overflow-auto p-6">
-        <pre className="bg-gray-50 rounded-lg p-4 text-sm font-mono overflow-auto border">
-          <code className="text-gray-800">{jsonString}</code>
+        <pre className="bg-gray-50 dark:bg-gray-900 rounded-lg p-4 text-sm font-mono overflow-auto border border-gray-200 dark:border-gray-700 transition-colors">
+          <code className="text-gray-800 dark:text-gray-200 transition-colors">{jsonString}</code>
         </pre>
       </div>
 
       {/* Footer Stats */}
-      <div className="border-t border-gray-200 px-6 py-3 bg-gray-50">
-        <div className="flex items-center justify-between text-sm text-gray-600">
+      <div className="border-t border-gray-200 dark:border-gray-700 px-6 py-3 bg-gray-50 dark:bg-gray-800 transition-colors">
+        <div className="flex items-center justify-between text-sm text-gray-600 dark:text-gray-300 transition-colors">
           <div className="flex items-center space-x-6">
             <span>Controls: {droppedControls.length}</span>
             <span>Sections: {sections.length}</span>
