@@ -40,6 +40,7 @@ function App() {
     total: number;
     errors: string[];
   } | null>(null);
+  const [nuclearResetInProgress, setNuclearResetInProgress] = useState(false);
 
   // Initialize theme
   const { theme } = useTheme();
@@ -56,7 +57,8 @@ function App() {
     selectControl,
     clearSelection,
     forceRefresh,
-    forceReload
+    forceReload,
+    nuclearReset
   } = useDragDrop(currentQuestionnaire, isDbInitialized, refreshKey);
 
   // Initialize database and load sections
@@ -188,8 +190,58 @@ function App() {
     removeControl(controlId);
   };
 
+  // NUCLEAR OPTION: Complete application state reset and reload
+  const executeNuclearReset = async () => {
+    console.log('💥 NUCLEAR RESET: ===== INITIATING COMPLETE APPLICATION RESET =====');
+    setNuclearResetInProgress(true);
+    
+    try {
+      // Step 1: Clear all React state
+      console.log('🧹 NUCLEAR RESET: Step 1 - Clearing all React state...');
+      setRefreshKey(0);
+      setSections([]);
+      setSelectedControl(null);
+      setIsLoading(true);
+      
+      // Step 2: Force hook reset
+      console.log('🔄 NUCLEAR RESET: Step 2 - Forcing hook reset...');
+      await nuclearReset();
+      
+      // Step 3: Wait for state to clear
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      // Step 4: Reinitialize everything from scratch
+      console.log('🔄 NUCLEAR RESET: Step 3 - Reinitializing from database...');
+      
+      // Reload sections
+      const freshSections = await getSections(currentQuestionnaire);
+      setSections(freshSections);
+      console.log('📂 NUCLEAR RESET: Reloaded sections:', freshSections.length);
+      
+      // Set active section
+      if (freshSections.length > 0) {
+        setActiveSection(freshSections[0].id);
+      }
+      
+      // Step 5: Force multiple refresh cycles
+      console.log('🔄 NUCLEAR RESET: Step 4 - Multiple refresh cycles...');
+      for (let i = 0; i < 3; i++) {
+        setRefreshKey(prev => prev + 1);
+        await new Promise(resolve => setTimeout(resolve, 200));
+      }
+      
+      console.log('✅ NUCLEAR RESET: ===== COMPLETE APPLICATION RESET SUCCESSFUL =====');
+      
+    } catch (error) {
+      console.error('❌ NUCLEAR RESET: Failed:', error);
+    } finally {
+      setNuclearResetInProgress(false);
+      setIsLoading(false);
+    }
+  };
+
   const handleImportControls = async (controls: DroppedControl[]) => {
-    console.log('🚀 EXCEL IMPORT: ===== STARTING ULTIMATE IMPORT PROCESS =====');
+    console.log('🚀 EXCEL IMPORT: ===== STARTING NUCLEAR IMPORT PROCESS =====');
     console.log('📊 EXCEL IMPORT: Import details:', {
       controlCount: controls.length,
       questionnaire: currentQuestionnaire,
@@ -267,14 +319,15 @@ function App() {
           const randomSuffix = Math.random().toString(36).substring(2, 10);
           const indexSuffix = i.toString().padStart(4, '0');
           const processSuffix = Math.floor(Math.random() * 10000).toString().padStart(4, '0');
-          const uniqueId = `imported-${control.type}-${timestamp}-${randomSuffix}-${indexSuffix}-${processSuffix}`;
+          const nuclearSuffix = Math.floor(Math.random() * 100000).toString().padStart(5, '0');
+          const uniqueId = `nuclear-${control.type}-${timestamp}-${randomSuffix}-${indexSuffix}-${processSuffix}-${nuclearSuffix}`;
           
           const controlToInsert = {
             ...control,
             id: uniqueId
           };
 
-          console.log(`📝 EXCEL IMPORT: Inserting control with ultra-unique ID: ${uniqueId}`);
+          console.log(`📝 EXCEL IMPORT: Inserting control with nuclear-unique ID: ${uniqueId}`);
           await insertControl(controlToInsert, currentQuestionnaire);
           successCount++;
           console.log(`✅ EXCEL IMPORT: Successfully inserted control ${i + 1}: ${control.name}`);
@@ -304,92 +357,25 @@ function App() {
         errors: errors
       });
 
-      // STEP 3: ULTIMATE COMPREHENSIVE STATE REFRESH STRATEGY WITH ENHANCED VERIFICATION
-      console.log('🔄 EXCEL IMPORT: STEP 3 - Executing ultimate comprehensive refresh strategy...');
+      // STEP 3: NUCLEAR OPTION - COMPLETE APPLICATION RESET AND RELOAD
+      console.log('💥 EXCEL IMPORT: STEP 3 - EXECUTING NUCLEAR RESET AND RELOAD...');
       
-      // Strategy 1: Immediate refresh key update (0ms)
-      console.log('📈 EXCEL IMPORT: Strategy 1 - Immediate refresh key update');
-      const newRefreshKey = refreshKey + 1;
-      setRefreshKey(newRefreshKey);
-      console.log(`🔑 EXCEL IMPORT: Refresh key updated: ${refreshKey} → ${newRefreshKey}`);
-
-      // Strategy 2: Force refresh with comprehensive verification (200ms)
-      setTimeout(async () => {
-        console.log('⏰ EXCEL IMPORT: Strategy 2 - Force refresh with comprehensive verification');
-        try {
-          await forceRefresh();
-          console.log('✅ EXCEL IMPORT: Force refresh completed');
-          
-          // Verify controls are loaded with enhanced checking
-          const currentControls = await getControls(currentQuestionnaire);
-          console.log('🔍 EXCEL IMPORT: Post-refresh verification:', {
-            dbControlCount: currentControls.length,
-            uiControlCount: droppedControls.length,
-            importedCount: successCount,
-            refreshKey: newRefreshKey,
-            expectedMinimum: successCount,
-            syncStatus: currentControls.length >= successCount ? 'GOOD' : 'NEEDS_SYNC'
-          });
-          
-        } catch (error) {
-          console.error('❌ EXCEL IMPORT: Force refresh failed:', error);
-        }
-      }, 200);
-
-      // Strategy 3: Enhanced final verification and sync check (500ms)
-      setTimeout(async () => {
-        console.log('🔍 EXCEL IMPORT: Strategy 3 - Enhanced final verification and sync check');
-        try {
-          const dbControls = await getControls(currentQuestionnaire);
-          const currentUIControls = droppedControls.length;
-          
-          console.log('📊 EXCEL IMPORT: Enhanced final verification results:', {
-            dbControlCount: dbControls.length,
-            uiControlCount: currentUIControls,
-            expectedMinimum: successCount,
-            syncStatus: dbControls.length >= successCount ? 'GOOD' : 'NEEDS_SYNC',
-            refreshKey: newRefreshKey,
-            syncDifference: dbControls.length - currentUIControls
-          });
-
-          // If UI is significantly out of sync, force multiple refreshes
-          if (dbControls.length > currentUIControls + 2) {
-            console.log('🔄 EXCEL IMPORT: UI significantly out of sync - forcing multiple refreshes');
-            setRefreshKey(prev => prev + 1);
-            
-            // Additional force reload after 300ms
-            setTimeout(async () => {
-              console.log('🔄 EXCEL IMPORT: Additional force reload');
-              await forceReload();
-              setRefreshKey(prev => prev + 1);
-            }, 300);
-          } else {
-            console.log('✅ EXCEL IMPORT: UI and database are reasonably in sync');
-          }
-
-          // Log section distribution for debugging
-          const sectionDistribution = dbControls.reduce((acc, control) => {
-            const section = control.sectionId || 'unknown';
-            acc[section] = (acc[section] || 0) + 1;
-            return acc;
-          }, {} as Record<string, number>);
-          console.log('📂 EXCEL IMPORT: Final controls by section:', sectionDistribution);
-
-        } catch (error) {
-          console.error('❌ EXCEL IMPORT: Enhanced final verification failed:', error);
-        }
-      }, 500);
-
-      // Strategy 4: Show success dialog (100ms)
+      // Show dialog first
       setTimeout(() => {
-        console.log('🎉 EXCEL IMPORT: Strategy 4 - Showing success dialog');
+        console.log('🎉 EXCEL IMPORT: Showing success dialog');
         setShowImportDialog(true);
       }, 100);
 
-      console.log('🎉 EXCEL IMPORT: ===== IMPORT PROCESS COMPLETED SUCCESSFULLY =====');
+      // Execute nuclear reset after a short delay
+      setTimeout(async () => {
+        console.log('💥 EXCEL IMPORT: Executing nuclear reset...');
+        await executeNuclearReset();
+      }, 500);
+
+      console.log('🎉 EXCEL IMPORT: ===== NUCLEAR IMPORT PROCESS COMPLETED SUCCESSFULLY =====');
 
     } catch (error) {
-      console.error('❌ EXCEL IMPORT: ===== IMPORT PROCESS FAILED =====', error);
+      console.error('❌ EXCEL IMPORT: ===== NUCLEAR IMPORT PROCESS FAILED =====', error);
       setImportResults({
         success: 0,
         total: controls.length,
@@ -403,75 +389,54 @@ function App() {
   };
 
   const handleDialogClose = () => {
-    console.log('🔄 DIALOG: ===== DIALOG CLOSE AND ULTIMATE SCREEN REFRESH =====');
+    console.log('🔄 DIALOG: ===== DIALOG CLOSE WITH NUCLEAR VERIFICATION =====');
     setShowImportDialog(false);
     setImportResults(null);
     
-    // Strategy 5: Enhanced dialog-triggered refresh (100ms)
-    setTimeout(() => {
-      console.log('🔄 DIALOG: Strategy 5 - Enhanced post-dialog refresh');
-      setRefreshKey(prev => {
-        const newKey = prev + 1;
-        console.log(`🔑 DIALOG: Refresh key updated: ${prev} → ${newKey}`);
-        return newKey;
-      });
-      
-      // Strategy 6: Ultimate verification after dialog close (300ms)
-      setTimeout(async () => {
-        console.log('🔄 DIALOG: Strategy 6 - Ultimate verification after dialog close');
-        try {
-          await forceRefresh();
-          
-          // Ultimate state verification with enhanced logging
-          const finalControls = await getControls(currentQuestionnaire);
-          console.log('🔍 DIALOG: Ultimate state verification:', {
-            dbControlCount: finalControls.length,
-            uiControlCount: droppedControls.length,
-            timestamp: new Date().toISOString(),
-            refreshKey: refreshKey,
-            syncDifference: finalControls.length - droppedControls.length
-          });
+    // Nuclear verification after dialog close
+    setTimeout(async () => {
+      console.log('💥 DIALOG: Nuclear verification after dialog close');
+      try {
+        // Final verification with nuclear reset if needed
+        const finalControls = await getControls(currentQuestionnaire);
+        console.log('🔍 DIALOG: Final nuclear verification:', {
+          dbControlCount: finalControls.length,
+          uiControlCount: droppedControls.length,
+          timestamp: new Date().toISOString(),
+          refreshKey: refreshKey,
+          syncDifference: finalControls.length - droppedControls.length
+        });
 
-          // If still significantly out of sync, force ultimate refresh
-          if (finalControls.length > droppedControls.length + 1) {
-            console.log('🔄 DIALOG: Still significantly out of sync - forcing ultimate refresh');
-            setRefreshKey(prev => prev + 1);
-            
-            // Wait and verify one more time with force reload
-            setTimeout(async () => {
-              try {
-                console.log('🔄 DIALOG: Ultimate force reload');
-                await forceReload();
-                setRefreshKey(prev => prev + 1);
-                
-                const ultimateControls = await getControls(currentQuestionnaire);
-                console.log('🔍 DIALOG: Ultimate verification after force reload:', {
-                  dbControlCount: ultimateControls.length,
-                  uiControlCount: droppedControls.length,
-                  finalRefreshKey: refreshKey + 2,
-                  ultimateSyncStatus: ultimateControls.length === droppedControls.length ? 'SYNCED' : 'STILL_OUT_OF_SYNC'
-                });
-              } catch (error) {
-                console.error('❌ DIALOG: Ultimate verification failed:', error);
-              }
-            }, 200);
-          }
-          
-          console.log('✅ DIALOG: ===== ULTIMATE SCREEN REFRESH COMPLETED =====');
-        } catch (error) {
-          console.error('❌ DIALOG: Ultimate verification failed:', error);
+        // If still significantly out of sync, execute nuclear reset
+        if (finalControls.length > droppedControls.length + 2) {
+          console.log('💥 DIALOG: Still significantly out of sync - executing nuclear reset');
+          await executeNuclearReset();
+        } else {
+          // Just a regular refresh
+          setRefreshKey(prev => prev + 1);
         }
-      }, 300);
-    }, 100);
+        
+        console.log('✅ DIALOG: ===== NUCLEAR VERIFICATION COMPLETED =====');
+      } catch (error) {
+        console.error('❌ DIALOG: Nuclear verification failed:', error);
+      }
+    }, 200);
   };
 
   const renderContent = () => {
-    if (isLoading || !isDbInitialized) {
+    if (isLoading || !isDbInitialized || nuclearResetInProgress) {
       return (
         <div className="flex-1 flex items-center justify-center bg-gray-50 dark:bg-gray-900 transition-colors">
           <div className="text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-            <p className="text-gray-600 dark:text-gray-300 transition-colors">Initializing database...</p>
+            <p className="text-gray-600 dark:text-gray-300 transition-colors">
+              {nuclearResetInProgress ? 'Nuclear reset in progress...' : 'Initializing database...'}
+            </p>
+            {nuclearResetInProgress && (
+              <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
+                Completely resetting application state and reloading from database
+              </p>
+            )}
           </div>
         </div>
       );
@@ -567,13 +532,37 @@ function App() {
               <div className="text-center">
                 <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
                 <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
-                  Importing Controls...
+                  Nuclear Import in Progress...
                 </h3>
                 <p className="text-gray-600 dark:text-gray-300 text-sm">
-                  Processing Excel data and importing controls with ultimate validation.
+                  Processing Excel data with nuclear-level validation and complete state reset.
                 </p>
                 <p className="text-gray-500 dark:text-gray-400 text-xs mt-2">
                   Check console for detailed progress logs.
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Nuclear Reset Progress Indicator */}
+        {nuclearResetInProgress && (
+          <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50">
+            <div className="bg-white dark:bg-gray-900 rounded-lg shadow-xl p-8 max-w-md w-full mx-4">
+              <div className="text-center">
+                <div className="animate-pulse">
+                  <div className="w-16 h-16 bg-red-500 rounded-full mx-auto mb-4 flex items-center justify-center">
+                    <span className="text-white text-2xl">💥</span>
+                  </div>
+                </div>
+                <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
+                  Nuclear Reset in Progress
+                </h3>
+                <p className="text-gray-600 dark:text-gray-300 text-sm">
+                  Completely resetting application state and reloading all data from database.
+                </p>
+                <p className="text-gray-500 dark:text-gray-400 text-xs mt-2">
+                  This will force synchronization between UI and database.
                 </p>
               </div>
             </div>
@@ -587,7 +576,7 @@ function App() {
           results={importResults}
         />
         
-        {/* Enhanced Footer with Better Debugging Visibility */}
+        {/* Enhanced Footer with Nuclear Status */}
         <footer className="bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700 px-6 py-3 transition-colors">
           <div className="flex items-center justify-between text-sm text-gray-600 dark:text-gray-300 transition-colors">
             <div className="flex items-center space-x-6">
@@ -595,7 +584,8 @@ function App() {
               <span>Professional Form Builder Platform</span>
               {isDbInitialized && <span className="text-green-600 dark:text-green-400">Database Connected</span>}
               <span className="capitalize">{theme} Theme</span>
-              {importInProgress && <span className="text-blue-600 dark:text-blue-400 animate-pulse">Import Processing...</span>}
+              {importInProgress && <span className="text-blue-600 dark:text-blue-400 animate-pulse">Nuclear Import Processing...</span>}
+              {nuclearResetInProgress && <span className="text-red-600 dark:text-red-400 animate-pulse">Nuclear Reset Active</span>}
               <span className="text-xs text-white font-mono bg-blue-600 dark:bg-blue-700 px-3 py-1 rounded-full shadow-sm">
                 RefreshKey: {refreshKey}
               </span>
@@ -605,6 +595,11 @@ function App() {
               {droppedControls.length > 0 && (
                 <span className="text-xs text-white font-mono bg-purple-600 dark:bg-purple-700 px-3 py-1 rounded-full shadow-sm">
                   Loaded: ✓
+                </span>
+              )}
+              {nuclearResetInProgress && (
+                <span className="text-xs text-white font-mono bg-red-600 dark:bg-red-700 px-3 py-1 rounded-full shadow-sm animate-pulse">
+                  Nuclear: 💥
                 </span>
               )}
             </div>

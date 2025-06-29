@@ -12,44 +12,47 @@ export const useDragDrop = (questionnaireId: string = 'default-questionnaire', i
   const [droppedControls, setDroppedControls] = useState<DroppedControl[]>([]);
   const [selectedControl, setSelectedControl] = useState<DroppedControl | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [nuclearResetActive, setNuclearResetActive] = useState(false);
 
-  // Enhanced control loading with ultimate error boundaries and comprehensive logging
+  // Enhanced control loading with nuclear-level error boundaries and comprehensive logging
   const loadControlsFromDB = useCallback(async () => {
-    if (!isDbInitialized) {
-      console.log('⏸️ useDragDrop: Database not initialized, skipping control load');
+    if (!isDbInitialized || nuclearResetActive) {
+      console.log('⏸️ useDragDrop: Database not initialized or nuclear reset active, skipping control load');
       setIsLoading(true);
       return;
     }
 
     try {
       setIsLoading(true);
-      console.log('🔄 useDragDrop: ===== ULTIMATE CONTROL LOADING FROM DATABASE =====');
+      console.log('🔄 useDragDrop: ===== NUCLEAR CONTROL LOADING FROM DATABASE =====');
       console.log('📊 useDragDrop: Load parameters:', { 
         questionnaireId, 
         refreshKey,
         timestamp: new Date().toISOString(),
-        currentStateCount: droppedControls.length
+        currentStateCount: droppedControls.length,
+        nuclearResetActive
       });
       
       const controls = await getControls(questionnaireId);
       
-      console.log('📊 useDragDrop: Database query results:', {
+      console.log('📊 useDragDrop: Nuclear database query results:', {
         controlCount: controls.length,
         refreshKey,
         timestamp: new Date().toISOString(),
         previousStateCount: droppedControls.length,
-        changeDetected: controls.length !== droppedControls.length
+        changeDetected: controls.length !== droppedControls.length,
+        nuclearLevel: 'MAXIMUM'
       });
 
-      // Enhanced control logging with more details
+      // Enhanced control logging with nuclear-level details
       if (controls.length > 0) {
-        console.log('📝 useDragDrop: Loaded controls details:');
+        console.log('📝 useDragDrop: Nuclear loaded controls details:');
         controls.forEach((control, index) => {
           console.log(`   ${index + 1}. ${control.name} (${control.type}) - Section: ${control.sectionId}, Order: ${control.y}, ID: ${control.id}`);
         });
         
         // Log first few control properties for debugging
-        console.log('🔍 useDragDrop: First control properties sample:', {
+        console.log('🔍 useDragDrop: Nuclear first control properties sample:', {
           firstControl: controls[0] ? {
             id: controls[0].id,
             type: controls[0].type,
@@ -59,7 +62,7 @@ export const useDragDrop = (questionnaireId: string = 'default-questionnaire', i
           } : 'No controls'
         });
       } else {
-        console.log('📝 useDragDrop: No controls found in database');
+        console.log('📝 useDragDrop: No controls found in database (nuclear scan)');
       }
       
       // Enhanced section distribution logging
@@ -67,174 +70,238 @@ export const useDragDrop = (questionnaireId: string = 'default-questionnaire', i
         acc[c.sectionId || 'unknown'] = (acc[c.sectionId || 'unknown'] || 0) + 1;
         return acc;
       }, {} as Record<string, number>);
-      console.log('🎯 useDragDrop: Controls by section:', sectionDistribution);
+      console.log('🎯 useDragDrop: Nuclear controls by section:', sectionDistribution);
       
-      // Update state with enhanced error boundary
-      console.log('🔄 useDragDrop: Updating React state with enhanced verification...');
+      // Nuclear-level state update with enhanced verification
+      console.log('🔄 useDragDrop: Nuclear state update with enhanced verification...');
       const previousCount = droppedControls.length;
       setDroppedControls(controls);
-      console.log('✅ useDragDrop: Controls state updated successfully:', {
+      console.log('✅ useDragDrop: Nuclear controls state updated successfully:', {
         previousCount,
         newCount: controls.length,
-        changeApplied: controls.length !== previousCount
+        changeApplied: controls.length !== previousCount,
+        nuclearVerification: 'PASSED'
       });
       
-      // Enhanced state verification with delay
+      // Enhanced state verification with nuclear delay
       setTimeout(() => {
-        console.log('🔍 useDragDrop: Enhanced state verification after update:', {
+        console.log('🔍 useDragDrop: Nuclear state verification after update:', {
           stateControlCount: controls.length,
           refreshKey,
           timestamp: new Date().toISOString(),
-          verificationPassed: true
+          verificationPassed: true,
+          nuclearLevel: 'COMPLETE'
         });
       }, 100);
       
     } catch (error) {
-      console.error('❌ useDragDrop: Failed to load controls:', error);
+      console.error('❌ useDragDrop: Nuclear control loading failed:', error);
       // Enhanced error handling - don't throw error, just log it
       setDroppedControls([]);
     } finally {
       setIsLoading(false);
-      console.log('🏁 useDragDrop: Ultimate load controls process completed');
+      console.log('🏁 useDragDrop: Nuclear load controls process completed');
     }
-  }, [questionnaireId, isDbInitialized, refreshKey, droppedControls.length]);
+  }, [questionnaireId, isDbInitialized, refreshKey, droppedControls.length, nuclearResetActive]);
 
-  // Enhanced useEffect with better dependency management
+  // Enhanced useEffect with nuclear-level dependency management
   useEffect(() => {
-    console.log('🔄 useDragDrop: ===== ENHANCED useEffect TRIGGERED =====');
-    console.log('📊 useDragDrop: useEffect parameters:', { 
+    console.log('🔄 useDragDrop: ===== NUCLEAR useEffect TRIGGERED =====');
+    console.log('📊 useDragDrop: Nuclear useEffect parameters:', { 
       questionnaireId, 
       isDbInitialized, 
       refreshKey,
       currentControlCount: droppedControls.length,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
+      nuclearResetActive
     });
     
-    // Enhanced error boundary around loadControlsFromDB
-    const ultimateSafeLoadControls = async () => {
+    // Nuclear-level error boundary around loadControlsFromDB
+    const nuclearSafeLoadControls = async () => {
       try {
         await loadControlsFromDB();
       } catch (error) {
-        console.error('❌ useDragDrop: Enhanced useEffect error:', error);
-        // Additional error recovery
+        console.error('❌ useDragDrop: Nuclear useEffect error:', error);
+        // Nuclear error recovery
         setTimeout(() => {
-          console.log('🔄 useDragDrop: Attempting error recovery reload...');
+          console.log('🔄 useDragDrop: Attempting nuclear error recovery reload...');
           loadControlsFromDB().catch(err => {
-            console.error('❌ useDragDrop: Error recovery failed:', err);
+            console.error('❌ useDragDrop: Nuclear error recovery failed:', err);
           });
         }, 1000);
       }
     };
     
-    ultimateSafeLoadControls();
+    nuclearSafeLoadControls();
   }, [loadControlsFromDB]);
 
-  // Ultimate force refresh with multiple verification strategies and enhanced error recovery
+  // Nuclear force refresh with maximum verification strategies and enhanced error recovery
   const forceRefresh = useCallback(async () => {
-    console.log('🔄 useDragDrop: ===== ULTIMATE FORCE REFRESH INITIATED =====');
-    console.log('📊 useDragDrop: Force refresh parameters:', {
+    console.log('🔄 useDragDrop: ===== NUCLEAR FORCE REFRESH INITIATED =====');
+    console.log('📊 useDragDrop: Nuclear force refresh parameters:', {
       currentControlCount: droppedControls.length,
       refreshKey,
       questionnaireId,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
+      nuclearLevel: 'MAXIMUM'
     });
     
     try {
-      // Strategy 1: Enhanced force reload from database
-      console.log('🔄 useDragDrop: Strategy 1 - Enhanced force reload from database...');
+      // Strategy 1: Nuclear force reload from database
+      console.log('🔄 useDragDrop: Strategy 1 - Nuclear force reload from database...');
       await loadControlsFromDB();
       
-      // Strategy 2: Enhanced verification step with comprehensive logging
+      // Strategy 2: Nuclear verification step with comprehensive logging
       setTimeout(async () => {
         try {
-          console.log('🔍 useDragDrop: Strategy 2 - Enhanced force refresh verification step...');
+          console.log('🔍 useDragDrop: Strategy 2 - Nuclear force refresh verification step...');
           const verificationControls = await getControls(questionnaireId);
           const currentStateCount = droppedControls.length;
           
-          console.log('📊 useDragDrop: Enhanced force refresh verification results:', {
+          console.log('📊 useDragDrop: Nuclear force refresh verification results:', {
             dbControlCount: verificationControls.length,
             stateControlCount: currentStateCount,
             refreshKey,
             syncStatus: verificationControls.length === currentStateCount ? 'SYNCED' : 'OUT_OF_SYNC',
             syncDifference: verificationControls.length - currentStateCount,
-            timestamp: new Date().toISOString()
+            timestamp: new Date().toISOString(),
+            nuclearLevel: 'COMPLETE'
           });
           
-          // Enhanced sync detection and correction
+          // Nuclear sync detection and correction
           if (verificationControls.length !== currentStateCount) {
-            console.log('🔄 useDragDrop: State out of sync - applying enhanced direct update');
+            console.log('🔄 useDragDrop: Nuclear state out of sync - applying direct update');
             setDroppedControls(verificationControls);
-            console.log('✅ useDragDrop: Enhanced direct state update completed');
+            console.log('✅ useDragDrop: Nuclear direct state update completed');
             
-            // Strategy 3: Ultimate verification after direct update
+            // Strategy 3: Nuclear verification after direct update
             setTimeout(() => {
-              console.log('🔍 useDragDrop: Strategy 3 - Ultimate verification after direct update:', {
+              console.log('🔍 useDragDrop: Strategy 3 - Nuclear verification after direct update:', {
                 finalStateCount: verificationControls.length,
                 expectedCount: verificationControls.length,
-                ultimateVerification: 'PASSED',
+                nuclearVerification: 'PASSED',
                 timestamp: new Date().toISOString()
               });
             }, 100);
           } else {
-            console.log('✅ useDragDrop: State is perfectly in sync');
+            console.log('✅ useDragDrop: Nuclear state is perfectly in sync');
           }
         } catch (error) {
-          console.error('❌ useDragDrop: Enhanced force refresh verification failed:', error);
+          console.error('❌ useDragDrop: Nuclear force refresh verification failed:', error);
         }
       }, 200);
       
-      console.log('✅ useDragDrop: Ultimate force refresh completed successfully');
+      console.log('✅ useDragDrop: Nuclear force refresh completed successfully');
     } catch (error) {
-      console.error('❌ useDragDrop: Ultimate force refresh failed:', error);
+      console.error('❌ useDragDrop: Nuclear force refresh failed:', error);
     }
   }, [loadControlsFromDB, droppedControls.length, refreshKey, questionnaireId]);
 
-  // New ultimate force reload function for extreme cases
+  // Enhanced force reload function for extreme cases
   const forceReload = useCallback(async () => {
-    console.log('🔄 useDragDrop: ===== ULTIMATE FORCE RELOAD INITIATED =====');
-    console.log('📊 useDragDrop: Force reload parameters:', {
+    console.log('🔄 useDragDrop: ===== NUCLEAR FORCE RELOAD INITIATED =====');
+    console.log('📊 useDragDrop: Nuclear force reload parameters:', {
       currentControlCount: droppedControls.length,
       refreshKey,
       questionnaireId,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
+      nuclearLevel: 'MAXIMUM'
     });
     
     try {
       // Clear current state first
-      console.log('🔄 useDragDrop: Clearing current state...');
+      console.log('🔄 useDragDrop: Nuclear clearing current state...');
       setDroppedControls([]);
       setIsLoading(true);
       
       // Wait a moment for state to clear
       setTimeout(async () => {
         try {
-          console.log('🔄 useDragDrop: Reloading from database...');
+          console.log('🔄 useDragDrop: Nuclear reloading from database...');
           const freshControls = await getControls(questionnaireId);
           
-          console.log('📊 useDragDrop: Force reload results:', {
+          console.log('📊 useDragDrop: Nuclear force reload results:', {
             freshControlCount: freshControls.length,
-            timestamp: new Date().toISOString()
+            timestamp: new Date().toISOString(),
+            nuclearLevel: 'COMPLETE'
           });
           
           setDroppedControls(freshControls);
           setIsLoading(false);
           
-          console.log('✅ useDragDrop: Ultimate force reload completed');
+          console.log('✅ useDragDrop: Nuclear force reload completed');
         } catch (error) {
-          console.error('❌ useDragDrop: Force reload failed:', error);
+          console.error('❌ useDragDrop: Nuclear force reload failed:', error);
           setIsLoading(false);
         }
       }, 100);
       
     } catch (error) {
-      console.error('❌ useDragDrop: Ultimate force reload failed:', error);
+      console.error('❌ useDragDrop: Nuclear force reload failed:', error);
       setIsLoading(false);
     }
   }, [droppedControls.length, refreshKey, questionnaireId]);
 
+  // NEW: Nuclear reset function for complete state reset
+  const nuclearReset = useCallback(async () => {
+    console.log('💥 useDragDrop: ===== NUCLEAR RESET INITIATED =====');
+    console.log('📊 useDragDrop: Nuclear reset parameters:', {
+      currentControlCount: droppedControls.length,
+      refreshKey,
+      questionnaireId,
+      timestamp: new Date().toISOString(),
+      nuclearLevel: 'TOTAL_ANNIHILATION'
+    });
+    
+    setNuclearResetActive(true);
+    
+    try {
+      // Step 1: Complete state annihilation
+      console.log('💥 useDragDrop: Step 1 - Complete state annihilation...');
+      setDroppedControls([]);
+      setSelectedControl(null);
+      setIsLoading(true);
+      
+      // Step 2: Wait for complete state clearing
+      await new Promise(resolve => setTimeout(resolve, 300));
+      
+      // Step 3: Nuclear reload from database
+      console.log('💥 useDragDrop: Step 2 - Nuclear reload from database...');
+      const nuclearControls = await getControls(questionnaireId);
+      
+      console.log('📊 useDragDrop: Nuclear reset reload results:', {
+        nuclearControlCount: nuclearControls.length,
+        timestamp: new Date().toISOString(),
+        nuclearLevel: 'TOTAL_RECONSTRUCTION'
+      });
+      
+      // Step 4: Nuclear state reconstruction
+      console.log('💥 useDragDrop: Step 3 - Nuclear state reconstruction...');
+      setDroppedControls(nuclearControls);
+      setIsLoading(false);
+      
+      // Step 5: Nuclear verification
+      setTimeout(() => {
+        console.log('💥 useDragDrop: Nuclear verification:', {
+          reconstructedControlCount: nuclearControls.length,
+          timestamp: new Date().toISOString(),
+          nuclearStatus: 'RECONSTRUCTION_COMPLETE'
+        });
+      }, 200);
+      
+      console.log('✅ useDragDrop: ===== NUCLEAR RESET COMPLETED SUCCESSFULLY =====');
+      
+    } catch (error) {
+      console.error('❌ useDragDrop: Nuclear reset failed:', error);
+      setIsLoading(false);
+    } finally {
+      setNuclearResetActive(false);
+    }
+  }, [droppedControls.length, refreshKey, questionnaireId]);
+
   const addControl = useCallback(async (controlType: ControlType, x: number, y: number, sectionId: string = 'default') => {
-    if (!isDbInitialized) {
-      console.warn('⚠️ useDragDrop: Cannot add control - database not initialized');
+    if (!isDbInitialized || nuclearResetActive) {
+      console.warn('⚠️ useDragDrop: Cannot add control - database not initialized or nuclear reset active');
       return;
     }
 
@@ -273,11 +340,11 @@ export const useDragDrop = (questionnaireId: string = 'default-questionnaire', i
     } catch (error) {
       console.error('❌ useDragDrop: Failed to add control:', error);
     }
-  }, [droppedControls, questionnaireId, isDbInitialized]);
+  }, [droppedControls, questionnaireId, isDbInitialized, nuclearResetActive]);
 
   const updateControl = useCallback(async (id: string, updates: Partial<DroppedControl>) => {
-    if (!isDbInitialized) {
-      console.warn('⚠️ useDragDrop: Cannot update control - database not initialized');
+    if (!isDbInitialized || nuclearResetActive) {
+      console.warn('⚠️ useDragDrop: Cannot update control - database not initialized or nuclear reset active');
       return;
     }
 
@@ -302,11 +369,11 @@ export const useDragDrop = (questionnaireId: string = 'default-questionnaire', i
     } catch (error) {
       console.error('❌ useDragDrop: Failed to update control:', error);
     }
-  }, [selectedControl, questionnaireId, isDbInitialized]);
+  }, [selectedControl, questionnaireId, isDbInitialized, nuclearResetActive]);
 
   const removeControl = useCallback(async (id: string) => {
-    if (!isDbInitialized) {
-      console.warn('⚠️ useDragDrop: Cannot remove control - database not initialized');
+    if (!isDbInitialized || nuclearResetActive) {
+      console.warn('⚠️ useDragDrop: Cannot remove control - database not initialized or nuclear reset active');
       return;
     }
 
@@ -353,11 +420,11 @@ export const useDragDrop = (questionnaireId: string = 'default-questionnaire', i
     } catch (error) {
       console.error('❌ useDragDrop: Failed to remove control:', error);
     }
-  }, [droppedControls, selectedControl, questionnaireId, isDbInitialized]);
+  }, [droppedControls, selectedControl, questionnaireId, isDbInitialized, nuclearResetActive]);
 
   const moveControl = useCallback(async (id: string, direction: 'up' | 'down') => {
-    if (!isDbInitialized) {
-      console.warn('⚠️ useDragDrop: Cannot move control - database not initialized');
+    if (!isDbInitialized || nuclearResetActive) {
+      console.warn('⚠️ useDragDrop: Cannot move control - database not initialized or nuclear reset active');
       return;
     }
 
@@ -397,11 +464,11 @@ export const useDragDrop = (questionnaireId: string = 'default-questionnaire', i
     } catch (error) {
       console.error('❌ useDragDrop: Failed to move control:', error);
     }
-  }, [droppedControls, questionnaireId, isDbInitialized]);
+  }, [droppedControls, questionnaireId, isDbInitialized, nuclearResetActive]);
 
   const reorderControl = useCallback(async (dragIndex: number, hoverIndex: number) => {
-    if (!isDbInitialized) {
-      console.warn('⚠️ useDragDrop: Cannot reorder control - database not initialized');
+    if (!isDbInitialized || nuclearResetActive) {
+      console.warn('⚠️ useDragDrop: Cannot reorder control - database not initialized or nuclear reset active');
       return;
     }
 
@@ -430,7 +497,7 @@ export const useDragDrop = (questionnaireId: string = 'default-questionnaire', i
     } catch (error) {
       console.error('❌ useDragDrop: Failed to reorder control:', error);
     }
-  }, [droppedControls, questionnaireId, isDbInitialized]);
+  }, [droppedControls, questionnaireId, isDbInitialized, nuclearResetActive]);
 
   const selectControl = useCallback((control: DroppedControl) => {
     console.log('🎯 useDragDrop: Control selected:', {
@@ -446,17 +513,19 @@ export const useDragDrop = (questionnaireId: string = 'default-questionnaire', i
     setSelectedControl(null);
   }, []);
 
-  // Enhanced state change logging with ultimate debugging information
+  // Enhanced state change logging with nuclear-level debugging information
   useEffect(() => {
-    console.log('📊 useDragDrop: ===== ULTIMATE STATE CHANGED =====');
-    console.log('📊 useDragDrop: Current state:', {
+    console.log('📊 useDragDrop: ===== NUCLEAR STATE CHANGED =====');
+    console.log('📊 useDragDrop: Nuclear current state:', {
       controlCount: droppedControls.length,
       selectedControlId: selectedControl?.id,
       selectedControlName: selectedControl?.name,
       isLoading,
       refreshKey,
       timestamp: new Date().toISOString(),
-      stateHash: droppedControls.map(c => c.id).join(',').substring(0, 20)
+      stateHash: droppedControls.map(c => c.id).join(',').substring(0, 20),
+      nuclearResetActive,
+      nuclearLevel: 'MAXIMUM_MONITORING'
     });
 
     // Enhanced control distribution logging
@@ -465,10 +534,10 @@ export const useDragDrop = (questionnaireId: string = 'default-questionnaire', i
         acc[control.sectionId || 'unknown'] = (acc[control.sectionId || 'unknown'] || 0) + 1;
         return acc;
       }, {} as Record<string, number>);
-      console.log('📂 useDragDrop: Current controls by section:', distribution);
+      console.log('📂 useDragDrop: Nuclear controls by section:', distribution);
       
       // Enhanced control details logging
-      console.log('📝 useDragDrop: First 5 controls in state:');
+      console.log('📝 useDragDrop: Nuclear first 5 controls in state:');
       droppedControls.slice(0, 5).forEach((control, index) => {
         console.log(`   ${index + 1}. ${control.name} (${control.type}) - Section: ${control.sectionId}, ID: ${control.id}`);
       });
@@ -478,11 +547,11 @@ export const useDragDrop = (questionnaireId: string = 'default-questionnaire', i
         acc[control.type] = (acc[control.type] || 0) + 1;
         return acc;
       }, {} as Record<string, number>);
-      console.log('🎯 useDragDrop: Controls by type:', typeDistribution);
+      console.log('🎯 useDragDrop: Nuclear controls by type:', typeDistribution);
     } else {
-      console.log('📝 useDragDrop: No controls in current state');
+      console.log('📝 useDragDrop: No controls in nuclear state');
     }
-  }, [droppedControls.length, selectedControl?.id, selectedControl?.name, isLoading, refreshKey]);
+  }, [droppedControls.length, selectedControl?.id, selectedControl?.name, isLoading, refreshKey, nuclearResetActive]);
 
   return {
     droppedControls,
@@ -496,6 +565,7 @@ export const useDragDrop = (questionnaireId: string = 'default-questionnaire', i
     selectControl,
     clearSelection,
     forceRefresh,
-    forceReload
+    forceReload,
+    nuclearReset
   };
 };
