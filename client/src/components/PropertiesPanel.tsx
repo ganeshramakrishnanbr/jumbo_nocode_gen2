@@ -76,7 +76,7 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
 
   if (!selectedControl) {
     return (
-      <div className="w-80 bg-white dark:bg-gray-900 border-l border-gray-200 dark:border-gray-700 p-6 transition-colors">
+      <div className="w-full md:w-80 bg-white dark:bg-gray-900 border-t md:border-t-0 md:border-l border-gray-200 dark:border-gray-700 p-4 sm:p-6 transition-colors">
         <div className="text-center text-gray-500 dark:text-gray-400">
           <Settings className="w-12 h-12 mx-auto mb-4 text-gray-400 dark:text-gray-500" />
           <h3 className="text-lg font-medium text-gray-600 dark:text-gray-300 mb-2 transition-colors">No Control Selected</h3>
@@ -91,7 +91,7 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
   const isFirstControl = selectedControl.y === 0;
 
   return (
-    <div className="w-80 bg-white dark:bg-gray-900 border-l border-gray-200 dark:border-gray-700 flex flex-col transition-colors">
+    <div className="w-full md:w-80 bg-white dark:bg-gray-900 border-t md:border-t-0 md:border-l border-gray-200 dark:border-gray-700 flex flex-col transition-colors">
       {/* Header */}
       <div className="p-4 border-b border-gray-200 dark:border-gray-700">
         <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-1 transition-colors">Properties Panel</h2>
