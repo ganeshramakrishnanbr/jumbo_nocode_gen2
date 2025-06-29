@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { DroppedControl, Section } from '../types';
-import { CheckCircle, AlertCircle, Circle, ChevronRight, Trash2, Palette, Layout, Maximize2, Grid3X3, AlignLeft, Sparkles } from 'lucide-react';
+import { CheckCircle, AlertCircle, Circle, ChevronRight, Trash2, Palette, Layout, Maximize2, Grid3X3, AlignLeft, Sparkles, BarChart3, Settings, ArrowUp, ArrowDown, ArrowLeft, ArrowRight } from 'lucide-react';
 
 interface PreviewModeProps {
   droppedControls: DroppedControl[];
@@ -81,9 +81,39 @@ export const PreviewMode: React.FC<PreviewModeProps> = ({
   const [formData, setFormData] = useState<Record<string, any>>({});
   const [selectedTheme, setSelectedTheme] = useState<keyof typeof FORM_THEMES>('classic');
   const [showThemeSelector, setShowThemeSelector] = useState(false);
+  const [tabAlignment, setTabAlignment] = useState<'top' | 'left' | 'right'>('top');
 
   const handleInputChange = (controlId: string, value: any) => {
     setFormData(prev => ({ ...prev, [controlId]: value }));
+  };
+
+  // Calculate form completion percentage
+  const calculateFormCompletion = () => {
+    const allControls = droppedControls.filter(isControlVisible);
+    const requiredControls = allControls.filter(control => control.properties.required);
+    const allControlsCount = allControls.length;
+    const filledControlsCount = allControls.filter(control => {
+      const value = formData[control.id];
+      return value !== undefined && value !== '' && value !== null;
+    }).length;
+    
+    const requiredControlsCount = requiredControls.length;
+    const filledRequiredControlsCount = requiredControls.filter(control => {
+      const value = formData[control.id];
+      return value !== undefined && value !== '' && value !== null;
+    }).length;
+
+    const overallPercentage = allControlsCount > 0 ? Math.round((filledControlsCount / allControlsCount) * 100) : 0;
+    const requiredPercentage = requiredControlsCount > 0 ? Math.round((filledRequiredControlsCount / requiredControlsCount) * 100) : 100;
+
+    return {
+      overall: overallPercentage,
+      required: requiredPercentage,
+      filledCount: filledControlsCount,
+      totalCount: allControlsCount,
+      requiredFilled: filledRequiredControlsCount,
+      requiredTotal: requiredControlsCount
+    };
   };
 
   const handleDeleteControl = (controlId: string, e: React.MouseEvent) => {
@@ -1065,6 +1095,60 @@ export const PreviewMode: React.FC<PreviewModeProps> = ({
     }
   };
 
+  // Render form content (separated for reuse in different layouts)
+  const renderFormContent = (theme: typeof FORM_THEMES.classic) => {
+    if (!currentSection) return null;
+
+    return (
+      <>
+        {/* Form Title */}
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">{currentSection.name}</h1>
+          {currentSection.description && (
+            <p className="text-gray-600 dark:text-gray-300">{currentSection.description}</p>
+          )}
+        </div>
+        
+        {/* Form Fields with theme styling */}
+        {sectionControls.length === 0 ? (
+          <div className="text-center py-16">
+            <Circle className="w-16 h-16 text-gray-400 dark:text-gray-500 mx-auto mb-4" />
+            <h3 className="text-xl font-medium text-gray-600 dark:text-gray-300 mb-2">No controls in this section</h3>
+            <p className="text-gray-500 dark:text-gray-400">Add form controls to see the preview</p>
+          </div>
+        ) : (
+          <div className={theme.fieldSpacing}>
+            {sectionControls
+              .sort((a, b) => a.y - b.y || a.x - b.x)
+              .map(control => (
+                <div key={control.id} className="relative group">
+                  {/* Themed field container */}
+                  <div className="space-y-2">
+                    {control.properties.label && (
+                      <label className={theme.labelClass}>
+                        {control.properties.required && (
+                          <span className="text-red-500 mr-1">*</span>
+                        )}
+                        {control.properties.label}
+                        {control.properties.dependencies && control.properties.dependencies.length > 0 && (
+                          <span className="ml-2 text-xs text-blue-600 dark:text-blue-400 bg-blue-100 dark:bg-blue-900 px-1 py-0.5 rounded">
+                            Conditional
+                          </span>
+                        )}
+                      </label>
+                    )}
+                    <div className="themed-input">
+                      {renderThemedControl(control, theme)}
+                    </div>
+                  </div>
+                </div>
+              ))}
+          </div>
+        )}
+      </>
+    );
+  };
+
   if (sections.length === 0) {
     return (
       <div className="flex-1 bg-gray-50 dark:bg-gray-800 flex items-center justify-center transition-colors">
@@ -1135,6 +1219,93 @@ export const PreviewMode: React.FC<PreviewModeProps> = ({
           </div>
         </div>
 
+        {/* Form Progress Section */}
+        <div className="p-4 border-b border-gray-200 dark:border-gray-700 flex-shrink-0">
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="font-medium text-gray-900 dark:text-white transition-colors">Form Progress</h3>
+            <BarChart3 className="w-4 h-4 text-gray-600 dark:text-gray-400" />
+          </div>
+          
+          {(() => {
+            const completion = calculateFormCompletion();
+            return (
+              <div className="space-y-3">
+                {/* Overall Progress */}
+                <div>
+                  <div className="flex justify-between text-xs text-gray-600 dark:text-gray-400 mb-1">
+                    <span>Overall Progress</span>
+                    <span>{completion.filledCount}/{completion.totalCount} fields</span>
+                  </div>
+                  <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                    <div 
+                      className="h-2 rounded-full bg-blue-500 transition-all duration-300" 
+                      style={{ width: `${completion.overall}%` }}
+                    ></div>
+                  </div>
+                  <div className="text-center text-sm font-medium text-gray-900 dark:text-white mt-1">
+                    {completion.overall}%
+                  </div>
+                </div>
+
+                {/* Required Fields Progress */}
+                {completion.requiredTotal > 0 && (
+                  <div>
+                    <div className="flex justify-between text-xs text-gray-600 dark:text-gray-400 mb-1">
+                      <span>Required Fields</span>
+                      <span>{completion.requiredFilled}/{completion.requiredTotal} required</span>
+                    </div>
+                    <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                      <div 
+                        className={`h-2 rounded-full transition-all duration-300 ${
+                          completion.required === 100 ? 'bg-green-500' : 'bg-orange-500'
+                        }`}
+                        style={{ width: `${completion.required}%` }}
+                      ></div>
+                    </div>
+                    <div className={`text-center text-sm font-medium mt-1 ${
+                      completion.required === 100 ? 'text-green-600 dark:text-green-400' : 'text-orange-600 dark:text-orange-400'
+                    }`}>
+                      {completion.required}%
+                    </div>
+                  </div>
+                )}
+              </div>
+            );
+          })()}
+        </div>
+
+        {/* Tab Alignment Settings */}
+        <div className="p-4 border-b border-gray-200 dark:border-gray-700 flex-shrink-0">
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="font-medium text-gray-900 dark:text-white transition-colors">Tab Layout</h3>
+            <Settings className="w-4 h-4 text-gray-600 dark:text-gray-400" />
+          </div>
+          
+          <div className="space-y-2">
+            <label className="text-xs text-gray-600 dark:text-gray-400 font-medium">Tab Alignment</label>
+            <div className="grid grid-cols-3 gap-2">
+              {[
+                { value: 'top', icon: ArrowUp, label: 'Top' },
+                { value: 'left', icon: ArrowLeft, label: 'Left' },
+                { value: 'right', icon: ArrowRight, label: 'Right' }
+              ].map(({ value, icon: IconComponent, label }) => (
+                <button
+                  key={value}
+                  onClick={() => setTabAlignment(value as 'top' | 'left' | 'right')}
+                  className={`flex flex-col items-center p-2 rounded-lg text-xs transition-all ${
+                    tabAlignment === value
+                      ? 'bg-blue-50 dark:bg-blue-900/20 border-2 border-blue-300 dark:border-blue-600 text-blue-600 dark:text-blue-400'
+                      : 'hover:bg-gray-50 dark:hover:bg-gray-800 border-2 border-transparent text-gray-600 dark:text-gray-400'
+                  }`}
+                >
+                  <IconComponent className="w-4 h-4 mb-1" />
+                  <span>{label}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+
         {/* Section Navigation */}
         <div className="p-4 border-b border-gray-200 dark:border-gray-700 flex-shrink-0">
           <h3 className="font-medium text-gray-900 dark:text-white transition-colors">Form Sections</h3>
@@ -1169,14 +1340,14 @@ export const PreviewMode: React.FC<PreviewModeProps> = ({
         </div>
       </div>
 
-      {/* Form Content - Scrollable area with theme */}
+      {/* Form Content - Scrollable area with theme and tab alignment */}
       <div className="flex-1 flex flex-col h-full">
         <div className="flex-1 overflow-y-auto">
           <div className="p-8">
-            {/* Themed Form Container */}
+            {/* Dynamic Layout based on tab alignment */}
             <div className={currentTheme.containerClass}>
-              {/* Section Tabs using theme */}
-              {sections.length > 1 && (
+              {/* Section Tabs - Top alignment */}
+              {tabAlignment === 'top' && sections.length > 1 && (
                 <div className={currentTheme.sectionTabsClass}>
                   {sections.map((section, index) => (
                     <button
@@ -1190,54 +1361,38 @@ export const PreviewMode: React.FC<PreviewModeProps> = ({
                 </div>
               )}
 
-              {/* Form Title */}
-              {currentSection && (
-                <>
-                  <div className="mb-8">
-                    <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">{currentSection.name}</h1>
-                    {currentSection.description && (
-                      <p className="text-gray-600 dark:text-gray-300">{currentSection.description}</p>
-                    )}
-                  </div>
-                  
-                  {/* Form Fields with theme styling */}
-                  {sectionControls.length === 0 ? (
-                    <div className="text-center py-16">
-                      <Circle className="w-16 h-16 text-gray-400 dark:text-gray-500 mx-auto mb-4" />
-                      <h3 className="text-xl font-medium text-gray-600 dark:text-gray-300 mb-2">No controls in this section</h3>
-                      <p className="text-gray-500 dark:text-gray-400">Add form controls to see the preview</p>
-                    </div>
-                  ) : (
-                    <div className={currentTheme.fieldSpacing}>
-                      {sectionControls
-                        .sort((a, b) => a.y - b.y || a.x - b.x)
-                        .map(control => (
-                          <div key={control.id} className="relative group">
-                            {/* Themed field container */}
-                            <div className="space-y-2">
-                              {control.properties.label && (
-                                <label className={currentTheme.labelClass}>
-                                  {control.properties.required && (
-                                    <span className="text-red-500 mr-1">*</span>
-                                  )}
-                                  {control.properties.label}
-                                  {control.properties.dependencies && control.properties.dependencies.length > 0 && (
-                                    <span className="ml-2 text-xs text-blue-600 dark:text-blue-400 bg-blue-100 dark:bg-blue-900 px-1 py-0.5 rounded">
-                                      Conditional
-                                    </span>
-                                  )}
-                                </label>
-                              )}
-                              <div className="themed-input">
-                                {renderThemedControl(control, currentTheme)}
-                              </div>
-                            </div>
+              {/* Main content area with sidebar for left/right tabs */}
+              <div className={`${tabAlignment !== 'top' ? 'flex gap-8' : ''} ${tabAlignment === 'right' ? 'flex-row-reverse' : 'flex-row'}`}>
+                {/* Section Tabs Sidebar - Left/Right alignment */}
+                {tabAlignment !== 'top' && sections.length > 1 && (
+                  <div className="flex-shrink-0 w-64 space-y-2">
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Sections</h3>
+                    {sections.map((section, index) => (
+                      <button
+                        key={section.id}
+                        onClick={() => setActiveSection(index)}
+                        className={`w-full text-left p-4 rounded-lg transition-all ${
+                          activeSection === index
+                            ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg'
+                            : 'bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-600'
+                        }`}
+                      >
+                        <div className="font-medium">{section.name}</div>
+                        {section.description && (
+                          <div className={`text-sm mt-1 ${activeSection === index ? 'text-blue-100' : 'text-gray-500 dark:text-gray-400'}`}>
+                            {section.description}
                           </div>
-                        ))}
-                    </div>
-                  )}
-                </>
-              )}
+                        )}
+                      </button>
+                    ))}
+                  </div>
+                )}
+
+                {/* Form Content */}
+                <div className={tabAlignment !== 'top' ? 'flex-1' : ''}>
+                  {renderFormContent(currentTheme)}
+                </div>
+              </div>
             </div>
           </div>
         </div>
