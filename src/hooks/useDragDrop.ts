@@ -42,6 +42,7 @@ export const useDragDrop = (questionnaireId: string = 'default-questionnaire', i
 
   // Load controls when dependencies change
   useEffect(() => {
+    console.log('🔄 useDragDrop useEffect triggered', { questionnaireId, isDbInitialized, refreshKey });
     loadControlsFromDB();
   }, [loadControlsFromDB]);
 

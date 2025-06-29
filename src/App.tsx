@@ -198,19 +198,17 @@ function App() {
       
       console.log(`✅ Import completed: ${insertedCount} controls inserted`);
       
-      // Force refresh the controls using multiple strategies
-      console.log('🔄 Triggering refresh mechanisms...');
+      // CRITICAL: Force complete refresh using multiple strategies
+      console.log('🔄 Triggering comprehensive refresh mechanisms...');
       
-      // Strategy 1: Increment refresh key
-      setRefreshKey(prev => {
-        const newKey = prev + 1;
-        console.log('📊 Refresh key updated:', prev, '->', newKey);
-        return newKey;
-      });
+      // Strategy 1: Increment refresh key to trigger useEffect in useDragDrop
+      const newRefreshKey = refreshKey + 1;
+      console.log('📊 Refresh key updated:', refreshKey, '->', newRefreshKey);
+      setRefreshKey(newRefreshKey);
       
-      // Strategy 2: Force refresh after a short delay
+      // Strategy 2: Wait for state update and force refresh
       setTimeout(async () => {
-        console.log('⏰ Executing delayed refresh...');
+        console.log('⏰ Executing delayed force refresh...');
         try {
           await forceRefresh();
           console.log('✅ Force refresh completed successfully');
@@ -219,9 +217,9 @@ function App() {
         }
       }, 100);
       
-      // Strategy 3: Direct database reload after longer delay
+      // Strategy 3: Direct database reload with longer delay to ensure all operations complete
       setTimeout(async () => {
-        console.log('🔄 Executing direct database reload...');
+        console.log('🔄 Executing final database verification...');
         try {
           const freshControls = await getControls(currentQuestionnaire);
           console.log('📊 Fresh controls loaded:', freshControls.length, 'controls');
@@ -229,17 +227,23 @@ function App() {
             acc[c.sectionId || 'unknown'] = (acc[c.sectionId || 'unknown'] || 0) + 1;
             return acc;
           }, {} as Record<string, number>));
+          
+          // If the UI still doesn't show the controls, force another refresh
+          if (freshControls.length > droppedControls.length) {
+            console.log('🔄 UI out of sync, forcing final refresh...');
+            setRefreshKey(prev => prev + 1);
+          }
         } catch (error) {
-          console.error('❌ Direct reload failed:', error);
+          console.error('❌ Final verification failed:', error);
         }
-      }, 200);
+      }, 300);
       
       // Show success message with details
       const message = `Successfully imported ${insertedCount} controls!`;
       console.log(`🎉 ${message}`);
       
       // Optional: Show user notification
-      alert(`${message} Check the Design tab to see them.`);
+      alert(`${message} Check the Design tab to see them. If they don't appear immediately, please wait a moment for the refresh to complete.`);
       
     } catch (error) {
       console.error('❌ Failed to import controls:', error);
