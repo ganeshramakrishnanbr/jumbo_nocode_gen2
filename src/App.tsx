@@ -10,6 +10,7 @@ import { PropertiesPanel } from './components/PropertiesPanel';
 import { PreviewMode } from './components/PreviewMode';
 import { JSONViewer } from './components/JSONViewer';
 import { SectionManager } from './components/SectionManager';
+import { ImportSuccessDialog } from './components/ImportSuccessDialog';
 import { useDragDrop } from './hooks/useDragDrop';
 import { useTheme } from './hooks/useTheme';
 import { 
@@ -33,6 +34,12 @@ function App() {
   const [isLoading, setIsLoading] = useState(true);
   const [refreshKey, setRefreshKey] = useState(0);
   const [importInProgress, setImportInProgress] = useState(false);
+  const [showImportDialog, setShowImportDialog] = useState(false);
+  const [importResults, setImportResults] = useState<{
+    success: number;
+    total: number;
+    errors: string[];
+  } | null>(null);
 
   // Initialize theme
   const { theme } = useTheme();
@@ -56,25 +63,25 @@ function App() {
     const initializeApp = async () => {
       try {
         setIsLoading(true);
-        console.log('🚀 Initializing application...');
+        console.log('🚀 APP: Initializing application...');
         
         // Initialize database
         await initializeDatabase();
         setIsDbInitialized(true);
-        console.log('✅ Database initialized successfully');
+        console.log('✅ APP: Database initialized successfully');
         
         // Load sections
         const loadedSections = await getSections(currentQuestionnaire);
         setSections(loadedSections);
-        console.log('📂 Loaded sections:', loadedSections.length);
+        console.log('📂 APP: Loaded sections:', loadedSections.length);
         
         // Set active section to first available section
         if (loadedSections.length > 0) {
           setActiveSection(loadedSections[0].id);
-          console.log('🎯 Active section set to:', loadedSections[0].id);
+          console.log('🎯 APP: Active section set to:', loadedSections[0].id);
         }
       } catch (error) {
-        console.error('❌ Failed to initialize app:', error);
+        console.error('❌ APP: Failed to initialize app:', error);
       } finally {
         setIsLoading(false);
       }
@@ -181,17 +188,18 @@ function App() {
   };
 
   const handleImportControls = async (controls: DroppedControl[]) => {
-    console.log('🚀 EXCEL IMPORT STARTED');
-    console.log('📊 Import Details:', {
+    console.log('🚀 EXCEL IMPORT: Starting comprehensive import process');
+    console.log('📊 EXCEL IMPORT: Import details:', {
       controlCount: controls.length,
       questionnaire: currentQuestionnaire,
       activeSection,
       currentControlCount: droppedControls.length,
-      dbInitialized: isDbInitialized
+      dbInitialized: isDbInitialized,
+      timestamp: new Date().toISOString()
     });
 
     if (!isDbInitialized) {
-      console.error('❌ Database not initialized - cannot import');
+      console.error('❌ EXCEL IMPORT: Database not initialized');
       alert('Database not ready. Please wait and try again.');
       return;
     }
@@ -199,86 +207,127 @@ function App() {
     setImportInProgress(true);
     
     try {
-      console.log('📝 Controls to import:', controls.map(c => ({
+      console.log('📝 EXCEL IMPORT: Controls to import:', controls.map(c => ({
         id: c.id,
         type: c.type,
         name: c.name,
         sectionId: c.sectionId,
-        order: c.y
+        order: c.y,
+        hasUniqueId: c.id.includes('imported-')
       })));
 
       let successCount = 0;
       let errorCount = 0;
       const errors: string[] = [];
 
-      // Process each control individually with detailed logging
+      // Validate Excel data structure
+      console.log('🔍 EXCEL IMPORT: Validating data structure...');
+      for (const control of controls) {
+        if (!control.type || !control.name) {
+          errors.push(`Invalid control data: missing type or name for control ${control.id}`);
+          errorCount++;
+          continue;
+        }
+        
+        if (!control.id || !control.id.includes('imported-')) {
+          errors.push(`Invalid control ID: ${control.id} - should be auto-generated`);
+          errorCount++;
+          continue;
+        }
+      }
+
+      if (errorCount > 0) {
+        console.error('❌ EXCEL IMPORT: Data validation failed:', errors);
+        throw new Error(`Data validation failed: ${errors.join(', ')}`);
+      }
+
+      console.log('✅ EXCEL IMPORT: Data validation passed');
+
+      // Process each control individually with comprehensive error handling
       for (let i = 0; i < controls.length; i++) {
         const control = controls[i];
-        console.log(`🔄 Processing control ${i + 1}/${controls.length}:`, {
+        console.log(`🔄 EXCEL IMPORT: Processing control ${i + 1}/${controls.length}:`, {
           id: control.id,
           type: control.type,
           name: control.name,
-          sectionId: control.sectionId
+          sectionId: control.sectionId,
+          properties: Object.keys(control.properties || {})
         });
 
         try {
-          await insertControl(control, currentQuestionnaire);
+          // Ensure unique ID with additional timestamp
+          const uniqueId = `${control.id}-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`;
+          const controlToInsert = {
+            ...control,
+            id: uniqueId
+          };
+
+          console.log(`📝 EXCEL IMPORT: Inserting control with ID: ${uniqueId}`);
+          await insertControl(controlToInsert, currentQuestionnaire);
           successCount++;
-          console.log(`✅ Successfully inserted control ${i + 1}: ${control.name}`);
+          console.log(`✅ EXCEL IMPORT: Successfully inserted control ${i + 1}: ${control.name}`);
         } catch (error) {
           errorCount++;
           const errorMsg = `Failed to insert ${control.name}: ${error}`;
           errors.push(errorMsg);
-          console.error(`❌ Error inserting control ${i + 1}:`, error);
+          console.error(`❌ EXCEL IMPORT: Error inserting control ${i + 1}:`, error);
         }
       }
 
-      console.log('📊 Import Summary:', {
+      console.log('📊 EXCEL IMPORT: Import summary:', {
         total: controls.length,
         success: successCount,
         errors: errorCount,
-        errorDetails: errors
+        errorDetails: errors.slice(0, 5) // Log first 5 errors
       });
 
       if (successCount === 0) {
-        throw new Error(`No controls were imported successfully. Errors: ${errors.join(', ')}`);
+        throw new Error(`No controls were imported successfully. Errors: ${errors.slice(0, 3).join(', ')}`);
       }
 
-      // COMPREHENSIVE REFRESH STRATEGY
-      console.log('🔄 Starting comprehensive refresh strategy...');
+      // Store import results for dialog
+      setImportResults({
+        success: successCount,
+        total: controls.length,
+        errors: errors
+      });
+
+      // COMPREHENSIVE STATE REFRESH STRATEGY
+      console.log('🔄 EXCEL IMPORT: Starting comprehensive refresh strategy...');
       
       // Strategy 1: Immediate refresh key update
-      console.log('📈 Strategy 1: Updating refresh key');
+      console.log('📈 EXCEL IMPORT: Strategy 1 - Updating refresh key');
       const newRefreshKey = refreshKey + 1;
       setRefreshKey(newRefreshKey);
-      console.log(`🔑 Refresh key: ${refreshKey} → ${newRefreshKey}`);
+      console.log(`🔑 EXCEL IMPORT: Refresh key: ${refreshKey} → ${newRefreshKey}`);
 
       // Strategy 2: Force refresh after short delay
       setTimeout(async () => {
-        console.log('⏰ Strategy 2: Executing force refresh');
+        console.log('⏰ EXCEL IMPORT: Strategy 2 - Executing force refresh');
         try {
           await forceRefresh();
-          console.log('✅ Force refresh completed');
+          console.log('✅ EXCEL IMPORT: Force refresh completed');
           
           // Verify controls are loaded
           const currentControls = await getControls(currentQuestionnaire);
-          console.log('🔍 Post-refresh verification:', {
+          console.log('🔍 EXCEL IMPORT: Post-refresh verification:', {
             dbControlCount: currentControls.length,
             uiControlCount: droppedControls.length,
-            importedCount: successCount
+            importedCount: successCount,
+            refreshKey: newRefreshKey
           });
           
         } catch (error) {
-          console.error('❌ Force refresh failed:', error);
+          console.error('❌ EXCEL IMPORT: Force refresh failed:', error);
         }
-      }, 150);
+      }, 200);
 
-      // Strategy 3: Final verification and correction
+      // Strategy 3: Final verification and sync check
       setTimeout(async () => {
-        console.log('🔍 Strategy 3: Final verification and sync check');
+        console.log('🔍 EXCEL IMPORT: Strategy 3 - Final verification and sync check');
         try {
           const dbControls = await getControls(currentQuestionnaire);
-          console.log('📊 Final verification results:', {
+          console.log('📊 EXCEL IMPORT: Final verification results:', {
             dbControlCount: dbControls.length,
             uiControlCount: droppedControls.length,
             expectedMinimum: successCount,
@@ -287,10 +336,10 @@ function App() {
 
           // If UI is out of sync, force another refresh
           if (dbControls.length > droppedControls.length) {
-            console.log('🔄 UI out of sync - forcing final refresh');
+            console.log('🔄 EXCEL IMPORT: UI out of sync - forcing final refresh');
             setRefreshKey(prev => prev + 1);
           } else {
-            console.log('✅ UI and database are in sync');
+            console.log('✅ EXCEL IMPORT: UI and database are in sync');
           }
 
           // Log section distribution
@@ -299,34 +348,51 @@ function App() {
             acc[section] = (acc[section] || 0) + 1;
             return acc;
           }, {} as Record<string, number>);
-          console.log('📂 Controls by section:', sectionDistribution);
+          console.log('📂 EXCEL IMPORT: Controls by section:', sectionDistribution);
 
         } catch (error) {
-          console.error('❌ Final verification failed:', error);
+          console.error('❌ EXCEL IMPORT: Final verification failed:', error);
         }
-      }, 400);
+      }, 500);
 
-      // Strategy 4: User notification and guidance
-      const message = successCount === controls.length 
-        ? `Successfully imported all ${successCount} controls!`
-        : `Imported ${successCount} of ${controls.length} controls. ${errorCount} failed.`;
-      
-      console.log(`🎉 ${message}`);
-      
-      // Show detailed user feedback
-      if (errorCount > 0) {
-        alert(`${message}\n\nErrors:\n${errors.slice(0, 3).join('\n')}${errors.length > 3 ? '\n...' : ''}`);
-      } else {
-        alert(`${message}\n\nControls should appear in the Design tab shortly. If they don't appear immediately, please wait a moment for the refresh to complete.`);
-      }
+      // Strategy 4: Show success dialog
+      setTimeout(() => {
+        console.log('🎉 EXCEL IMPORT: Showing success dialog');
+        setShowImportDialog(true);
+      }, 100);
+
+      console.log('🎉 EXCEL IMPORT: Import process completed successfully');
 
     } catch (error) {
-      console.error('❌ EXCEL IMPORT FAILED:', error);
-      alert(`Import failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      console.error('❌ EXCEL IMPORT: Import process failed:', error);
+      setImportResults({
+        success: 0,
+        total: controls.length,
+        errors: [error instanceof Error ? error.message : 'Unknown error occurred']
+      });
+      setShowImportDialog(true);
     } finally {
       setImportInProgress(false);
-      console.log('🏁 EXCEL IMPORT PROCESS COMPLETED');
+      console.log('🏁 EXCEL IMPORT: Process completed, import progress cleared');
     }
+  };
+
+  const handleDialogClose = () => {
+    console.log('🔄 DIALOG: Closing import dialog and triggering screen refresh');
+    setShowImportDialog(false);
+    setImportResults(null);
+    
+    // Trigger final refresh when dialog closes
+    setTimeout(() => {
+      console.log('🔄 DIALOG: Executing post-dialog refresh');
+      setRefreshKey(prev => prev + 1);
+      
+      // Force a complete page refresh if needed
+      setTimeout(() => {
+        console.log('🔄 DIALOG: Final verification after dialog close');
+        forceRefresh();
+      }, 300);
+    }, 100);
   };
 
   const renderContent = () => {
@@ -426,11 +492,27 @@ function App() {
         
         {/* Import Progress Indicator */}
         {importInProgress && (
-          <div className="fixed bottom-4 right-4 bg-blue-600 text-white px-4 py-2 rounded-lg shadow-lg flex items-center space-x-2">
-            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-            <span>Importing controls...</span>
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white dark:bg-gray-900 rounded-lg shadow-xl p-8 max-w-md w-full mx-4">
+              <div className="text-center">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+                <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
+                  Importing Controls...
+                </h3>
+                <p className="text-gray-600 dark:text-gray-300 text-sm">
+                  Please wait while we process your Excel file and import the controls.
+                </p>
+              </div>
+            </div>
           </div>
         )}
+
+        {/* Import Success/Error Dialog */}
+        <ImportSuccessDialog
+          isOpen={showImportDialog}
+          onClose={handleDialogClose}
+          results={importResults}
+        />
         
         {/* Footer */}
         <footer className="bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700 px-6 py-3 transition-colors">
@@ -440,7 +522,7 @@ function App() {
               <span>Professional Form Builder Platform</span>
               {isDbInitialized && <span className="text-green-600 dark:text-green-400">Database Connected</span>}
               <span className="capitalize">{theme} Theme</span>
-              {importInProgress && <span className="text-blue-600 dark:text-blue-400">Import in Progress</span>}
+              {importInProgress && <span className="text-blue-600 dark:text-blue-400 animate-pulse">Import Processing...</span>}
             </div>
             <div className="flex items-center space-x-4">
               <span>Version 1.0.0</span>

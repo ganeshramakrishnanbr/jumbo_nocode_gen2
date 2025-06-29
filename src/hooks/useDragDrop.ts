@@ -13,7 +13,7 @@ export const useDragDrop = (questionnaireId: string = 'default-questionnaire', i
   const [selectedControl, setSelectedControl] = useState<DroppedControl | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Enhanced control loading with comprehensive logging
+  // Enhanced control loading with comprehensive logging and error boundaries
   const loadControlsFromDB = useCallback(async () => {
     if (!isDbInitialized) {
       console.log('⏸️ useDragDrop: Database not initialized, skipping control load');
@@ -33,6 +33,7 @@ export const useDragDrop = (questionnaireId: string = 'default-questionnaire', i
       
       console.log('📊 useDragDrop: Database query results:', {
         controlCount: controls.length,
+        refreshKey,
         controls: controls.map(c => ({
           id: c.id,
           type: c.type,
@@ -42,34 +43,36 @@ export const useDragDrop = (questionnaireId: string = 'default-questionnaire', i
         }))
       });
       
-      // Log section distribution
+      // Log section distribution for debugging
       const sectionDistribution = controls.reduce((acc, c) => {
         acc[c.sectionId || 'unknown'] = (acc[c.sectionId || 'unknown'] || 0) + 1;
         return acc;
       }, {} as Record<string, number>);
       console.log('🎯 useDragDrop: Controls by section:', sectionDistribution);
       
-      // Update state
+      // Update state with error boundary
       setDroppedControls(controls);
       console.log('✅ useDragDrop: Controls state updated successfully');
       
-      // Verify state update
+      // Verify state update with delay
       setTimeout(() => {
         console.log('🔍 useDragDrop: State verification after update:', {
           stateControlCount: controls.length,
           refreshKey,
           timestamp: new Date().toISOString()
         });
-      }, 50);
+      }, 100);
       
     } catch (error) {
       console.error('❌ useDragDrop: Failed to load controls:', error);
+      // Don't throw error, just log it to prevent app crash
+      setDroppedControls([]);
     } finally {
       setIsLoading(false);
     }
   }, [questionnaireId, isDbInitialized, refreshKey]);
 
-  // Load controls when dependencies change
+  // Load controls when dependencies change with enhanced error handling
   useEffect(() => {
     console.log('🔄 useDragDrop: useEffect triggered', { 
       questionnaireId, 
@@ -77,10 +80,20 @@ export const useDragDrop = (questionnaireId: string = 'default-questionnaire', i
       refreshKey,
       timestamp: new Date().toISOString()
     });
-    loadControlsFromDB();
+    
+    // Add error boundary around loadControlsFromDB
+    const safeLoadControls = async () => {
+      try {
+        await loadControlsFromDB();
+      } catch (error) {
+        console.error('❌ useDragDrop: useEffect error:', error);
+      }
+    };
+    
+    safeLoadControls();
   }, [loadControlsFromDB]);
 
-  // Enhanced force refresh with verification
+  // Enhanced force refresh with comprehensive verification
   const forceRefresh = useCallback(async () => {
     console.log('🔄 useDragDrop: Force refresh initiated', {
       currentControlCount: droppedControls.length,
@@ -89,12 +102,35 @@ export const useDragDrop = (questionnaireId: string = 'default-questionnaire', i
     });
     
     try {
+      // Force reload from database
       await loadControlsFromDB();
+      
+      // Additional verification step
+      setTimeout(async () => {
+        try {
+          const verificationControls = await getControls(questionnaireId);
+          console.log('🔍 useDragDrop: Force refresh verification:', {
+            dbControlCount: verificationControls.length,
+            stateControlCount: droppedControls.length,
+            refreshKey,
+            timestamp: new Date().toISOString()
+          });
+          
+          // If state is still out of sync, update it directly
+          if (verificationControls.length !== droppedControls.length) {
+            console.log('🔄 useDragDrop: State out of sync, updating directly');
+            setDroppedControls(verificationControls);
+          }
+        } catch (error) {
+          console.error('❌ useDragDrop: Force refresh verification failed:', error);
+        }
+      }, 200);
+      
       console.log('✅ useDragDrop: Force refresh completed successfully');
     } catch (error) {
       console.error('❌ useDragDrop: Force refresh failed:', error);
     }
-  }, [loadControlsFromDB, droppedControls.length, refreshKey]);
+  }, [loadControlsFromDB, droppedControls.length, refreshKey, questionnaireId]);
 
   const addControl = useCallback(async (controlType: ControlType, x: number, y: number, sectionId: string = 'default') => {
     if (!isDbInitialized) {
@@ -105,7 +141,7 @@ export const useDragDrop = (questionnaireId: string = 'default-questionnaire', i
     try {
       const sectionControls = droppedControls.filter(c => c.sectionId === sectionId);
       const newControl: DroppedControl = {
-        id: `${controlType.type}-${Date.now()}`,
+        id: `${controlType.type}-${Date.now()}-${Math.random().toString(36).substring(2, 8)}`,
         type: controlType.type,
         name: controlType.name,
         x: 0, // Not used in ordered layout
@@ -310,7 +346,7 @@ export const useDragDrop = (questionnaireId: string = 'default-questionnaire', i
     setSelectedControl(null);
   }, []);
 
-  // Log state changes for debugging
+  // Enhanced state change logging for debugging
   useEffect(() => {
     console.log('📊 useDragDrop: State changed:', {
       controlCount: droppedControls.length,
