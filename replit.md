@@ -36,7 +36,7 @@ The application follows a full-stack monolithic architecture with clear separati
 2. **Form builder interface** with drag-and-drop controls from a component library
 3. **Section-based form organization** with visual management
 4. **Real-time preview mode** for form testing
-5. **PDF Preview functionality** with real-time generation, tier-based templates, and customization options
+5. **PDF Preview functionality** with real-time generation, tier-based templates, logo upload, custom footer notes, page break settings, and filled value display
 6. **JSON export/import** for form definitions with expandable sections
 7. **Excel template system** for bulk form creation
 8. **Dashboard with analytics** showing form usage statistics

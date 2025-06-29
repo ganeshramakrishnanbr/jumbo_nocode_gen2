@@ -641,6 +641,15 @@ export const PDFPreview: React.FC<PDFPreviewProps> = ({
             
             <div className="flex items-center space-x-2">
               <button
+                onClick={handleGenerateSampleData}
+                className="flex items-center px-3 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors"
+                title="Generate sample data for testing"
+              >
+                <Shuffle className="w-4 h-4 mr-1" />
+                Sample Data
+              </button>
+              
+              <button
                 onClick={() => setIsFullscreen(!isFullscreen)}
                 className="p-2 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-200 dark:hover:bg-gray-600 rounded transition-colors"
                 title="Toggle Fullscreen"
@@ -747,7 +756,7 @@ export const PDFPreview: React.FC<PDFPreviewProps> = ({
               </div>
               
               {/* Footer */}
-              {(customization.footer.showPageNumbers || customization.footer.showCompanyInfo) && (
+              {(customization.footer.showPageNumbers || customization.footer.showCompanyInfo || customization.footer.customNote) && (
                 <div 
                   className="mt-8 pt-4 border-t-2 text-center"
                   style={{ 
@@ -758,6 +767,9 @@ export const PDFPreview: React.FC<PDFPreviewProps> = ({
                 >
                   {customization.footer.showCompanyInfo && customization.footer.companyName && (
                     <p className="text-sm mb-2">{customization.footer.companyName}</p>
+                  )}
+                  {customization.footer.customNote && (
+                    <p className="text-sm mb-2 italic">{customization.footer.customNote}</p>
                   )}
                   {customization.footer.showPageNumbers && (
                     <p className="text-xs text-gray-500">Page 1</p>

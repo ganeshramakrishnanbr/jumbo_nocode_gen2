@@ -14,6 +14,7 @@ import { SectionManager } from './components/SectionManager';
 import { ImportSuccessDialog } from './components/ImportSuccessDialog';
 import { useDragDrop } from './hooks/useDragDrop';
 import { useTheme } from './hooks/useTheme';
+import { useFormValues } from './hooks/useFormValues';
 import { 
   initializeDatabase, 
   getSections, 
@@ -43,8 +44,9 @@ function App() {
   } | null>(null);
   const [nuclearResetInProgress, setNuclearResetInProgress] = useState(false);
 
-  // Initialize theme
+  // Initialize theme and form values
   const { theme } = useTheme();
+  const { formValues, updateFormValue } = useFormValues();
 
   const {
     droppedControls,
@@ -590,6 +592,8 @@ function App() {
             droppedControls={droppedControls}
             sections={sections}
             currentTier={currentTier}
+            formValues={formValues}
+            onFormValueChange={updateFormValue}
           />
         );
       
