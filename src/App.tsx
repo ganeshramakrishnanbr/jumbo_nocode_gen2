@@ -19,7 +19,8 @@ import {
   updateSection as updateSectionDB, 
   deleteSection as deleteSectionDB,
   insertControl,
-  getControls
+  getControls,
+  updateControl as updateControlDB
 } from './lib/db';
 
 function App() {
@@ -179,13 +180,31 @@ function App() {
     try {
       console.log('🚀 Starting import of', controls.length, 'controls');
       
-      // Insert all imported controls into the database
+      // Get existing controls from database to check for duplicates
+      const existingControls = await getControls(currentQuestionnaire);
+      const existingControlIds = new Set(existingControls.map(control => control.id));
+      
+      let insertedCount = 0;
+      let updatedCount = 0;
+      
+      // Process each imported control
       for (const control of controls) {
-        console.log('📝 Inserting control:', control.id, control.name, control.type);
-        await insertControl(control, currentQuestionnaire);
+        console.log('📝 Processing control:', control.id, control.name, control.type);
+        
+        if (existingControlIds.has(control.id)) {
+          // Control exists, update it
+          console.log('🔄 Updating existing control:', control.id);
+          await updateControlDB(control.id, control);
+          updatedCount++;
+        } else {
+          // Control doesn't exist, insert it
+          console.log('➕ Inserting new control:', control.id);
+          await insertControl(control, currentQuestionnaire);
+          insertedCount++;
+        }
       }
       
-      console.log('✅ All controls inserted into database');
+      console.log(`✅ Import completed: ${insertedCount} inserted, ${updatedCount} updated`);
       
       // Force refresh the controls using multiple strategies
       console.log('🔄 Triggering refresh mechanisms...');
@@ -223,11 +242,12 @@ function App() {
         }
       }, 200);
       
-      // Show success message
-      console.log(`🎉 Successfully imported ${controls.length} controls`);
+      // Show success message with details
+      const message = `Successfully imported ${controls.length} controls! (${insertedCount} new, ${updatedCount} updated)`;
+      console.log(`🎉 ${message}`);
       
       // Optional: Show user notification
-      alert(`Successfully imported ${controls.length} controls! Check the Design tab to see them.`);
+      alert(`${message} Check the Design tab to see them.`);
       
     } catch (error) {
       console.error('❌ Failed to import controls:', error);
