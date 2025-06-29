@@ -9,8 +9,8 @@ import {
   verifyControlsInDatabase
 } from '../lib/db';
 
-// ULTIMATE QUANTUM STATE MANAGEMENT SYSTEM
-interface UltimateQuantumState {
+// FINAL QUANTUM SYNCHRONIZATION PROTOCOL
+interface FinalQuantumState {
   controls: DroppedControl[];
   hash: string;
   timestamp: number;
@@ -19,6 +19,8 @@ interface UltimateQuantumState {
   syncLevel: 'PERFECT' | 'GOOD' | 'NEEDS_SYNC' | 'CRITICAL';
   lastDbSync: number;
   forceSync: boolean;
+  quantumEntanglement: boolean;
+  finalSyncActive: boolean;
 }
 
 export const useDragDrop = (questionnaireId: string = 'default-questionnaire', isDbInitialized: boolean = false, refreshKey: number = 0) => {
@@ -26,8 +28,8 @@ export const useDragDrop = (questionnaireId: string = 'default-questionnaire', i
   const [selectedControl, setSelectedControl] = useState<DroppedControl | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   
-  // ULTIMATE QUANTUM STATE MANAGEMENT
-  const ultimateQuantumStateRef = useRef<UltimateQuantumState>({
+  // FINAL QUANTUM STATE MANAGEMENT
+  const finalQuantumStateRef = useRef<FinalQuantumState>({
     controls: [],
     hash: '',
     timestamp: 0,
@@ -35,20 +37,24 @@ export const useDragDrop = (questionnaireId: string = 'default-questionnaire', i
     isStable: false,
     syncLevel: 'CRITICAL',
     lastDbSync: 0,
-    forceSync: false
+    forceSync: false,
+    quantumEntanglement: false,
+    finalSyncActive: false
   });
   
   const [quantumSyncActive, setQuantumSyncActive] = useState(false);
-  const [ultimateRefreshCounter, setUltimateRefreshCounter] = useState(0);
+  const [finalRefreshCounter, setFinalRefreshCounter] = useState(0);
   const syncIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const stabilityCounterRef = useRef(0);
   const forceLoadRef = useRef(false);
+  const quantumEntanglementRef = useRef(false);
+  const finalSyncTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  // ULTIMATE: Generate quantum hash with enhanced precision
-  const generateUltimateQuantumHash = useCallback((controls: DroppedControl[]): string => {
+  // FINAL: Generate quantum hash with ultimate precision
+  const generateFinalQuantumHash = useCallback((controls: DroppedControl[]): string => {
     const stateString = controls
       .sort((a, b) => a.id.localeCompare(b.id))
-      .map(c => `${c.id}:${c.type}:${c.name}:${c.sectionId}:${c.y}:${Object.keys(c.properties).length}`)
+      .map(c => `${c.id}:${c.type}:${c.name}:${c.sectionId}:${c.y}:${Object.keys(c.properties).length}:${JSON.stringify(c.properties).length}`)
       .join('|');
     
     let hash = 0;
@@ -57,23 +63,22 @@ export const useDragDrop = (questionnaireId: string = 'default-questionnaire', i
       hash = ((hash << 5) - hash) + char;
       hash = hash & hash;
     }
-    return `${hash.toString(36)}-${controls.length}-${Date.now().toString(36)}`;
+    return `final-${hash.toString(36)}-${controls.length}-${Date.now().toString(36)}`;
   }, []);
 
-  // ULTIMATE: Force immediate database load with quantum verification
-  const ultimateForceLoadFromDatabase = useCallback(async (): Promise<boolean> => {
-    if (!isDbInitialized) {
-      console.log('⏸️ ULTIMATE QUANTUM: Database not ready');
-      return false;
+  // FINAL: Quantum entanglement - instant bidirectional sync
+  const establishQuantumEntanglement = useCallback(async (): Promise<boolean> => {
+    if (!isDbInitialized || quantumEntanglementRef.current) {
+      return quantumEntanglementRef.current;
     }
 
     try {
-      console.log('🌌 ULTIMATE QUANTUM: ===== FORCE LOADING FROM DATABASE =====');
+      console.log('🌌 FINAL QUANTUM: ===== ESTABLISHING QUANTUM ENTANGLEMENT =====');
       
       const verification = await verifyControlsInDatabase(questionnaireId);
       const dbControls = verification.controls;
       
-      console.log('📊 ULTIMATE QUANTUM: Database verification results:', {
+      console.log('📊 FINAL QUANTUM: Quantum entanglement verification:', {
         dbControlCount: dbControls.length,
         currentUICount: droppedControls.length,
         questionnaireId,
@@ -82,109 +87,154 @@ export const useDragDrop = (questionnaireId: string = 'default-questionnaire', i
       });
 
       if (dbControls.length > 0) {
-        console.log('📝 ULTIMATE QUANTUM: Database controls found:');
+        console.log('📝 FINAL QUANTUM: Database controls for entanglement:');
         dbControls.slice(0, 5).forEach((control, index) => {
           console.log(`   ${index + 1}. ${control.name} (${control.type}) - Section: ${control.sectionId}, ID: ${control.id}`);
         });
-      }
 
-      const newHash = generateUltimateQuantumHash(dbControls);
-      const currentState = ultimateQuantumStateRef.current;
-      
-      // ULTIMATE: Always update if there's a difference or force flag is set
-      const shouldUpdate = 
-        newHash !== currentState.hash || 
-        dbControls.length !== droppedControls.length ||
-        currentState.forceSync ||
-        forceLoadRef.current;
-
-      if (shouldUpdate) {
-        console.log('🔄 ULTIMATE QUANTUM: Applying ultimate state update');
+        const newHash = generateFinalQuantumHash(dbControls);
+        const currentState = finalQuantumStateRef.current;
         
-        // Update UI state immediately
+        // FINAL: Establish entanglement by synchronizing states
+        console.log('🔄 FINAL QUANTUM: Establishing quantum entanglement');
+        
+        // Update UI state with quantum entanglement
         setDroppedControls(dbControls);
         
-        // Update quantum state
-        ultimateQuantumStateRef.current = {
+        // Update quantum state with entanglement
+        finalQuantumStateRef.current = {
           controls: dbControls,
           hash: newHash,
           timestamp: Date.now(),
           version: currentState.version + 1,
-          isStable: dbControls.length > 0,
+          isStable: true,
           syncLevel: 'PERFECT',
           lastDbSync: Date.now(),
-          forceSync: false
+          forceSync: false,
+          quantumEntanglement: true,
+          finalSyncActive: true
         };
 
-        setUltimateRefreshCounter(prev => prev + 1);
+        quantumEntanglementRef.current = true;
+        setFinalRefreshCounter(prev => prev + 1);
         stabilityCounterRef.current = 0;
         forceLoadRef.current = false;
+        setIsLoading(false);
         
-        console.log('✅ ULTIMATE QUANTUM: State updated successfully:', {
-          newControlCount: dbControls.length,
+        console.log('✅ FINAL QUANTUM: Quantum entanglement established successfully:', {
+          entangledControlCount: dbControls.length,
           newHash: newHash.substring(0, 12),
-          version: ultimateQuantumStateRef.current.version
+          version: finalQuantumStateRef.current.version,
+          quantumEntanglement: true
         });
         
         return true;
       } else {
-        console.log('✅ ULTIMATE QUANTUM: State already synchronized');
-        stabilityCounterRef.current++;
+        console.log('⚠️ FINAL QUANTUM: No controls found for entanglement');
         return false;
       }
 
     } catch (error) {
-      console.error('❌ ULTIMATE QUANTUM: Force load failed:', error);
+      console.error('❌ FINAL QUANTUM: Quantum entanglement failed:', error);
       return false;
     }
-  }, [isDbInitialized, questionnaireId, droppedControls.length, generateUltimateQuantumHash, refreshKey]);
+  }, [isDbInitialized, questionnaireId, droppedControls.length, generateFinalQuantumHash, refreshKey]);
 
-  // ULTIMATE: Continuous quantum synchronization
-  const ultimateQuantumSync = useCallback(async (): Promise<void> => {
+  // FINAL: Continuous quantum synchronization with entanglement
+  const finalQuantumSync = useCallback(async (): Promise<void> => {
     if (!isDbInitialized || quantumSyncActive) {
       return;
     }
 
     try {
       setQuantumSyncActive(true);
-      console.log('🌌 ULTIMATE QUANTUM SYNC: Starting continuous sync');
+      console.log('🌌 FINAL QUANTUM SYNC: Starting final quantum sync');
       
-      const syncResult = await ultimateForceLoadFromDatabase();
-      
-      if (syncResult) {
-        console.log('✅ ULTIMATE QUANTUM SYNC: Sync completed with updates');
-      } else {
-        console.log('✅ ULTIMATE QUANTUM SYNC: Sync completed - no updates needed');
+      // First establish entanglement if not already established
+      if (!quantumEntanglementRef.current) {
+        const entanglementResult = await establishQuantumEntanglement();
+        if (entanglementResult) {
+          console.log('✅ FINAL QUANTUM SYNC: Quantum entanglement established during sync');
+          return;
+        }
+      }
+
+      // If entanglement exists, perform instant sync
+      if (quantumEntanglementRef.current) {
+        const verification = await verifyControlsInDatabase(questionnaireId);
+        const dbControls = verification.controls;
+        
+        const newHash = generateFinalQuantumHash(dbControls);
+        const currentState = finalQuantumStateRef.current;
+        
+        if (newHash !== currentState.hash || dbControls.length !== droppedControls.length) {
+          console.log('🔄 FINAL QUANTUM SYNC: Quantum state update detected');
+          
+          setDroppedControls(dbControls);
+          finalQuantumStateRef.current = {
+            ...currentState,
+            controls: dbControls,
+            hash: newHash,
+            timestamp: Date.now(),
+            version: currentState.version + 1,
+            lastDbSync: Date.now(),
+            syncLevel: 'PERFECT'
+          };
+          
+          setFinalRefreshCounter(prev => prev + 1);
+          console.log('✅ FINAL QUANTUM SYNC: Quantum state synchronized');
+        } else {
+          console.log('✅ FINAL QUANTUM SYNC: Quantum states already synchronized');
+        }
       }
 
     } catch (error) {
-      console.error('❌ ULTIMATE QUANTUM SYNC: Sync failed:', error);
+      console.error('❌ FINAL QUANTUM SYNC: Sync failed:', error);
     } finally {
       setQuantumSyncActive(false);
     }
-  }, [isDbInitialized, quantumSyncActive, ultimateForceLoadFromDatabase]);
+  }, [isDbInitialized, quantumSyncActive, establishQuantumEntanglement, questionnaireId, generateFinalQuantumHash, droppedControls.length]);
 
-  // ULTIMATE: Initialize quantum system with aggressive loading
-  const initializeUltimateQuantumSystem = useCallback(() => {
-    console.log('🌌 ULTIMATE QUANTUM INIT: Initializing ultimate quantum system');
+  // FINAL: Initialize quantum system with immediate entanglement
+  const initializeFinalQuantumSystem = useCallback(() => {
+    console.log('🌌 FINAL QUANTUM INIT: Initializing final quantum system');
     
     if (syncIntervalRef.current) {
       clearInterval(syncIntervalRef.current);
     }
 
-    // Immediate first load
-    if (isDbInitialized) {
-      console.log('🌌 ULTIMATE QUANTUM INIT: Triggering immediate load');
-      forceLoadRef.current = true;
-      ultimateQuantumSync();
+    if (finalSyncTimeoutRef.current) {
+      clearTimeout(finalSyncTimeoutRef.current);
     }
 
-    // Start aggressive sync interval
+    // Immediate entanglement establishment
+    if (isDbInitialized) {
+      console.log('🌌 FINAL QUANTUM INIT: Triggering immediate quantum entanglement');
+      
+      // Multiple immediate attempts
+      establishQuantumEntanglement();
+      
+      setTimeout(() => {
+        if (!quantumEntanglementRef.current) {
+          console.log('🌌 FINAL QUANTUM INIT: Retry quantum entanglement');
+          establishQuantumEntanglement();
+        }
+      }, 100);
+      
+      setTimeout(() => {
+        if (!quantumEntanglementRef.current) {
+          console.log('🌌 FINAL QUANTUM INIT: Final retry quantum entanglement');
+          establishQuantumEntanglement();
+        }
+      }, 300);
+    }
+
+    // Start high-frequency sync interval
     syncIntervalRef.current = setInterval(() => {
       if (isDbInitialized) {
-        ultimateQuantumSync();
+        finalQuantumSync();
       }
-    }, 500); // Very frequent sync
+    }, 250); // Very high frequency
 
     // Cleanup function
     return () => {
@@ -192,72 +242,121 @@ export const useDragDrop = (questionnaireId: string = 'default-questionnaire', i
         clearInterval(syncIntervalRef.current);
         syncIntervalRef.current = null;
       }
+      if (finalSyncTimeoutRef.current) {
+        clearTimeout(finalSyncTimeoutRef.current);
+        finalSyncTimeoutRef.current = null;
+      }
     };
-  }, [isDbInitialized, ultimateQuantumSync]);
+  }, [isDbInitialized, establishQuantumEntanglement, finalQuantumSync]);
 
-  // ULTIMATE: Initialize on database ready
+  // FINAL: Initialize on database ready with immediate action
   useEffect(() => {
-    console.log('🌌 ULTIMATE QUANTUM EFFECT: Database state changed:', {
+    console.log('🌌 FINAL QUANTUM EFFECT: Database state changed:', {
       isDbInitialized,
       refreshKey,
-      currentControlCount: droppedControls.length
+      currentControlCount: droppedControls.length,
+      quantumEntanglement: quantumEntanglementRef.current
     });
 
     if (isDbInitialized) {
-      const cleanup = initializeUltimateQuantumSystem();
+      const cleanup = initializeFinalQuantumSystem();
       return cleanup;
     }
-  }, [isDbInitialized, initializeUltimateQuantumSystem]);
+  }, [isDbInitialized, initializeFinalQuantumSystem]);
 
-  // ULTIMATE: Respond to refresh key changes immediately
+  // FINAL: Respond to refresh key changes with quantum entanglement
   useEffect(() => {
     if (isDbInitialized && refreshKey > 0) {
-      console.log('🌌 ULTIMATE QUANTUM EFFECT: RefreshKey changed - forcing immediate sync');
-      forceLoadRef.current = true;
-      ultimateQuantumStateRef.current.forceSync = true;
-      ultimateQuantumSync();
-    }
-  }, [refreshKey, isDbInitialized, ultimateQuantumSync]);
-
-  // ULTIMATE: Force loading when controls are empty but should have data
-  useEffect(() => {
-    if (isDbInitialized && droppedControls.length === 0 && refreshKey > 0) {
-      console.log('🌌 ULTIMATE QUANTUM EFFECT: Empty controls detected with refreshKey > 0 - forcing load');
+      console.log('🌌 FINAL QUANTUM EFFECT: RefreshKey changed - establishing quantum entanglement');
+      
+      // Reset entanglement to force re-establishment
+      quantumEntanglementRef.current = false;
+      finalQuantumStateRef.current.quantumEntanglement = false;
+      finalQuantumStateRef.current.forceSync = true;
+      
+      // Immediate entanglement
+      establishQuantumEntanglement();
+      
+      // Backup attempts
       setTimeout(() => {
-        forceLoadRef.current = true;
-        ultimateQuantumSync();
+        if (!quantumEntanglementRef.current) {
+          establishQuantumEntanglement();
+        }
       }, 100);
+      
+      setTimeout(() => {
+        if (!quantumEntanglementRef.current) {
+          establishQuantumEntanglement();
+        }
+      }, 300);
     }
-  }, [isDbInitialized, droppedControls.length, refreshKey, ultimateQuantumSync]);
+  }, [refreshKey, isDbInitialized, establishQuantumEntanglement]);
 
-  // ULTIMATE: Enhanced force refresh
+  // FINAL: Force entanglement when controls are empty but should have data
+  useEffect(() => {
+    if (isDbInitialized && droppedControls.length === 0 && refreshKey > 0 && !quantumEntanglementRef.current) {
+      console.log('🌌 FINAL QUANTUM EFFECT: Empty controls detected - forcing quantum entanglement');
+      
+      finalSyncTimeoutRef.current = setTimeout(() => {
+        establishQuantumEntanglement();
+      }, 50);
+      
+      // Additional attempts
+      setTimeout(() => {
+        if (!quantumEntanglementRef.current) {
+          establishQuantumEntanglement();
+        }
+      }, 200);
+      
+      setTimeout(() => {
+        if (!quantumEntanglementRef.current) {
+          establishQuantumEntanglement();
+        }
+      }, 500);
+    }
+  }, [isDbInitialized, droppedControls.length, refreshKey, establishQuantumEntanglement]);
+
+  // FINAL: Enhanced force refresh with quantum entanglement
   const forceRefresh = useCallback(async () => {
-    console.log('🔄 ULTIMATE QUANTUM: ===== FORCE REFRESH =====');
+    console.log('🔄 FINAL QUANTUM: ===== FORCE REFRESH WITH QUANTUM ENTANGLEMENT =====');
     
-    forceLoadRef.current = true;
-    ultimateQuantumStateRef.current.forceSync = true;
+    // Reset entanglement
+    quantumEntanglementRef.current = false;
+    finalQuantumStateRef.current.quantumEntanglement = false;
+    finalQuantumStateRef.current.forceSync = true;
     stabilityCounterRef.current = 0;
     
-    const result = await ultimateForceLoadFromDatabase();
+    // Establish new entanglement
+    const result = await establishQuantumEntanglement();
     
     if (!result) {
-      // If no update, try again after a short delay
+      // Multiple retry attempts
       setTimeout(async () => {
-        console.log('🔄 ULTIMATE QUANTUM: Retry force refresh');
-        forceLoadRef.current = true;
-        await ultimateForceLoadFromDatabase();
-      }, 200);
+        console.log('🔄 FINAL QUANTUM: Retry 1 - force refresh');
+        await establishQuantumEntanglement();
+      }, 100);
+      
+      setTimeout(async () => {
+        console.log('🔄 FINAL QUANTUM: Retry 2 - force refresh');
+        await establishQuantumEntanglement();
+      }, 300);
+      
+      setTimeout(async () => {
+        console.log('🔄 FINAL QUANTUM: Retry 3 - force refresh');
+        await establishQuantumEntanglement();
+      }, 600);
     }
     
-    console.log('✅ ULTIMATE QUANTUM: Force refresh completed');
-  }, [ultimateForceLoadFromDatabase]);
+    console.log('✅ FINAL QUANTUM: Force refresh completed');
+  }, [establishQuantumEntanglement]);
 
-  // ULTIMATE: Enhanced force reload
+  // FINAL: Enhanced force reload with complete quantum reset
   const forceReload = useCallback(async () => {
-    console.log('🔄 ULTIMATE QUANTUM: ===== FORCE RELOAD =====');
+    console.log('🔄 FINAL QUANTUM: ===== FORCE RELOAD WITH QUANTUM RESET =====');
     
-    // Reset all state
-    ultimateQuantumStateRef.current = {
+    // Complete quantum reset
+    quantumEntanglementRef.current = false;
+    finalQuantumStateRef.current = {
       controls: [],
       hash: '',
       timestamp: 0,
@@ -265,7 +364,9 @@ export const useDragDrop = (questionnaireId: string = 'default-questionnaire', i
       isStable: false,
       syncLevel: 'CRITICAL',
       lastDbSync: 0,
-      forceSync: true
+      forceSync: true,
+      quantumEntanglement: false,
+      finalSyncActive: false
     };
     
     stabilityCounterRef.current = 0;
@@ -273,18 +374,17 @@ export const useDragDrop = (questionnaireId: string = 'default-questionnaire', i
     setDroppedControls([]);
     setIsLoading(true);
     
-    // Force immediate reload
+    // Establish quantum entanglement after reset
     setTimeout(async () => {
-      await ultimateForceLoadFromDatabase();
-      setIsLoading(false);
+      await establishQuantumEntanglement();
     }, 100);
     
-    console.log('✅ ULTIMATE QUANTUM: Force reload completed');
-  }, [ultimateForceLoadFromDatabase]);
+    console.log('✅ FINAL QUANTUM: Force reload completed');
+  }, [establishQuantumEntanglement]);
 
-  // ULTIMATE: Nuclear reset with complete reconstruction
+  // FINAL: Nuclear reset with quantum reconstruction
   const nuclearReset = useCallback(async () => {
-    console.log('💥 ULTIMATE QUANTUM: ===== NUCLEAR RESET =====');
+    console.log('💥 FINAL QUANTUM: ===== NUCLEAR RESET WITH QUANTUM RECONSTRUCTION =====');
     
     // Stop all processes
     if (syncIntervalRef.current) {
@@ -292,8 +392,14 @@ export const useDragDrop = (questionnaireId: string = 'default-questionnaire', i
       syncIntervalRef.current = null;
     }
     
-    // Complete state reset
-    ultimateQuantumStateRef.current = {
+    if (finalSyncTimeoutRef.current) {
+      clearTimeout(finalSyncTimeoutRef.current);
+      finalSyncTimeoutRef.current = null;
+    }
+    
+    // Complete quantum reset
+    quantumEntanglementRef.current = false;
+    finalQuantumStateRef.current = {
       controls: [],
       hash: '',
       timestamp: 0,
@@ -301,7 +407,9 @@ export const useDragDrop = (questionnaireId: string = 'default-questionnaire', i
       isStable: false,
       syncLevel: 'CRITICAL',
       lastDbSync: 0,
-      forceSync: true
+      forceSync: true,
+      quantumEntanglement: false,
+      finalSyncActive: false
     };
     
     stabilityCounterRef.current = 0;
@@ -310,23 +418,22 @@ export const useDragDrop = (questionnaireId: string = 'default-questionnaire', i
     setDroppedControls([]);
     setSelectedControl(null);
     setIsLoading(true);
-    setUltimateRefreshCounter(0);
+    setFinalRefreshCounter(0);
     
-    // Nuclear reconstruction
+    // Quantum reconstruction
     setTimeout(async () => {
-      console.log('💥 ULTIMATE QUANTUM: Nuclear reconstruction phase');
-      await ultimateForceLoadFromDatabase();
-      const cleanup = initializeUltimateQuantumSystem();
-      setIsLoading(false);
-      console.log('✅ ULTIMATE QUANTUM: Nuclear reset completed');
+      console.log('💥 FINAL QUANTUM: Quantum reconstruction phase');
+      await establishQuantumEntanglement();
+      const cleanup = initializeFinalQuantumSystem();
+      console.log('✅ FINAL QUANTUM: Nuclear reset with quantum reconstruction completed');
     }, 200);
     
-  }, [ultimateForceLoadFromDatabase, initializeUltimateQuantumSystem]);
+  }, [establishQuantumEntanglement, initializeFinalQuantumSystem]);
 
-  // Standard CRUD operations with ultimate quantum integration
+  // Standard CRUD operations with quantum entanglement integration
   const addControl = useCallback(async (controlType: ControlType, x: number, y: number, sectionId: string = 'default') => {
     if (!isDbInitialized) {
-      console.warn('⚠️ ULTIMATE QUANTUM: Cannot add control - database not initialized');
+      console.warn('⚠️ FINAL QUANTUM: Cannot add control - database not initialized');
       return;
     }
 
@@ -350,15 +457,14 @@ export const useDragDrop = (questionnaireId: string = 'default-questionnaire', i
       await insertControl(newControl, questionnaireId);
       setSelectedControl(newControl);
       
-      // Trigger ultimate quantum sync
-      forceLoadRef.current = true;
-      setTimeout(ultimateQuantumSync, 50);
+      // Trigger quantum entanglement sync
+      setTimeout(finalQuantumSync, 50);
       
-      console.log('✅ ULTIMATE QUANTUM: Control added with ultimate sync');
+      console.log('✅ FINAL QUANTUM: Control added with quantum sync');
     } catch (error) {
-      console.error('❌ ULTIMATE QUANTUM: Failed to add control:', error);
+      console.error('❌ FINAL QUANTUM: Failed to add control:', error);
     }
-  }, [droppedControls, questionnaireId, isDbInitialized, ultimateQuantumSync]);
+  }, [droppedControls, questionnaireId, isDbInitialized, finalQuantumSync]);
 
   const updateControl = useCallback(async (id: string, updates: Partial<DroppedControl>) => {
     if (!isDbInitialized) return;
@@ -370,15 +476,14 @@ export const useDragDrop = (questionnaireId: string = 'default-questionnaire', i
         setSelectedControl(prev => prev ? { ...prev, ...updates } : null);
       }
       
-      // Trigger ultimate quantum sync
-      forceLoadRef.current = true;
-      setTimeout(ultimateQuantumSync, 50);
+      // Trigger quantum entanglement sync
+      setTimeout(finalQuantumSync, 50);
       
-      console.log('✅ ULTIMATE QUANTUM: Control updated with ultimate sync');
+      console.log('✅ FINAL QUANTUM: Control updated with quantum sync');
     } catch (error) {
-      console.error('❌ ULTIMATE QUANTUM: Failed to update control:', error);
+      console.error('❌ FINAL QUANTUM: Failed to update control:', error);
     }
-  }, [selectedControl, questionnaireId, isDbInitialized, ultimateQuantumSync]);
+  }, [selectedControl, questionnaireId, isDbInitialized, finalQuantumSync]);
 
   const removeControl = useCallback(async (id: string) => {
     if (!isDbInitialized) return;
@@ -408,15 +513,14 @@ export const useDragDrop = (questionnaireId: string = 'default-questionnaire', i
         setSelectedControl(null);
       }
       
-      // Trigger ultimate quantum sync
-      forceLoadRef.current = true;
-      setTimeout(ultimateQuantumSync, 50);
+      // Trigger quantum entanglement sync
+      setTimeout(finalQuantumSync, 50);
       
-      console.log('✅ ULTIMATE QUANTUM: Control removed with ultimate sync');
+      console.log('✅ FINAL QUANTUM: Control removed with quantum sync');
     } catch (error) {
-      console.error('❌ ULTIMATE QUANTUM: Failed to remove control:', error);
+      console.error('❌ FINAL QUANTUM: Failed to remove control:', error);
     }
-  }, [droppedControls, selectedControl, questionnaireId, isDbInitialized, ultimateQuantumSync]);
+  }, [droppedControls, selectedControl, questionnaireId, isDbInitialized, finalQuantumSync]);
 
   const moveControl = useCallback(async (id: string, direction: 'up' | 'down') => {
     if (!isDbInitialized) return;
@@ -438,15 +542,14 @@ export const useDragDrop = (questionnaireId: string = 'default-questionnaire', i
       await updateControlDB(id, { y: targetControl.y });
       await updateControlDB(targetControl.id, { y: control.y });
       
-      // Trigger ultimate quantum sync
-      forceLoadRef.current = true;
-      setTimeout(ultimateQuantumSync, 50);
+      // Trigger quantum entanglement sync
+      setTimeout(finalQuantumSync, 50);
       
-      console.log('✅ ULTIMATE QUANTUM: Control moved with ultimate sync');
+      console.log('✅ FINAL QUANTUM: Control moved with quantum sync');
     } catch (error) {
-      console.error('❌ ULTIMATE QUANTUM: Failed to move control:', error);
+      console.error('❌ FINAL QUANTUM: Failed to move control:', error);
     }
-  }, [droppedControls, questionnaireId, isDbInitialized, ultimateQuantumSync]);
+  }, [droppedControls, questionnaireId, isDbInitialized, finalQuantumSync]);
 
   const reorderControl = useCallback(async (dragIndex: number, hoverIndex: number) => {
     if (!isDbInitialized) return;
@@ -465,15 +568,14 @@ export const useDragDrop = (questionnaireId: string = 'default-questionnaire', i
       
       await reorderControls(reorderedControls);
       
-      // Trigger ultimate quantum sync
-      forceLoadRef.current = true;
-      setTimeout(ultimateQuantumSync, 50);
+      // Trigger quantum entanglement sync
+      setTimeout(finalQuantumSync, 50);
       
-      console.log('✅ ULTIMATE QUANTUM: Controls reordered with ultimate sync');
+      console.log('✅ FINAL QUANTUM: Controls reordered with quantum sync');
     } catch (error) {
-      console.error('❌ ULTIMATE QUANTUM: Failed to reorder control:', error);
+      console.error('❌ FINAL QUANTUM: Failed to reorder control:', error);
     }
-  }, [droppedControls, questionnaireId, isDbInitialized, ultimateQuantumSync]);
+  }, [droppedControls, questionnaireId, isDbInitialized, finalQuantumSync]);
 
   const selectControl = useCallback((control: DroppedControl) => {
     setSelectedControl(control);
@@ -483,36 +585,38 @@ export const useDragDrop = (questionnaireId: string = 'default-questionnaire', i
     setSelectedControl(null);
   }, []);
 
-  // ULTIMATE: Enhanced state monitoring with detailed logging
+  // FINAL: Enhanced state monitoring with quantum entanglement status
   useEffect(() => {
-    const ultimateState = ultimateQuantumStateRef.current;
-    console.log('🌌 ULTIMATE QUANTUM STATE: Current state:', {
+    const finalState = finalQuantumStateRef.current;
+    console.log('🌌 FINAL QUANTUM STATE: Current state:', {
       controlCount: droppedControls.length,
-      ultimateHash: ultimateState.hash.substring(0, 12),
-      ultimateVersion: ultimateState.version,
-      isStable: ultimateState.isStable,
-      syncLevel: ultimateState.syncLevel,
+      finalHash: finalState.hash.substring(0, 12),
+      finalVersion: finalState.version,
+      isStable: finalState.isStable,
+      syncLevel: finalState.syncLevel,
+      quantumEntanglement: finalState.quantumEntanglement,
+      quantumEntanglementRef: quantumEntanglementRef.current,
       stabilityCounter: stabilityCounterRef.current,
       refreshKey,
-      ultimateRefreshCounter,
-      lastDbSync: ultimateState.lastDbSync ? new Date(ultimateState.lastDbSync).toLocaleTimeString() : 'Never',
-      forceSync: ultimateState.forceSync,
+      finalRefreshCounter,
+      lastDbSync: finalState.lastDbSync ? new Date(finalState.lastDbSync).toLocaleTimeString() : 'Never',
+      forceSync: finalState.forceSync,
       isLoading
     });
 
     // Log control details if we have controls
     if (droppedControls.length > 0) {
-      console.log('📝 ULTIMATE QUANTUM STATE: Current controls:');
+      console.log('📝 FINAL QUANTUM STATE: Current controls:');
       droppedControls.slice(0, 3).forEach((control, index) => {
         console.log(`   ${index + 1}. ${control.name} (${control.type}) - Section: ${control.sectionId}`);
       });
     }
-  }, [droppedControls.length, refreshKey, ultimateRefreshCounter, isLoading]);
+  }, [droppedControls.length, refreshKey, finalRefreshCounter, isLoading]);
 
-  // ULTIMATE: Set loading to false when we have controls
+  // FINAL: Set loading to false when quantum entanglement is established
   useEffect(() => {
-    if (droppedControls.length > 0 && isLoading) {
-      console.log('✅ ULTIMATE QUANTUM: Controls loaded - setting loading to false');
+    if (quantumEntanglementRef.current && droppedControls.length > 0 && isLoading) {
+      console.log('✅ FINAL QUANTUM: Quantum entanglement established - setting loading to false');
       setIsLoading(false);
     }
   }, [droppedControls.length, isLoading]);

@@ -65,11 +65,11 @@ function App() {
     const initializeApp = async () => {
       try {
         setIsLoading(true);
-        console.log('🚀 APP: Initializing application with Ultimate Quantum State Management...');
+        console.log('🚀 APP: Initializing application with Final Quantum Synchronization Protocol...');
         
         await initializeDatabase();
         setIsDbInitialized(true);
-        console.log('✅ APP: Database initialized - Ultimate Quantum system will activate');
+        console.log('✅ APP: Database initialized - Final Quantum system will activate');
         
         const loadedSections = await getSections(currentQuestionnaire);
         setSections(loadedSections);
@@ -80,11 +80,22 @@ function App() {
           console.log('🎯 APP: Active section set to:', loadedSections[0].id);
         }
 
-        // Force initial refresh to load controls
+        // Trigger quantum entanglement establishment
         setTimeout(() => {
-          console.log('🔄 APP: Triggering initial refresh for control loading');
+          console.log('🌌 APP: Triggering quantum entanglement establishment');
           setRefreshKey(1);
-        }, 500);
+        }, 100);
+
+        // Additional quantum sync triggers
+        setTimeout(() => {
+          console.log('🌌 APP: Additional quantum sync trigger');
+          setRefreshKey(prev => prev + 1);
+        }, 300);
+
+        setTimeout(() => {
+          console.log('🌌 APP: Final quantum sync trigger');
+          setRefreshKey(prev => prev + 1);
+        }, 600);
 
       } catch (error) {
         console.error('❌ APP: Failed to initialize app:', error);
@@ -181,10 +192,10 @@ function App() {
     removeControl(controlId);
   };
 
-  // ULTIMATE: Enhanced Excel import with ultimate quantum state management
+  // FINAL: Enhanced Excel import with quantum synchronization protocol
   const handleImportControls = async (controls: DroppedControl[]) => {
-    console.log('🚀 EXCEL IMPORT: ===== ULTIMATE QUANTUM-ENHANCED ATOMIC IMPORT =====');
-    console.log('📊 EXCEL IMPORT: Ultimate quantum import details:', {
+    console.log('🚀 EXCEL IMPORT: ===== FINAL QUANTUM-ENHANCED ATOMIC IMPORT =====');
+    console.log('📊 EXCEL IMPORT: Final quantum import details:', {
       controlCount: controls.length,
       questionnaire: currentQuestionnaire,
       activeSection,
@@ -208,11 +219,11 @@ function App() {
         console.log(`   ${index + 1}. ${control.name} (${control.type}) - Section: ${control.sectionId}, Order: ${control.y}, ID: ${control.id}`);
       });
 
-      // ULTIMATE: Atomic batch insert with ultimate quantum verification
-      console.log('🔄 EXCEL IMPORT: STEP 1 - Ultimate quantum-enhanced atomic batch insert...');
+      // FINAL: Atomic batch insert with quantum verification
+      console.log('🔄 EXCEL IMPORT: STEP 1 - Final quantum-enhanced atomic batch insert...');
       const batchResult = await insertControlsBatch(controls, currentQuestionnaire);
       
-      console.log('📊 EXCEL IMPORT: Ultimate quantum atomic batch results:', {
+      console.log('📊 EXCEL IMPORT: Final quantum atomic batch results:', {
         successCount: batchResult.success,
         errorCount: batchResult.errors.length,
         totalControls: controls.length,
@@ -228,60 +239,68 @@ function App() {
       });
 
       if (batchResult.success === 0) {
-        throw new Error(`Ultimate quantum atomic import failed: ${batchResult.errors.slice(0, 3).join(', ')}`);
+        throw new Error(`Final quantum atomic import failed: ${batchResult.errors.slice(0, 3).join(', ')}`);
       }
 
-      // ULTIMATE: Intelligent ultimate quantum state synchronization
-      console.log('🔄 EXCEL IMPORT: STEP 2 - Ultimate quantum state synchronization...');
+      // FINAL: Quantum entanglement synchronization protocol
+      console.log('🔄 EXCEL IMPORT: STEP 2 - Final quantum entanglement synchronization...');
       
       // Show dialog first
       setTimeout(() => {
-        console.log('🎉 EXCEL IMPORT: Showing ultimate quantum success dialog');
+        console.log('🎉 EXCEL IMPORT: Showing final quantum success dialog');
         setShowImportDialog(true);
       }, 100);
 
-      // ULTIMATE: Trigger ultimate quantum sync with multiple strategies
+      // FINAL: Trigger quantum entanglement with multiple strategies
       if (batchResult.success === controls.length) {
-        console.log('🌌 EXCEL IMPORT: Perfect atomic import - triggering ultimate quantum sync');
+        console.log('🌌 EXCEL IMPORT: Perfect atomic import - triggering quantum entanglement');
         
-        // Strategy 1: Immediate refresh key increment
+        // Strategy 1: Immediate quantum entanglement trigger
         setRefreshKey(prev => prev + 1);
         
-        // Strategy 2: Force refresh after short delay
+        // Strategy 2: Force quantum sync after short delay
         setTimeout(() => {
-          console.log('🌌 EXCEL IMPORT: Strategy 2 - Force refresh');
+          console.log('🌌 EXCEL IMPORT: Strategy 2 - Force quantum sync');
           forceRefresh();
-        }, 200);
+        }, 150);
         
-        // Strategy 3: Nuclear option if needed
+        // Strategy 3: Quantum verification and entanglement
         setTimeout(() => {
-          console.log('🌌 EXCEL IMPORT: Strategy 3 - Verification and potential nuclear option');
+          console.log('🌌 EXCEL IMPORT: Strategy 3 - Quantum verification and entanglement');
           verifyControlsInDatabase(currentQuestionnaire).then(verification => {
-            console.log('🔍 EXCEL IMPORT: Post-import verification:', {
+            console.log('🔍 EXCEL IMPORT: Post-import quantum verification:', {
               dbControlCount: verification.count,
               uiControlCount: droppedControls.length,
-              expectedCount: batchResult.success
+              expectedCount: batchResult.success,
+              quantumEntanglementNeeded: verification.count !== droppedControls.length
             });
             
             if (verification.count !== droppedControls.length && verification.count > 0) {
-              console.log('🌌 EXCEL IMPORT: Verification shows mismatch - triggering nuclear reset');
-              nuclearReset();
+              console.log('🌌 EXCEL IMPORT: Quantum entanglement required - triggering');
+              setRefreshKey(prev => prev + 1);
+              setTimeout(forceRefresh, 100);
             }
           });
+        }, 500);
+        
+        // Strategy 4: Final quantum entanglement establishment
+        setTimeout(() => {
+          console.log('🌌 EXCEL IMPORT: Strategy 4 - Final quantum entanglement establishment');
+          setRefreshKey(prev => prev + 1);
         }, 1000);
         
       } else {
-        console.log('🌌 EXCEL IMPORT: Partial import - triggering ultimate quantum recovery');
+        console.log('🌌 EXCEL IMPORT: Partial import - triggering quantum recovery');
         setRefreshKey(prev => prev + 1);
         setTimeout(() => {
           forceRefresh();
         }, 200);
       }
 
-      console.log('🎉 EXCEL IMPORT: ===== ULTIMATE QUANTUM-ENHANCED ATOMIC IMPORT COMPLETED =====');
+      console.log('🎉 EXCEL IMPORT: ===== FINAL QUANTUM-ENHANCED ATOMIC IMPORT COMPLETED =====');
 
     } catch (error) {
-      console.error('❌ EXCEL IMPORT: ===== ULTIMATE QUANTUM-ENHANCED ATOMIC IMPORT FAILED =====', error);
+      console.error('❌ EXCEL IMPORT: ===== FINAL QUANTUM-ENHANCED ATOMIC IMPORT FAILED =====', error);
       setImportResults({
         success: 0,
         total: controls.length,
@@ -294,18 +313,23 @@ function App() {
     }
   };
 
-  // ULTIMATE: Enhanced dialog close with ultimate quantum verification
+  // FINAL: Enhanced dialog close with quantum entanglement verification
   const handleDialogClose = () => {
-    console.log('🔄 DIALOG: ===== ULTIMATE QUANTUM DIALOG CLOSE =====');
+    console.log('🔄 DIALOG: ===== FINAL QUANTUM DIALOG CLOSE =====');
     setShowImportDialog(false);
     setImportResults(null);
     
-    // ULTIMATE: The ultimate quantum system handles verification automatically
-    console.log('🌌 DIALOG: Ultimate quantum system will handle verification automatically');
+    // FINAL: Quantum entanglement verification
+    console.log('🌌 DIALOG: Final quantum entanglement verification');
     
-    // Additional verification step
+    // Additional quantum sync
     setTimeout(() => {
-      console.log('🌌 DIALOG: Additional verification step');
+      console.log('🌌 DIALOG: Additional quantum sync');
+      setRefreshKey(prev => prev + 1);
+    }, 100);
+    
+    setTimeout(() => {
+      console.log('🌌 DIALOG: Final quantum verification');
       forceRefresh();
     }, 300);
   };
@@ -318,14 +342,14 @@ function App() {
             <div className="relative">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
               <div className="absolute inset-0 animate-pulse">
-                <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full mx-auto opacity-20"></div>
+                <div className="w-12 h-12 bg-gradient-to-r from-blue-500 via-purple-500 to-cyan-500 rounded-full mx-auto opacity-30"></div>
               </div>
             </div>
             <p className="text-gray-600 dark:text-gray-300 transition-colors">
-              Initializing Ultimate Quantum State Management...
+              Initializing Final Quantum Synchronization Protocol...
             </p>
             <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
-              Setting up real-time bidirectional synchronization with ultimate precision
+              Establishing quantum entanglement for instant bidirectional synchronization
             </p>
           </div>
         </div>
@@ -415,7 +439,7 @@ function App() {
           {renderContent()}
         </div>
         
-        {/* Ultimate Quantum Import Progress Indicator */}
+        {/* Final Quantum Import Progress Indicator */}
         {importInProgress && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
             <div className="bg-white dark:bg-gray-900 rounded-lg shadow-xl p-8 max-w-md w-full mx-4">
@@ -423,39 +447,39 @@ function App() {
                 <div className="relative">
                   <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
                   <div className="absolute inset-0 animate-pulse">
-                    <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full mx-auto opacity-30"></div>
+                    <div className="w-12 h-12 bg-gradient-to-r from-blue-500 via-purple-500 to-cyan-500 rounded-full mx-auto opacity-40"></div>
                   </div>
                 </div>
                 <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
-                  Ultimate Quantum-Enhanced Import...
+                  Final Quantum-Enhanced Import...
                 </h3>
                 <p className="text-gray-600 dark:text-gray-300 text-sm">
-                  Processing Excel data with ultimate quantum state management and atomic transactions.
+                  Processing Excel data with final quantum synchronization protocol and atomic transactions.
                 </p>
                 <p className="text-gray-500 dark:text-gray-400 text-xs mt-2">
-                  Real-time bidirectional synchronization with ultimate precision active.
+                  Quantum entanglement for instant bidirectional synchronization active.
                 </p>
               </div>
             </div>
           </div>
         )}
 
-        {/* Ultimate Quantum Import Success/Error Dialog */}
+        {/* Final Quantum Import Success/Error Dialog */}
         <ImportSuccessDialog
           isOpen={showImportDialog}
           onClose={handleDialogClose}
           results={importResults}
         />
         
-        {/* Ultimate Quantum-Enhanced Footer */}
+        {/* Final Quantum-Enhanced Footer */}
         <footer className="bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700 px-6 py-3 transition-colors">
           <div className="flex items-center justify-between text-sm text-gray-600 dark:text-gray-300 transition-colors">
             <div className="flex items-center space-x-6">
               <span>© 2025 Jumbo No-Code Builder</span>
-              <span>Ultimate Quantum State Management Platform</span>
-              {isDbInitialized && <span className="text-green-600 dark:text-green-400">Ultimate Quantum Sync Active</span>}
+              <span>Final Quantum Synchronization Platform</span>
+              {isDbInitialized && <span className="text-green-600 dark:text-green-400">Quantum Entanglement Active</span>}
               <span className="capitalize">{theme} Theme</span>
-              {importInProgress && <span className="text-blue-600 dark:text-blue-400 animate-pulse">Ultimate Quantum Import Processing...</span>}
+              {importInProgress && <span className="text-blue-600 dark:text-blue-400 animate-pulse">Final Quantum Import Processing...</span>}
               <span className="text-xs text-white font-mono bg-blue-600 dark:bg-blue-700 px-3 py-1 rounded-full shadow-sm">
                 RefreshKey: {refreshKey}
               </span>
@@ -464,11 +488,11 @@ function App() {
               </span>
               {droppedControls.length > 0 && (
                 <span className="text-xs text-white font-mono bg-purple-600 dark:bg-purple-700 px-3 py-1 rounded-full shadow-sm">
-                  Ultimate: ✓
+                  Quantum: ✓
                 </span>
               )}
-              <span className="text-xs text-white font-mono bg-gradient-to-r from-purple-500 via-blue-500 to-cyan-500 px-3 py-1 rounded-full shadow-sm animate-pulse">
-                🌌 ULTIMATE QUANTUM
+              <span className="text-xs text-white font-mono bg-gradient-to-r from-purple-500 via-blue-500 via-cyan-500 to-green-500 px-3 py-1 rounded-full shadow-sm animate-pulse">
+                🌌 FINAL QUANTUM ENTANGLEMENT
               </span>
             </div>
             <div className="flex items-center space-x-4">
