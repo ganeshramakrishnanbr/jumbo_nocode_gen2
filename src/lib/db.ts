@@ -129,6 +129,148 @@ const insertDefaultData = async () => {
   });
 };
 
+// NEW: Atomic batch insert for controls with comprehensive error handling
+export const insertControlsBatch = async (controls: DroppedControl[], questionnaireId: string = 'default-questionnaire'): Promise<{ success: number; errors: string[] }> => {
+  if (!db) throw new Error('Database not initialized');
+
+  console.log('🔄 DB ATOMIC: ===== STARTING ATOMIC BATCH INSERT =====');
+  console.log('📊 DB ATOMIC: Batch details:', {
+    controlCount: controls.length,
+    questionnaireId,
+    timestamp: new Date().toISOString()
+  });
+
+  let success = 0;
+  const errors: string[] = [];
+
+  // Start transaction for atomic operation
+  try {
+    console.log('🔄 DB ATOMIC: Beginning transaction...');
+    await db.execute('BEGIN TRANSACTION');
+
+    for (let i = 0; i < controls.length; i++) {
+      const control = controls[i];
+      try {
+        console.log(`🔄 DB ATOMIC: Inserting control ${i + 1}/${controls.length}: ${control.name}`);
+        
+        // Validate control data
+        if (!control.id || !control.type || !control.name) {
+          throw new Error(`Invalid control data: missing required fields`);
+        }
+
+        // Insert control with atomic operation
+        await db.execute({
+          sql: `INSERT INTO controls (id, questionnaire_id, section_id, type, name, x, y, width, height, properties) 
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+          args: [
+            control.id,
+            questionnaireId,
+            control.sectionId || 'default',
+            control.type,
+            control.name,
+            control.x,
+            control.y,
+            control.width,
+            control.height,
+            JSON.stringify(control.properties)
+          ]
+        });
+
+        success++;
+        console.log(`✅ DB ATOMIC: Successfully inserted control ${i + 1}: ${control.name}`);
+      } catch (error) {
+        const errorMsg = `Failed to insert control ${control.name}: ${error}`;
+        errors.push(errorMsg);
+        console.error(`❌ DB ATOMIC: ${errorMsg}`);
+        
+        // For atomic operation, we should rollback on any error
+        throw error;
+      }
+    }
+
+    // Commit transaction if all inserts successful
+    console.log('🔄 DB ATOMIC: Committing transaction...');
+    await db.execute('COMMIT');
+    
+    console.log('✅ DB ATOMIC: ===== ATOMIC BATCH INSERT COMPLETED SUCCESSFULLY =====');
+    console.log('📊 DB ATOMIC: Final results:', {
+      successCount: success,
+      errorCount: errors.length,
+      totalProcessed: controls.length
+    });
+
+    return { success, errors };
+
+  } catch (error) {
+    // Rollback transaction on any error
+    console.log('🔄 DB ATOMIC: Rolling back transaction due to error...');
+    try {
+      await db.execute('ROLLBACK');
+      console.log('✅ DB ATOMIC: Transaction rolled back successfully');
+    } catch (rollbackError) {
+      console.error('❌ DB ATOMIC: Failed to rollback transaction:', rollbackError);
+    }
+
+    console.error('❌ DB ATOMIC: ===== ATOMIC BATCH INSERT FAILED =====');
+    console.error('❌ DB ATOMIC: Error details:', error);
+    
+    // Return error result
+    return { 
+      success: 0, 
+      errors: [`Atomic transaction failed: ${error instanceof Error ? error.message : 'Unknown error'}`] 
+    };
+  }
+};
+
+// NEW: Enhanced control verification with detailed logging
+export const verifyControlsInDatabase = async (questionnaireId: string = 'default-questionnaire'): Promise<{ count: number; controls: DroppedControl[] }> => {
+  if (!db) throw new Error('Database not initialized');
+
+  console.log('🔍 DB VERIFY: ===== STARTING DATABASE VERIFICATION =====');
+  console.log('📊 DB VERIFY: Verification parameters:', {
+    questionnaireId,
+    timestamp: new Date().toISOString()
+  });
+
+  try {
+    const result = await db.execute({
+      sql: 'SELECT * FROM controls WHERE questionnaire_id = ? ORDER BY y, x',
+      args: [questionnaireId]
+    });
+
+    const controls = result.rows.map(row => ({
+      id: row.id as string,
+      type: row.type as string,
+      name: row.name as string,
+      x: row.x as number,
+      y: row.y as number,
+      width: row.width as number,
+      height: row.height as number,
+      properties: JSON.parse(row.properties as string || '{}'),
+      sectionId: row.section_id as string
+    }));
+
+    console.log('✅ DB VERIFY: Database verification completed:', {
+      controlCount: controls.length,
+      sectionDistribution: controls.reduce((acc, c) => {
+        acc[c.sectionId || 'unknown'] = (acc[c.sectionId || 'unknown'] || 0) + 1;
+        return acc;
+      }, {} as Record<string, number>)
+    });
+
+    console.log('📝 DB VERIFY: First 5 controls in database:');
+    controls.slice(0, 5).forEach((control, index) => {
+      console.log(`   ${index + 1}. ${control.name} (${control.type}) - Section: ${control.sectionId}, ID: ${control.id}`);
+    });
+
+    return { count: controls.length, controls };
+
+  } catch (error) {
+    console.error('❌ DB VERIFY: Database verification failed:', error);
+    throw error;
+  }
+};
+
 // Questionnaire operations
 export const getQuestionnaires = async (): Promise<Questionnaire[]> => {
   if (!db) throw new Error('Database not initialized');
