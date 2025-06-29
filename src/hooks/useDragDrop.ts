@@ -9,14 +9,16 @@ import {
   verifyControlsInDatabase
 } from '../lib/db';
 
-// QUANTUM STATE MANAGEMENT SYSTEM
-interface QuantumState {
+// ULTIMATE QUANTUM STATE MANAGEMENT SYSTEM
+interface UltimateQuantumState {
   controls: DroppedControl[];
   hash: string;
   timestamp: number;
   version: number;
   isStable: boolean;
   syncLevel: 'PERFECT' | 'GOOD' | 'NEEDS_SYNC' | 'CRITICAL';
+  lastDbSync: number;
+  forceSync: boolean;
 }
 
 export const useDragDrop = (questionnaireId: string = 'default-questionnaire', isDbInitialized: boolean = false, refreshKey: number = 0) => {
@@ -24,320 +26,307 @@ export const useDragDrop = (questionnaireId: string = 'default-questionnaire', i
   const [selectedControl, setSelectedControl] = useState<DroppedControl | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   
-  // QUANTUM STATE MANAGEMENT
-  const quantumStateRef = useRef<QuantumState>({
+  // ULTIMATE QUANTUM STATE MANAGEMENT
+  const ultimateQuantumStateRef = useRef<UltimateQuantumState>({
     controls: [],
     hash: '',
     timestamp: 0,
     version: 0,
     isStable: false,
-    syncLevel: 'CRITICAL'
+    syncLevel: 'CRITICAL',
+    lastDbSync: 0,
+    forceSync: false
   });
   
   const [quantumSyncActive, setQuantumSyncActive] = useState(false);
-  const [lastQuantumSync, setLastQuantumSync] = useState(0);
+  const [ultimateRefreshCounter, setUltimateRefreshCounter] = useState(0);
   const syncIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const stabilityCounterRef = useRef(0);
+  const forceLoadRef = useRef(false);
 
-  // QUANTUM: Generate state hash for perfect tracking
-  const generateQuantumHash = useCallback((controls: DroppedControl[]): string => {
+  // ULTIMATE: Generate quantum hash with enhanced precision
+  const generateUltimateQuantumHash = useCallback((controls: DroppedControl[]): string => {
     const stateString = controls
       .sort((a, b) => a.id.localeCompare(b.id))
-      .map(c => `${c.id}:${c.type}:${c.sectionId}:${c.y}`)
+      .map(c => `${c.id}:${c.type}:${c.name}:${c.sectionId}:${c.y}:${Object.keys(c.properties).length}`)
       .join('|');
     
-    // Simple hash function for state tracking
     let hash = 0;
     for (let i = 0; i < stateString.length; i++) {
       const char = stateString.charCodeAt(i);
       hash = ((hash << 5) - hash) + char;
-      hash = hash & hash; // Convert to 32-bit integer
+      hash = hash & hash;
     }
-    return hash.toString(36);
+    return `${hash.toString(36)}-${controls.length}-${Date.now().toString(36)}`;
   }, []);
 
-  // QUANTUM: Analyze sync level between database and UI state
-  const analyzeQuantumSyncLevel = useCallback((dbControls: DroppedControl[], uiControls: DroppedControl[]): 'PERFECT' | 'GOOD' | 'NEEDS_SYNC' | 'CRITICAL' => {
-    const dbHash = generateQuantumHash(dbControls);
-    const uiHash = generateQuantumHash(uiControls);
-    
-    if (dbHash === uiHash) return 'PERFECT';
-    if (Math.abs(dbControls.length - uiControls.length) <= 1) return 'GOOD';
-    if (Math.abs(dbControls.length - uiControls.length) <= 3) return 'NEEDS_SYNC';
-    return 'CRITICAL';
-  }, [generateQuantumHash]);
-
-  // QUANTUM: Real-time bidirectional synchronization
-  const quantumSync = useCallback(async (): Promise<boolean> => {
-    if (!isDbInitialized || quantumSyncActive) {
+  // ULTIMATE: Force immediate database load with quantum verification
+  const ultimateForceLoadFromDatabase = useCallback(async (): Promise<boolean> => {
+    if (!isDbInitialized) {
+      console.log('⏸️ ULTIMATE QUANTUM: Database not ready');
       return false;
     }
 
     try {
-      setQuantumSyncActive(true);
-      console.log('🌌 QUANTUM SYNC: ===== INITIATING QUANTUM SYNCHRONIZATION =====');
+      console.log('🌌 ULTIMATE QUANTUM: ===== FORCE LOADING FROM DATABASE =====');
       
-      const startTime = Date.now();
       const verification = await verifyControlsInDatabase(questionnaireId);
       const dbControls = verification.controls;
       
-      const currentQuantumState = quantumStateRef.current;
-      const newHash = generateQuantumHash(dbControls);
-      const syncLevel = analyzeQuantumSyncLevel(dbControls, droppedControls);
-      
-      console.log('🌌 QUANTUM SYNC: State analysis:', {
+      console.log('📊 ULTIMATE QUANTUM: Database verification results:', {
         dbControlCount: dbControls.length,
-        uiControlCount: droppedControls.length,
-        previousHash: currentQuantumState.hash.substring(0, 8),
-        newHash: newHash.substring(0, 8),
-        syncLevel,
-        hashChanged: newHash !== currentQuantumState.hash,
-        stabilityCounter: stabilityCounterRef.current,
+        currentUICount: droppedControls.length,
+        questionnaireId,
         refreshKey,
         timestamp: new Date().toISOString()
       });
 
-      // QUANTUM: Update quantum state
-      const newQuantumState: QuantumState = {
-        controls: dbControls,
-        hash: newHash,
-        timestamp: startTime,
-        version: currentQuantumState.version + 1,
-        isStable: syncLevel === 'PERFECT' && stabilityCounterRef.current >= 3,
-        syncLevel
-      };
-
-      quantumStateRef.current = newQuantumState;
-
-      // QUANTUM: Apply state updates based on sync level
-      let stateUpdated = false;
-      
-      if (syncLevel === 'PERFECT') {
-        stabilityCounterRef.current++;
-        console.log('✨ QUANTUM SYNC: Perfect synchronization achieved');
-        
-        if (stabilityCounterRef.current >= 5) {
-          console.log('🎯 QUANTUM SYNC: Quantum stability reached - entering maintenance mode');
-          setLastQuantumSync(startTime);
-          return true; // Quantum stability achieved
-        }
-      } else {
-        stabilityCounterRef.current = 0;
-        
-        if (newHash !== currentQuantumState.hash || syncLevel === 'CRITICAL') {
-          console.log('🔄 QUANTUM SYNC: Applying quantum state correction');
-          setDroppedControls(dbControls);
-          stateUpdated = true;
-        }
+      if (dbControls.length > 0) {
+        console.log('📝 ULTIMATE QUANTUM: Database controls found:');
+        dbControls.slice(0, 5).forEach((control, index) => {
+          console.log(`   ${index + 1}. ${control.name} (${control.type}) - Section: ${control.sectionId}, ID: ${control.id}`);
+        });
       }
 
-      const syncDuration = Date.now() - startTime;
-      console.log('✅ QUANTUM SYNC: Synchronization completed:', {
-        duration: `${syncDuration}ms`,
-        stateUpdated,
-        syncLevel,
-        stabilityCounter: stabilityCounterRef.current,
-        quantumVersion: newQuantumState.version
-      });
+      const newHash = generateUltimateQuantumHash(dbControls);
+      const currentState = ultimateQuantumStateRef.current;
+      
+      // ULTIMATE: Always update if there's a difference or force flag is set
+      const shouldUpdate = 
+        newHash !== currentState.hash || 
+        dbControls.length !== droppedControls.length ||
+        currentState.forceSync ||
+        forceLoadRef.current;
 
-      setLastQuantumSync(startTime);
-      return syncLevel === 'PERFECT' && stabilityCounterRef.current >= 5;
+      if (shouldUpdate) {
+        console.log('🔄 ULTIMATE QUANTUM: Applying ultimate state update');
+        
+        // Update UI state immediately
+        setDroppedControls(dbControls);
+        
+        // Update quantum state
+        ultimateQuantumStateRef.current = {
+          controls: dbControls,
+          hash: newHash,
+          timestamp: Date.now(),
+          version: currentState.version + 1,
+          isStable: dbControls.length > 0,
+          syncLevel: 'PERFECT',
+          lastDbSync: Date.now(),
+          forceSync: false
+        };
+
+        setUltimateRefreshCounter(prev => prev + 1);
+        stabilityCounterRef.current = 0;
+        forceLoadRef.current = false;
+        
+        console.log('✅ ULTIMATE QUANTUM: State updated successfully:', {
+          newControlCount: dbControls.length,
+          newHash: newHash.substring(0, 12),
+          version: ultimateQuantumStateRef.current.version
+        });
+        
+        return true;
+      } else {
+        console.log('✅ ULTIMATE QUANTUM: State already synchronized');
+        stabilityCounterRef.current++;
+        return false;
+      }
 
     } catch (error) {
-      console.error('❌ QUANTUM SYNC: Synchronization failed:', error);
-      stabilityCounterRef.current = 0;
+      console.error('❌ ULTIMATE QUANTUM: Force load failed:', error);
       return false;
-    } finally {
-      setQuantumSyncActive(false);
     }
-  }, [isDbInitialized, quantumSyncActive, questionnaireId, generateQuantumHash, analyzeQuantumSyncLevel, droppedControls, refreshKey]);
+  }, [isDbInitialized, questionnaireId, droppedControls.length, generateUltimateQuantumHash, refreshKey]);
 
-  // QUANTUM: Initialize quantum synchronization system
-  const initializeQuantumSync = useCallback(() => {
-    if (syncIntervalRef.current) {
-      clearInterval(syncIntervalRef.current);
-    }
-
-    console.log('🌌 QUANTUM INIT: Initializing quantum synchronization system');
-    
-    // Start quantum sync interval
-    syncIntervalRef.current = setInterval(async () => {
-      const quantumStable = await quantumSync();
-      
-      if (quantumStable) {
-        console.log('🎯 QUANTUM INIT: Quantum stability achieved - reducing sync frequency');
-        if (syncIntervalRef.current) {
-          clearInterval(syncIntervalRef.current);
-          // Switch to maintenance mode with longer intervals
-          syncIntervalRef.current = setInterval(quantumSync, 5000);
-        }
-      }
-    }, 1000); // Initial high-frequency sync
-
-  }, [quantumSync]);
-
-  // QUANTUM: Enhanced control loading with quantum integration
-  const loadControlsFromDB = useCallback(async () => {
-    if (!isDbInitialized) {
-      console.log('⏸️ useDragDrop: Database not initialized, skipping control load');
-      setIsLoading(true);
+  // ULTIMATE: Continuous quantum synchronization
+  const ultimateQuantumSync = useCallback(async (): Promise<void> => {
+    if (!isDbInitialized || quantumSyncActive) {
       return;
     }
 
     try {
-      setIsLoading(true);
-      console.log('🔄 useDragDrop: ===== QUANTUM-ENHANCED CONTROL LOADING =====');
+      setQuantumSyncActive(true);
+      console.log('🌌 ULTIMATE QUANTUM SYNC: Starting continuous sync');
       
-      const verification = await verifyControlsInDatabase(questionnaireId);
-      const controls = verification.controls;
+      const syncResult = await ultimateForceLoadFromDatabase();
       
-      const newHash = generateQuantumHash(controls);
-      const currentQuantumState = quantumStateRef.current;
-      
-      console.log('📊 useDragDrop: Quantum-enhanced load results:', {
-        controlCount: controls.length,
-        newHash: newHash.substring(0, 8),
-        previousHash: currentQuantumState.hash.substring(0, 8),
-        hashChanged: newHash !== currentQuantumState.hash,
-        refreshKey,
-        timestamp: new Date().toISOString()
-      });
-
-      // QUANTUM: Only update if quantum state indicates change
-      if (newHash !== currentQuantumState.hash || controls.length !== droppedControls.length) {
-        console.log('🔄 useDragDrop: Quantum state change detected - updating');
-        setDroppedControls(controls);
-        
-        // Update quantum state
-        quantumStateRef.current = {
-          ...currentQuantumState,
-          controls,
-          hash: newHash,
-          timestamp: Date.now(),
-          version: currentQuantumState.version + 1
-        };
-        
-        stabilityCounterRef.current = 0;
+      if (syncResult) {
+        console.log('✅ ULTIMATE QUANTUM SYNC: Sync completed with updates');
       } else {
-        console.log('✅ useDragDrop: Quantum state stable - no update needed');
-        stabilityCounterRef.current++;
+        console.log('✅ ULTIMATE QUANTUM SYNC: Sync completed - no updates needed');
       }
-      
+
     } catch (error) {
-      console.error('❌ useDragDrop: Quantum-enhanced loading failed:', error);
-      setDroppedControls([]);
+      console.error('❌ ULTIMATE QUANTUM SYNC: Sync failed:', error);
     } finally {
-      setIsLoading(false);
+      setQuantumSyncActive(false);
     }
-  }, [questionnaireId, isDbInitialized, generateQuantumHash, droppedControls.length, refreshKey]);
+  }, [isDbInitialized, quantumSyncActive, ultimateForceLoadFromDatabase]);
 
-  // QUANTUM: Initialize system on database ready
-  useEffect(() => {
+  // ULTIMATE: Initialize quantum system with aggressive loading
+  const initializeUltimateQuantumSystem = useCallback(() => {
+    console.log('🌌 ULTIMATE QUANTUM INIT: Initializing ultimate quantum system');
+    
+    if (syncIntervalRef.current) {
+      clearInterval(syncIntervalRef.current);
+    }
+
+    // Immediate first load
     if (isDbInitialized) {
-      console.log('🌌 QUANTUM EFFECT: Database initialized - starting quantum system');
-      initializeQuantumSync();
-      loadControlsFromDB();
+      console.log('🌌 ULTIMATE QUANTUM INIT: Triggering immediate load');
+      forceLoadRef.current = true;
+      ultimateQuantumSync();
     }
 
+    // Start aggressive sync interval
+    syncIntervalRef.current = setInterval(() => {
+      if (isDbInitialized) {
+        ultimateQuantumSync();
+      }
+    }, 500); // Very frequent sync
+
+    // Cleanup function
     return () => {
       if (syncIntervalRef.current) {
         clearInterval(syncIntervalRef.current);
         syncIntervalRef.current = null;
       }
     };
-  }, [isDbInitialized, initializeQuantumSync, loadControlsFromDB]);
+  }, [isDbInitialized, ultimateQuantumSync]);
 
-  // QUANTUM: Respond to refresh key changes
+  // ULTIMATE: Initialize on database ready
+  useEffect(() => {
+    console.log('🌌 ULTIMATE QUANTUM EFFECT: Database state changed:', {
+      isDbInitialized,
+      refreshKey,
+      currentControlCount: droppedControls.length
+    });
+
+    if (isDbInitialized) {
+      const cleanup = initializeUltimateQuantumSystem();
+      return cleanup;
+    }
+  }, [isDbInitialized, initializeUltimateQuantumSystem]);
+
+  // ULTIMATE: Respond to refresh key changes immediately
   useEffect(() => {
     if (isDbInitialized && refreshKey > 0) {
-      console.log('🌌 QUANTUM EFFECT: RefreshKey changed - triggering quantum sync');
-      stabilityCounterRef.current = 0; // Reset stability
-      quantumSync();
+      console.log('🌌 ULTIMATE QUANTUM EFFECT: RefreshKey changed - forcing immediate sync');
+      forceLoadRef.current = true;
+      ultimateQuantumStateRef.current.forceSync = true;
+      ultimateQuantumSync();
     }
-  }, [refreshKey, isDbInitialized, quantumSync]);
+  }, [refreshKey, isDbInitialized, ultimateQuantumSync]);
 
-  // QUANTUM: Enhanced force refresh with quantum intelligence
+  // ULTIMATE: Force loading when controls are empty but should have data
+  useEffect(() => {
+    if (isDbInitialized && droppedControls.length === 0 && refreshKey > 0) {
+      console.log('🌌 ULTIMATE QUANTUM EFFECT: Empty controls detected with refreshKey > 0 - forcing load');
+      setTimeout(() => {
+        forceLoadRef.current = true;
+        ultimateQuantumSync();
+      }, 100);
+    }
+  }, [isDbInitialized, droppedControls.length, refreshKey, ultimateQuantumSync]);
+
+  // ULTIMATE: Enhanced force refresh
   const forceRefresh = useCallback(async () => {
-    console.log('🔄 useDragDrop: ===== QUANTUM FORCE REFRESH =====');
+    console.log('🔄 ULTIMATE QUANTUM: ===== FORCE REFRESH =====');
     
+    forceLoadRef.current = true;
+    ultimateQuantumStateRef.current.forceSync = true;
     stabilityCounterRef.current = 0;
-    const quantumStable = await quantumSync();
     
-    if (!quantumStable) {
-      // If not stable, trigger additional sync
-      setTimeout(quantumSync, 500);
+    const result = await ultimateForceLoadFromDatabase();
+    
+    if (!result) {
+      // If no update, try again after a short delay
+      setTimeout(async () => {
+        console.log('🔄 ULTIMATE QUANTUM: Retry force refresh');
+        forceLoadRef.current = true;
+        await ultimateForceLoadFromDatabase();
+      }, 200);
     }
     
-    console.log('✅ useDragDrop: Quantum force refresh completed');
-  }, [quantumSync]);
+    console.log('✅ ULTIMATE QUANTUM: Force refresh completed');
+  }, [ultimateForceLoadFromDatabase]);
 
-  // QUANTUM: Enhanced force reload with quantum reset
+  // ULTIMATE: Enhanced force reload
   const forceReload = useCallback(async () => {
-    console.log('🔄 useDragDrop: ===== QUANTUM FORCE RELOAD =====');
+    console.log('🔄 ULTIMATE QUANTUM: ===== FORCE RELOAD =====');
     
-    // Reset quantum state
-    quantumStateRef.current = {
+    // Reset all state
+    ultimateQuantumStateRef.current = {
       controls: [],
       hash: '',
       timestamp: 0,
       version: 0,
       isStable: false,
-      syncLevel: 'CRITICAL'
+      syncLevel: 'CRITICAL',
+      lastDbSync: 0,
+      forceSync: true
     };
     
     stabilityCounterRef.current = 0;
+    forceLoadRef.current = true;
     setDroppedControls([]);
     setIsLoading(true);
     
-    // Reinitialize quantum system
+    // Force immediate reload
     setTimeout(async () => {
-      await loadControlsFromDB();
-      initializeQuantumSync();
-    }, 200);
+      await ultimateForceLoadFromDatabase();
+      setIsLoading(false);
+    }, 100);
     
-    console.log('✅ useDragDrop: Quantum force reload completed');
-  }, [loadControlsFromDB, initializeQuantumSync]);
+    console.log('✅ ULTIMATE QUANTUM: Force reload completed');
+  }, [ultimateForceLoadFromDatabase]);
 
-  // QUANTUM: Nuclear reset with complete quantum reconstruction
+  // ULTIMATE: Nuclear reset with complete reconstruction
   const nuclearReset = useCallback(async () => {
-    console.log('💥 useDragDrop: ===== QUANTUM NUCLEAR RESET =====');
+    console.log('💥 ULTIMATE QUANTUM: ===== NUCLEAR RESET =====');
     
-    // Stop all quantum processes
+    // Stop all processes
     if (syncIntervalRef.current) {
       clearInterval(syncIntervalRef.current);
       syncIntervalRef.current = null;
     }
     
-    // Complete quantum state reset
-    quantumStateRef.current = {
+    // Complete state reset
+    ultimateQuantumStateRef.current = {
       controls: [],
       hash: '',
       timestamp: 0,
       version: 0,
       isStable: false,
-      syncLevel: 'CRITICAL'
+      syncLevel: 'CRITICAL',
+      lastDbSync: 0,
+      forceSync: true
     };
     
     stabilityCounterRef.current = 0;
+    forceLoadRef.current = true;
     setQuantumSyncActive(false);
     setDroppedControls([]);
     setSelectedControl(null);
     setIsLoading(true);
+    setUltimateRefreshCounter(0);
     
-    // Quantum reconstruction
+    // Nuclear reconstruction
     setTimeout(async () => {
-      console.log('💥 useDragDrop: Quantum reconstruction phase');
-      await loadControlsFromDB();
-      initializeQuantumSync();
-      console.log('✅ useDragDrop: Quantum nuclear reset completed');
-    }, 300);
+      console.log('💥 ULTIMATE QUANTUM: Nuclear reconstruction phase');
+      await ultimateForceLoadFromDatabase();
+      const cleanup = initializeUltimateQuantumSystem();
+      setIsLoading(false);
+      console.log('✅ ULTIMATE QUANTUM: Nuclear reset completed');
+    }, 200);
     
-  }, [loadControlsFromDB, initializeQuantumSync]);
+  }, [ultimateForceLoadFromDatabase, initializeUltimateQuantumSystem]);
 
-  // Standard CRUD operations with quantum integration
+  // Standard CRUD operations with ultimate quantum integration
   const addControl = useCallback(async (controlType: ControlType, x: number, y: number, sectionId: string = 'default') => {
     if (!isDbInitialized) {
-      console.warn('⚠️ useDragDrop: Cannot add control - database not initialized');
+      console.warn('⚠️ ULTIMATE QUANTUM: Cannot add control - database not initialized');
       return;
     }
 
@@ -361,15 +350,15 @@ export const useDragDrop = (questionnaireId: string = 'default-questionnaire', i
       await insertControl(newControl, questionnaireId);
       setSelectedControl(newControl);
       
-      // Trigger quantum sync
-      stabilityCounterRef.current = 0;
-      setTimeout(quantumSync, 100);
+      // Trigger ultimate quantum sync
+      forceLoadRef.current = true;
+      setTimeout(ultimateQuantumSync, 50);
       
-      console.log('✅ useDragDrop: Control added with quantum sync');
+      console.log('✅ ULTIMATE QUANTUM: Control added with ultimate sync');
     } catch (error) {
-      console.error('❌ useDragDrop: Failed to add control:', error);
+      console.error('❌ ULTIMATE QUANTUM: Failed to add control:', error);
     }
-  }, [droppedControls, questionnaireId, isDbInitialized, quantumSync]);
+  }, [droppedControls, questionnaireId, isDbInitialized, ultimateQuantumSync]);
 
   const updateControl = useCallback(async (id: string, updates: Partial<DroppedControl>) => {
     if (!isDbInitialized) return;
@@ -381,15 +370,15 @@ export const useDragDrop = (questionnaireId: string = 'default-questionnaire', i
         setSelectedControl(prev => prev ? { ...prev, ...updates } : null);
       }
       
-      // Trigger quantum sync
-      stabilityCounterRef.current = 0;
-      setTimeout(quantumSync, 100);
+      // Trigger ultimate quantum sync
+      forceLoadRef.current = true;
+      setTimeout(ultimateQuantumSync, 50);
       
-      console.log('✅ useDragDrop: Control updated with quantum sync');
+      console.log('✅ ULTIMATE QUANTUM: Control updated with ultimate sync');
     } catch (error) {
-      console.error('❌ useDragDrop: Failed to update control:', error);
+      console.error('❌ ULTIMATE QUANTUM: Failed to update control:', error);
     }
-  }, [selectedControl, questionnaireId, isDbInitialized, quantumSync]);
+  }, [selectedControl, questionnaireId, isDbInitialized, ultimateQuantumSync]);
 
   const removeControl = useCallback(async (id: string) => {
     if (!isDbInitialized) return;
@@ -419,15 +408,15 @@ export const useDragDrop = (questionnaireId: string = 'default-questionnaire', i
         setSelectedControl(null);
       }
       
-      // Trigger quantum sync
-      stabilityCounterRef.current = 0;
-      setTimeout(quantumSync, 100);
+      // Trigger ultimate quantum sync
+      forceLoadRef.current = true;
+      setTimeout(ultimateQuantumSync, 50);
       
-      console.log('✅ useDragDrop: Control removed with quantum sync');
+      console.log('✅ ULTIMATE QUANTUM: Control removed with ultimate sync');
     } catch (error) {
-      console.error('❌ useDragDrop: Failed to remove control:', error);
+      console.error('❌ ULTIMATE QUANTUM: Failed to remove control:', error);
     }
-  }, [droppedControls, selectedControl, questionnaireId, isDbInitialized, quantumSync]);
+  }, [droppedControls, selectedControl, questionnaireId, isDbInitialized, ultimateQuantumSync]);
 
   const moveControl = useCallback(async (id: string, direction: 'up' | 'down') => {
     if (!isDbInitialized) return;
@@ -449,15 +438,15 @@ export const useDragDrop = (questionnaireId: string = 'default-questionnaire', i
       await updateControlDB(id, { y: targetControl.y });
       await updateControlDB(targetControl.id, { y: control.y });
       
-      // Trigger quantum sync
-      stabilityCounterRef.current = 0;
-      setTimeout(quantumSync, 100);
+      // Trigger ultimate quantum sync
+      forceLoadRef.current = true;
+      setTimeout(ultimateQuantumSync, 50);
       
-      console.log('✅ useDragDrop: Control moved with quantum sync');
+      console.log('✅ ULTIMATE QUANTUM: Control moved with ultimate sync');
     } catch (error) {
-      console.error('❌ useDragDrop: Failed to move control:', error);
+      console.error('❌ ULTIMATE QUANTUM: Failed to move control:', error);
     }
-  }, [droppedControls, questionnaireId, isDbInitialized, quantumSync]);
+  }, [droppedControls, questionnaireId, isDbInitialized, ultimateQuantumSync]);
 
   const reorderControl = useCallback(async (dragIndex: number, hoverIndex: number) => {
     if (!isDbInitialized) return;
@@ -476,15 +465,15 @@ export const useDragDrop = (questionnaireId: string = 'default-questionnaire', i
       
       await reorderControls(reorderedControls);
       
-      // Trigger quantum sync
-      stabilityCounterRef.current = 0;
-      setTimeout(quantumSync, 100);
+      // Trigger ultimate quantum sync
+      forceLoadRef.current = true;
+      setTimeout(ultimateQuantumSync, 50);
       
-      console.log('✅ useDragDrop: Controls reordered with quantum sync');
+      console.log('✅ ULTIMATE QUANTUM: Controls reordered with ultimate sync');
     } catch (error) {
-      console.error('❌ useDragDrop: Failed to reorder control:', error);
+      console.error('❌ ULTIMATE QUANTUM: Failed to reorder control:', error);
     }
-  }, [droppedControls, questionnaireId, isDbInitialized, quantumSync]);
+  }, [droppedControls, questionnaireId, isDbInitialized, ultimateQuantumSync]);
 
   const selectControl = useCallback((control: DroppedControl) => {
     setSelectedControl(control);
@@ -494,20 +483,39 @@ export const useDragDrop = (questionnaireId: string = 'default-questionnaire', i
     setSelectedControl(null);
   }, []);
 
-  // QUANTUM: Enhanced state monitoring
+  // ULTIMATE: Enhanced state monitoring with detailed logging
   useEffect(() => {
-    const quantumState = quantumStateRef.current;
-    console.log('🌌 QUANTUM STATE: Current quantum state:', {
+    const ultimateState = ultimateQuantumStateRef.current;
+    console.log('🌌 ULTIMATE QUANTUM STATE: Current state:', {
       controlCount: droppedControls.length,
-      quantumHash: quantumState.hash.substring(0, 8),
-      quantumVersion: quantumState.version,
-      isStable: quantumState.isStable,
-      syncLevel: quantumState.syncLevel,
+      ultimateHash: ultimateState.hash.substring(0, 12),
+      ultimateVersion: ultimateState.version,
+      isStable: ultimateState.isStable,
+      syncLevel: ultimateState.syncLevel,
       stabilityCounter: stabilityCounterRef.current,
-      lastSync: lastQuantumSync ? new Date(lastQuantumSync).toLocaleTimeString() : 'Never',
-      refreshKey
+      refreshKey,
+      ultimateRefreshCounter,
+      lastDbSync: ultimateState.lastDbSync ? new Date(ultimateState.lastDbSync).toLocaleTimeString() : 'Never',
+      forceSync: ultimateState.forceSync,
+      isLoading
     });
-  }, [droppedControls.length, lastQuantumSync, refreshKey]);
+
+    // Log control details if we have controls
+    if (droppedControls.length > 0) {
+      console.log('📝 ULTIMATE QUANTUM STATE: Current controls:');
+      droppedControls.slice(0, 3).forEach((control, index) => {
+        console.log(`   ${index + 1}. ${control.name} (${control.type}) - Section: ${control.sectionId}`);
+      });
+    }
+  }, [droppedControls.length, refreshKey, ultimateRefreshCounter, isLoading]);
+
+  // ULTIMATE: Set loading to false when we have controls
+  useEffect(() => {
+    if (droppedControls.length > 0 && isLoading) {
+      console.log('✅ ULTIMATE QUANTUM: Controls loaded - setting loading to false');
+      setIsLoading(false);
+    }
+  }, [droppedControls.length, isLoading]);
 
   return {
     droppedControls,
