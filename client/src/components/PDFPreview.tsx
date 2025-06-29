@@ -75,7 +75,49 @@ export const PDFPreview: React.FC<PDFPreviewProps> = ({
   };
 
   const handleGenerateSampleData = () => {
-    const sampleData = generateSampleData(droppedControls);
+    // Generate sample data for each control
+    const sampleData: { [controlId: string]: any } = {};
+    
+    droppedControls.forEach(control => {
+      switch (control.type) {
+        case 'text':
+          sampleData[control.id] = control.properties.placeholder || 'Sample text input';
+          break;
+        case 'email':
+          sampleData[control.id] = 'user@example.com';
+          break;
+        case 'textarea':
+          sampleData[control.id] = 'This is a sample multi-line text response with more detailed information.';
+          break;
+        case 'number':
+          sampleData[control.id] = Math.floor(Math.random() * 100) + 1;
+          break;
+        case 'select':
+          if (control.properties.options && control.properties.options.length > 0) {
+            sampleData[control.id] = control.properties.options[0];
+          }
+          break;
+        case 'radio':
+          if (control.properties.options && control.properties.options.length > 0) {
+            sampleData[control.id] = control.properties.options[Math.floor(Math.random() * control.properties.options.length)];
+          }
+          break;
+        case 'checkbox':
+          sampleData[control.id] = Math.random() > 0.5;
+          break;
+        case 'date':
+          sampleData[control.id] = new Date().toISOString().split('T')[0];
+          break;
+        case 'phone':
+          sampleData[control.id] = '+1 (555) 123-4567';
+          break;
+        case 'url':
+          sampleData[control.id] = 'https://example.com';
+          break;
+        default:
+          sampleData[control.id] = `Sample ${control.type} value`;
+      }
+    });
     
     // Update form values to sync with parent component
     Object.entries(sampleData).forEach(([controlId, value]) => {
@@ -83,9 +125,6 @@ export const PDFPreview: React.FC<PDFPreviewProps> = ({
         onFormValueChange(controlId, value);
       }
     });
-    
-    // Force re-render of the preview
-    updatePreview();
   };
 
   const zoomIn = () => setZoomLevel(prev => Math.min(prev + 25, 200));
@@ -274,7 +313,17 @@ export const PDFPreview: React.FC<PDFPreviewProps> = ({
       
       if (customization.footer.customNote) {
         pdf.setFontSize(8);
-        pdf.text(customization.footer.customNote, pageWidth / 2, pageHeight - 15, { align: 'center' });
+        const footerWidth = pageWidth - 40; // Margin on both sides
+        const footerLines = pdf.splitTextToSize(customization.footer.customNote, footerWidth);
+        
+        // Calculate vertical positioning for footer
+        const lineHeight = 3;
+        const totalFooterHeight = footerLines.length * lineHeight;
+        const startY = pageHeight - 15 - totalFooterHeight;
+        
+        footerLines.forEach((line: string, index: number) => {
+          pdf.text(line, pageWidth / 2, startY + (index * lineHeight), { align: 'center' });
+        });
       }
       
       if (customization.footer.showPageNumbers) {
@@ -675,9 +724,9 @@ export const PDFPreview: React.FC<PDFPreviewProps> = ({
   );
 
   return (
-    <div className="flex-1 bg-white dark:bg-gray-800 flex transition-colors">
+    <div className={`${isFullscreen ? 'fixed inset-0 z-50' : 'flex-1'} bg-white dark:bg-gray-800 flex transition-all duration-300`}>
       {/* Left Panel - Customization */}
-      {showCustomization && renderCustomizationPanel()}
+      {!isFullscreen && showCustomization && renderCustomizationPanel()}
       
       {/* Main Content */}
       <div className="flex-1 flex flex-col">
@@ -734,9 +783,15 @@ export const PDFPreview: React.FC<PDFPreviewProps> = ({
               <button
                 onClick={() => setIsFullscreen(!isFullscreen)}
                 className="p-2 text-gray-600 dark:text-gray-300 hover:text-white hover:bg-gradient-to-r hover:from-gray-500 hover:to-gray-600 rounded-lg transition-all duration-200"
-                title="Toggle Fullscreen"
+                title={isFullscreen ? "Exit Fullscreen" : "Enter Fullscreen"}
               >
-                <Maximize2 className="w-4 h-4" />
+                {isFullscreen ? (
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 8l4-4m0 0v4m0-4H6m8 16l4-4m0 0v-4m0 4h-4m-8-8l-4 4m0 0v-4m0 4h4m8-8l4-4m0 0v4m0-4h-4" />
+                  </svg>
+                ) : (
+                  <Maximize2 className="w-4 h-4" />
+                )}
               </button>
               
               <button

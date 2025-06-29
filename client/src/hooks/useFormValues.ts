@@ -68,6 +68,7 @@ export const useFormValues = () => {
     });
     
     setFormValues(sampleValues);
+    return sampleValues;
   }, []);
 
   return {
