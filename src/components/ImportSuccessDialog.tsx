@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { CheckCircle, AlertTriangle, X, RefreshCw, Eye, Database } from 'lucide-react';
+import { CheckCircle, AlertTriangle, X, RefreshCw, Eye, Zap } from 'lucide-react';
 
 interface ImportResults {
   success: number;
@@ -18,7 +18,7 @@ export const ImportSuccessDialog: React.FC<ImportSuccessDialogProps> = ({
   onClose,
   results
 }) => {
-  const [countdown, setCountdown] = useState(5);
+  const [countdown, setCountdown] = useState(3);
   const [autoRefresh, setAutoRefresh] = useState(true);
 
   useEffect(() => {
@@ -40,7 +40,7 @@ export const ImportSuccessDialog: React.FC<ImportSuccessDialogProps> = ({
 
   useEffect(() => {
     if (isOpen) {
-      setCountdown(5);
+      setCountdown(3);
     }
   }, [isOpen]);
 
@@ -48,7 +48,7 @@ export const ImportSuccessDialog: React.FC<ImportSuccessDialogProps> = ({
 
   const isSuccess = results.success > 0;
   const hasErrors = results.errors.length > 0;
-  const isAtomicSuccess = results.success === results.total;
+  const isDirectImportSuccess = results.success === results.total;
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
@@ -68,14 +68,14 @@ export const ImportSuccessDialog: React.FC<ImportSuccessDialogProps> = ({
                 <h3 className={`text-lg font-semibold ${
                   isSuccess ? 'text-green-900 dark:text-green-100' : 'text-red-900 dark:text-red-100'
                 }`}>
-                  {isAtomicSuccess ? 'Atomic Import Successful!' : 
+                  {isDirectImportSuccess ? 'Direct Import Successful!' : 
                    isSuccess ? 'Partial Import Completed' : 'Import Failed'}
                 </h3>
                 <p className={`text-sm ${
                   isSuccess ? 'text-green-700 dark:text-green-300' : 'text-red-700 dark:text-red-300'
                 }`}>
                   {isSuccess 
-                    ? `${results.success} of ${results.total} controls imported`
+                    ? `${results.success} of ${results.total} controls imported directly to UI`
                     : `Failed to import controls`
                   }
                 </p>
@@ -100,37 +100,38 @@ export const ImportSuccessDialog: React.FC<ImportSuccessDialogProps> = ({
               <div className="flex items-center space-x-2 text-green-700 dark:text-green-300">
                 <CheckCircle className="w-5 h-5" />
                 <span className="font-medium">
-                  {isAtomicSuccess ? 'Atomic transaction completed successfully!' : 
+                  {isDirectImportSuccess ? 'Direct UI import completed successfully!' : 
                    `Successfully imported ${results.success} controls!`}
                 </span>
               </div>
               
-              {isAtomicSuccess && (
+              {isDirectImportSuccess && (
                 <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700 rounded-lg p-4">
                   <div className="flex items-start space-x-3">
-                    <Database className="w-5 h-5 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
+                    <Zap className="w-5 h-5 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
                     <div>
                       <h4 className="font-medium text-blue-900 dark:text-blue-100 mb-1">
-                        Atomic Transaction Success
+                        Direct UI Import Success
                       </h4>
                       <p className="text-sm text-blue-800 dark:text-blue-200">
-                        All controls were imported in a single atomic transaction, ensuring complete data integrity. 
-                        No partial data or inconsistent states occurred during the import process.
+                        All controls were imported directly to the UI, bypassing the database completely. 
+                        This approach eliminates synchronization issues and provides instant results.
                       </p>
                     </div>
                   </div>
                 </div>
               )}
               
-              <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700 rounded-lg p-4">
+              <div className="bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-700 rounded-lg p-4">
                 <div className="flex items-start space-x-3">
-                  <RefreshCw className="w-5 h-5 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
+                  <RefreshCw className="w-5 h-5 text-orange-600 dark:text-orange-400 flex-shrink-0 mt-0.5" />
                   <div>
-                    <h4 className="font-medium text-blue-900 dark:text-blue-100 mb-1">
-                      Enhanced State Synchronization
+                    <h4 className="font-medium text-orange-900 dark:text-orange-100 mb-1">
+                      Direct Import Mode Active
                     </h4>
-                    <p className="text-sm text-blue-800 dark:text-blue-200">
-                      The application is using enhanced state synchronization to ensure your imported controls appear correctly. 
+                    <p className="text-sm text-orange-800 dark:text-orange-200">
+                      Your controls are currently loaded in Direct Import Mode. They are visible and functional 
+                      but not yet saved to the database. Use the "Save to Database" button to persist them.
                       {autoRefresh && (
                         <span className="font-medium"> Auto-closing in {countdown} seconds...</span>
                       )}
@@ -142,15 +143,15 @@ export const ImportSuccessDialog: React.FC<ImportSuccessDialogProps> = ({
               <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4">
                 <h4 className="font-medium text-gray-900 dark:text-white mb-2">Next Steps:</h4>
                 <ul className="text-sm text-gray-700 dark:text-gray-300 space-y-1">
-                  <li>• Controls will appear in the Design tab with enhanced synchronization</li>
-                  <li>• You can modify properties in the Properties panel</li>
+                  <li>• Controls are immediately visible in the Design tab</li>
+                  <li>• You can modify properties and test functionality</li>
+                  <li>• Use "Save to Database" to persist your changes</li>
                   <li>• Use Preview tab to test your form</li>
                   <li>• Export JSON when ready for deployment</li>
-                  <li>• All changes are automatically saved with atomic operations</li>
                 </ul>
               </div>
 
-              {hasErrors && !isAtomicSuccess && (
+              {hasErrors && !isDirectImportSuccess && (
                 <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-700 rounded-lg p-4">
                   <h4 className="font-medium text-yellow-900 dark:text-yellow-100 mb-2">
                     Partial Import - Some Issues Found:
@@ -170,17 +171,16 @@ export const ImportSuccessDialog: React.FC<ImportSuccessDialogProps> = ({
             <div className="space-y-4">
               <div className="flex items-center space-x-2 text-red-700 dark:text-red-300">
                 <AlertTriangle className="w-5 h-5" />
-                <span className="font-medium">Atomic import failed</span>
+                <span className="font-medium">Direct import failed</span>
               </div>
               
               <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-700 rounded-lg p-4">
                 <div className="flex items-start space-x-3">
-                  <Database className="w-5 h-5 text-red-600 dark:text-red-400 flex-shrink-0 mt-0.5" />
+                  <Zap className="w-5 h-5 text-red-600 dark:text-red-400 flex-shrink-0 mt-0.5" />
                   <div>
-                    <h4 className="font-medium text-red-900 dark:text-red-100 mb-2">Atomic Transaction Failed</h4>
+                    <h4 className="font-medium text-red-900 dark:text-red-100 mb-2">Direct Import Failed</h4>
                     <p className="text-sm text-red-800 dark:text-red-200 mb-2">
-                      The atomic transaction was rolled back to prevent partial data corruption. 
-                      No controls were imported to maintain data integrity.
+                      The direct UI import failed to process the controls. No changes were made to the UI state.
                     </p>
                     <div className="text-sm text-red-800 dark:text-red-200 space-y-1">
                       <strong>Errors:</strong>

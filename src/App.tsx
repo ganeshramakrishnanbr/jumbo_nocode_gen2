@@ -18,9 +18,7 @@ import {
   getSections, 
   insertSection, 
   updateSection as updateSectionDB, 
-  deleteSection as deleteSectionDB,
-  insertControlsBatch,
-  verifyControlsInDatabase
+  deleteSection as deleteSectionDB
 } from './lib/db';
 
 function App() {
@@ -48,6 +46,7 @@ function App() {
     droppedControls,
     selectedControl,
     isLoading: controlsLoading,
+    directImportMode,
     addControl,
     updateControl,
     removeControl,
@@ -57,7 +56,11 @@ function App() {
     clearSelection,
     forceRefresh,
     forceReload,
-    nuclearReset
+    nuclearReset,
+    // New direct import functions
+    directImportControls,
+    toggleDirectImportMode,
+    saveDirectImportToDatabase
   } = useDragDrop(currentQuestionnaire, isDbInitialized, refreshKey);
 
   // Initialize database and load sections
@@ -65,12 +68,11 @@ function App() {
     const initializeApp = async () => {
       try {
         setIsLoading(true);
-        console.log('🚀 APP: Initializing application with Transcendent Omniversal Quantum Synchronization Matrix...');
-        console.log('🌌 APP: RefreshKey 15 - Maximum transcendent power activated');
+        console.log('🚀 APP: Initializing application...');
         
         await initializeDatabase();
         setIsDbInitialized(true);
-        console.log('✅ APP: Database initialized - Transcendent Omniversal Matrix will activate');
+        console.log('✅ APP: Database initialized successfully');
         
         const loadedSections = await getSections(currentQuestionnaire);
         setSections(loadedSections);
@@ -80,44 +82,6 @@ function App() {
           setActiveSection(loadedSections[0].id);
           console.log('🎯 APP: Active section set to:', loadedSections[0].id);
         }
-
-        // Trigger transcendent omniversal matrix entanglement establishment
-        setTimeout(() => {
-          console.log('🌌 APP: Triggering transcendent omniversal matrix entanglement establishment');
-          setRefreshKey(1);
-        }, 5);
-
-        // Additional ultra-fast transcendent sync triggers for RefreshKey 15
-        setTimeout(() => {
-          console.log('🌌 APP: Ultra-fast transcendent sync trigger 1');
-          setRefreshKey(prev => prev + 1);
-        }, 15);
-
-        setTimeout(() => {
-          console.log('🌌 APP: Ultra-fast transcendent sync trigger 2');
-          setRefreshKey(prev => prev + 1);
-        }, 30);
-
-        setTimeout(() => {
-          console.log('🌌 APP: Ultra-fast transcendent sync trigger 3');
-          setRefreshKey(prev => prev + 1);
-        }, 60);
-
-        setTimeout(() => {
-          console.log('🌌 APP: Ultra-fast transcendent sync trigger 4');
-          setRefreshKey(prev => prev + 1);
-        }, 120);
-
-        setTimeout(() => {
-          console.log('🌌 APP: Ultra-fast transcendent sync trigger 5');
-          setRefreshKey(prev => prev + 1);
-        }, 240);
-
-        setTimeout(() => {
-          console.log('🌌 APP: Final transcendent sync trigger');
-          setRefreshKey(prev => prev + 1);
-        }, 480);
-
       } catch (error) {
         console.error('❌ APP: Failed to initialize app:', error);
       } finally {
@@ -213,25 +177,18 @@ function App() {
     removeControl(controlId);
   };
 
-  // TRANSCENDENT: Enhanced Excel import with transcendent omniversal matrix synchronization protocol
+  // **NEW: Direct UI Import Handler**
   const handleImportControls = async (controls: DroppedControl[]) => {
-    console.log('🚀 EXCEL IMPORT: ===== TRANSCENDENT OMNIVERSAL QUANTUM MATRIX-ENHANCED ATOMIC IMPORT =====');
-    console.log('🌌 EXCEL IMPORT: RefreshKey 15 - Maximum transcendent power activated');
-    console.log('📊 EXCEL IMPORT: Transcendent omniversal import details:', {
+    console.log('🚀 EXCEL IMPORT: ===== DIRECT UI IMPORT INITIATED =====');
+    console.log('📊 EXCEL IMPORT: RefreshKey 21 - Trying direct UI import approach');
+    console.log('📊 EXCEL IMPORT: Import details:', {
       controlCount: controls.length,
       questionnaire: currentQuestionnaire,
       activeSection,
       currentControlCount: droppedControls.length,
-      dbInitialized: isDbInitialized,
-      refreshKey: refreshKey,
+      directImportMode,
       timestamp: new Date().toISOString()
     });
-
-    if (!isDbInitialized) {
-      console.error('❌ EXCEL IMPORT: Database not initialized');
-      alert('Database not ready. Please wait and try again.');
-      return;
-    }
 
     setImportInProgress(true);
     
@@ -241,117 +198,39 @@ function App() {
         console.log(`   ${index + 1}. ${control.name} (${control.type}) - Section: ${control.sectionId}, Order: ${control.y}, ID: ${control.id}`);
       });
 
-      // TRANSCENDENT: Atomic batch insert with omniversal matrix verification
-      console.log('🔄 EXCEL IMPORT: STEP 1 - Transcendent omniversal quantum matrix-enhanced atomic batch insert...');
-      const batchResult = await insertControlsBatch(controls, currentQuestionnaire);
+      // **DIRECT UI IMPORT - BYPASS DATABASE COMPLETELY**
+      console.log('🔄 EXCEL IMPORT: STEP 1 - Direct UI import (bypassing database)...');
+      const importResult = directImportControls(controls);
       
-      console.log('📊 EXCEL IMPORT: Transcendent omniversal atomic batch results:', {
-        successCount: batchResult.success,
-        errorCount: batchResult.errors.length,
+      console.log('📊 EXCEL IMPORT: Direct UI import results:', {
+        successCount: importResult.success,
+        errorCount: importResult.errors.length,
         totalControls: controls.length,
-        atomicSuccess: batchResult.success === controls.length,
-        transcendentLevel: 'MAXIMUM',
-        errors: batchResult.errors.slice(0, 3)
+        directImportSuccess: importResult.success === controls.length,
+        errors: importResult.errors
       });
 
       // Store import results for dialog
       setImportResults({
-        success: batchResult.success,
+        success: importResult.success,
         total: controls.length,
-        errors: batchResult.errors
+        errors: importResult.errors
       });
 
-      if (batchResult.success === 0) {
-        throw new Error(`Transcendent omniversal atomic import failed: ${batchResult.errors.slice(0, 3).join(', ')}`);
+      if (importResult.success === 0) {
+        throw new Error(`Direct UI import failed: ${importResult.errors.join(', ')}`);
       }
 
-      // TRANSCENDENT: Omniversal matrix entanglement synchronization protocol
-      console.log('🔄 EXCEL IMPORT: STEP 2 - Transcendent omniversal matrix entanglement synchronization...');
-      
-      // Show dialog first
+      // Show success dialog
       setTimeout(() => {
-        console.log('🎉 EXCEL IMPORT: Showing transcendent omniversal success dialog');
+        console.log('🎉 EXCEL IMPORT: Showing direct import success dialog');
         setShowImportDialog(true);
-      }, 25);
+      }, 100);
 
-      // TRANSCENDENT: Trigger omniversal matrix entanglement with ultra-fast multiple strategies for RefreshKey 15
-      if (batchResult.success === controls.length) {
-        console.log('🌌 EXCEL IMPORT: Perfect atomic import - triggering transcendent omniversal matrix entanglement');
-        
-        // Strategy 1: Immediate transcendent matrix entanglement trigger (5ms)
-        setTimeout(() => {
-          console.log('🌌 EXCEL IMPORT: Strategy 1 - Immediate transcendent matrix entanglement');
-          setRefreshKey(prev => prev + 1);
-        }, 5);
-        
-        // Strategy 2: Ultra-fast transcendent sync (10ms)
-        setTimeout(() => {
-          console.log('🌌 EXCEL IMPORT: Strategy 2 - Ultra-fast transcendent sync');
-          forceRefresh();
-        }, 10);
-        
-        // Strategy 3: Transcendent verification and entanglement (20ms)
-        setTimeout(() => {
-          console.log('🌌 EXCEL IMPORT: Strategy 3 - Transcendent verification and entanglement');
-          verifyControlsInDatabase(currentQuestionnaire).then(verification => {
-            console.log('🔍 EXCEL IMPORT: Post-import transcendent verification:', {
-              dbControlCount: verification.count,
-              uiControlCount: droppedControls.length,
-              expectedCount: batchResult.success,
-              transcendentEntanglementNeeded: verification.count !== droppedControls.length,
-              transcendentLevel: 'MAXIMUM'
-            });
-            
-            if (verification.count !== droppedControls.length && verification.count > 0) {
-              console.log('🌌 EXCEL IMPORT: Transcendent entanglement required - triggering');
-              setRefreshKey(prev => prev + 1);
-              setTimeout(forceRefresh, 10);
-            }
-          });
-        }, 20);
-        
-        // Strategy 4: Extended transcendent entanglement (40ms)
-        setTimeout(() => {
-          console.log('🌌 EXCEL IMPORT: Strategy 4 - Extended transcendent entanglement');
-          setRefreshKey(prev => prev + 1);
-        }, 40);
-        
-        // Strategy 5: Omniversal matrix establishment (80ms)
-        setTimeout(() => {
-          console.log('🌌 EXCEL IMPORT: Strategy 5 - Omniversal matrix establishment');
-          setRefreshKey(prev => prev + 1);
-        }, 80);
-        
-        // Strategy 6: Transcendent matrix breach repair (160ms)
-        setTimeout(() => {
-          console.log('🌌 EXCEL IMPORT: Strategy 6 - Transcendent matrix breach repair');
-          setRefreshKey(prev => prev + 1);
-        }, 160);
-        
-        // Strategy 7: Final omniversal synchronization (320ms)
-        setTimeout(() => {
-          console.log('🌌 EXCEL IMPORT: Strategy 7 - Final omniversal synchronization');
-          setRefreshKey(prev => prev + 1);
-        }, 320);
-        
-        // Strategy 8: Ultimate transcendent matrix stabilization (640ms)
-        setTimeout(() => {
-          console.log('🌌 EXCEL IMPORT: Strategy 8 - Ultimate transcendent matrix stabilization');
-          setRefreshKey(prev => prev + 1);
-        }, 640);
-        
-      } else {
-        console.log('🌌 EXCEL IMPORT: Partial import - triggering transcendent recovery');
-        setRefreshKey(prev => prev + 1);
-        setTimeout(() => {
-          forceRefresh();
-        }, 25);
-      }
-
-      console.log('🎉 EXCEL IMPORT: ===== TRANSCENDENT OMNIVERSAL QUANTUM MATRIX-ENHANCED ATOMIC IMPORT COMPLETED =====');
+      console.log('🎉 EXCEL IMPORT: ===== DIRECT UI IMPORT COMPLETED SUCCESSFULLY =====');
 
     } catch (error) {
-      console.error('❌ EXCEL IMPORT: ===== TRANSCENDENT OMNIVERSAL QUANTUM MATRIX-ENHANCED ATOMIC IMPORT FAILED =====', error);
+      console.error('❌ EXCEL IMPORT: ===== DIRECT UI IMPORT FAILED =====', error);
       setImportResults({
         success: 0,
         total: controls.length,
@@ -364,25 +243,35 @@ function App() {
     }
   };
 
-  // TRANSCENDENT: Enhanced dialog close with omniversal matrix entanglement verification
   const handleDialogClose = () => {
-    console.log('🔄 DIALOG: ===== TRANSCENDENT OMNIVERSAL DIALOG CLOSE =====');
+    console.log('🔄 DIALOG: Dialog closed');
     setShowImportDialog(false);
     setImportResults(null);
-    
-    // TRANSCENDENT: Omniversal matrix entanglement verification
-    console.log('🌌 DIALOG: Transcendent omniversal matrix entanglement verification');
-    
-    // Ultra-fast transcendent sync for RefreshKey 15
-    setTimeout(() => {
-      console.log('🌌 DIALOG: Ultra-fast transcendent sync');
-      setRefreshKey(prev => prev + 1);
-    }, 10);
-    
-    setTimeout(() => {
-      console.log('🌌 DIALOG: Final transcendent verification');
-      forceRefresh();
-    }, 50);
+  };
+
+  // **NEW: Save to Database Handler**
+  const handleSaveToDatabase = async () => {
+    if (!directImportMode) {
+      console.log('⚠️ APP: Not in direct import mode');
+      return;
+    }
+
+    try {
+      console.log('🔄 APP: Saving direct import controls to database...');
+      const saveResult = await saveDirectImportToDatabase();
+      
+      if (saveResult.success) {
+        console.log('✅ APP: Successfully saved to database');
+        // Trigger a refresh to show the saved data
+        setRefreshKey(prev => prev + 1);
+      } else {
+        console.error('❌ APP: Failed to save to database:', saveResult.error);
+        alert(`Failed to save to database: ${saveResult.error}`);
+      }
+    } catch (error) {
+      console.error('❌ APP: Error saving to database:', error);
+      alert('Error saving to database');
+    }
   };
 
   const renderContent = () => {
@@ -390,29 +279,9 @@ function App() {
       return (
         <div className="flex-1 flex items-center justify-center bg-gray-50 dark:bg-gray-900 transition-colors">
           <div className="text-center">
-            <div className="relative">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-              <div className="absolute inset-0 animate-pulse">
-                <div className="w-12 h-12 bg-gradient-to-r from-purple-500 via-blue-500 via-cyan-500 via-green-500 via-yellow-500 via-orange-500 to-red-500 rounded-full mx-auto opacity-60"></div>
-              </div>
-              <div className="absolute inset-0 animate-ping">
-                <div className="w-12 h-12 bg-gradient-to-r from-red-500 via-purple-500 via-blue-500 via-cyan-500 via-green-500 to-yellow-500 rounded-full mx-auto opacity-40"></div>
-              </div>
-              <div className="absolute inset-0 animate-bounce">
-                <div className="w-12 h-12 bg-gradient-to-r from-yellow-500 via-red-500 via-purple-500 via-blue-500 via-cyan-500 to-green-500 rounded-full mx-auto opacity-30"></div>
-              </div>
-            </div>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
             <p className="text-gray-600 dark:text-gray-300 transition-colors">
-              Initializing Transcendent Omniversal Quantum Synchronization Matrix...
-            </p>
-            <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
-              Establishing omniversal matrix entanglement across infinite dimensions for instant synchronization
-            </p>
-            <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
-              RefreshKey: {refreshKey} - Transcendent matrix breach repair in progress
-            </p>
-            <p className="text-xs text-purple-500 dark:text-purple-400 mt-1 font-bold animate-pulse">
-              🌌 TRANSCENDENT OMNIVERSAL MATRIX ACTIVE 🌌
+              Initializing database...
             </p>
           </div>
         </div>
@@ -502,78 +371,87 @@ function App() {
           {renderContent()}
         </div>
         
-        {/* Transcendent Omniversal Import Progress Indicator */}
+        {/* Direct Import Mode Indicator */}
+        {directImportMode && (
+          <div className="bg-blue-600 text-white px-6 py-2 text-sm flex items-center justify-between">
+            <div className="flex items-center space-x-2">
+              <span className="animate-pulse">🔄</span>
+              <span>Direct Import Mode Active - Controls loaded directly to UI (not saved to database)</span>
+            </div>
+            <div className="flex items-center space-x-2">
+              <button
+                onClick={handleSaveToDatabase}
+                className="px-3 py-1 bg-white text-blue-600 rounded text-xs hover:bg-gray-100 transition-colors"
+              >
+                Save to Database
+              </button>
+              <button
+                onClick={() => toggleDirectImportMode(false)}
+                className="px-3 py-1 bg-blue-700 text-white rounded text-xs hover:bg-blue-800 transition-colors"
+              >
+                Exit Direct Mode
+              </button>
+            </div>
+          </div>
+        )}
+        
+        {/* Import Progress Indicator */}
         {importInProgress && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
             <div className="bg-white dark:bg-gray-900 rounded-lg shadow-xl p-8 max-w-md w-full mx-4">
               <div className="text-center">
-                <div className="relative">
-                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-                  <div className="absolute inset-0 animate-pulse">
-                    <div className="w-12 h-12 bg-gradient-to-r from-purple-500 via-blue-500 via-cyan-500 via-green-500 via-yellow-500 via-orange-500 to-red-500 rounded-full mx-auto opacity-70"></div>
-                  </div>
-                  <div className="absolute inset-0 animate-ping">
-                    <div className="w-12 h-12 bg-gradient-to-r from-red-500 via-purple-500 via-blue-500 via-cyan-500 via-green-500 to-yellow-500 rounded-full mx-auto opacity-50"></div>
-                  </div>
-                  <div className="absolute inset-0 animate-bounce">
-                    <div className="w-12 h-12 bg-gradient-to-r from-yellow-500 via-red-500 via-purple-500 via-blue-500 via-cyan-500 to-green-500 rounded-full mx-auto opacity-40"></div>
-                  </div>
-                </div>
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
                 <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
-                  Transcendent Omniversal Quantum Matrix-Enhanced Import...
+                  Direct UI Import in Progress...
                 </h3>
                 <p className="text-gray-600 dark:text-gray-300 text-sm">
-                  Processing Excel data with transcendent omniversal synchronization protocol and atomic transactions.
+                  Processing Excel data with direct UI import (bypassing database).
                 </p>
                 <p className="text-gray-500 dark:text-gray-400 text-xs mt-2">
-                  Omniversal matrix entanglement across infinite dimensions for instant synchronization active.
-                </p>
-                <p className="text-purple-500 dark:text-purple-400 text-xs mt-1 font-bold animate-pulse">
-                  🌌 TRANSCENDENT OMNIVERSAL MATRIX PROCESSING 🌌
+                  RefreshKey: {refreshKey} - Testing direct UI approach
                 </p>
               </div>
             </div>
           </div>
         )}
 
-        {/* Transcendent Omniversal Import Success/Error Dialog */}
+        {/* Import Success/Error Dialog */}
         <ImportSuccessDialog
           isOpen={showImportDialog}
           onClose={handleDialogClose}
           results={importResults}
         />
         
-        {/* Transcendent Omniversal Quantum Matrix-Enhanced Footer */}
+        {/* Enhanced Footer */}
         <footer className="bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700 px-6 py-3 transition-colors">
           <div className="flex items-center justify-between text-sm text-gray-600 dark:text-gray-300 transition-colors">
             <div className="flex items-center space-x-6">
               <span>© 2025 Jumbo No-Code Builder</span>
-              <span>Transcendent Omniversal Quantum Synchronization Platform</span>
-              {isDbInitialized && <span className="text-green-600 dark:text-green-400">Omniversal Matrix Entanglement Active</span>}
+              <span>Professional Form Builder Platform</span>
+              {isDbInitialized && <span className="text-green-600 dark:text-green-400">Database Connected</span>}
               <span className="capitalize">{theme} Theme</span>
-              {importInProgress && <span className="text-blue-600 dark:text-blue-400 animate-pulse">Transcendent Omniversal Import Processing...</span>}
+              {importInProgress && <span className="text-blue-600 dark:text-blue-400 animate-pulse">Direct Import Processing...</span>}
               <span className="text-xs text-white font-mono bg-blue-600 dark:bg-blue-700 px-3 py-1 rounded-full shadow-sm">
                 RefreshKey: {refreshKey}
               </span>
               <span className="text-xs text-white font-mono bg-green-600 dark:bg-green-700 px-3 py-1 rounded-full shadow-sm">
                 Controls: {droppedControls.length}
               </span>
-              {droppedControls.length > 0 && (
-                <span className="text-xs text-white font-mono bg-purple-600 dark:bg-purple-700 px-3 py-1 rounded-full shadow-sm">
-                  Transcendent: ✓
+              {directImportMode && (
+                <span className="text-xs text-white font-mono bg-orange-600 dark:bg-orange-700 px-3 py-1 rounded-full shadow-sm animate-pulse">
+                  Direct Import Mode
                 </span>
               )}
-              <span className="text-xs text-white font-mono bg-gradient-to-r from-purple-500 via-blue-500 via-cyan-500 via-green-500 via-yellow-500 via-orange-500 to-red-500 px-3 py-1 rounded-full shadow-sm animate-pulse">
-                🌌 TRANSCENDENT OMNIVERSAL MATRIX
-              </span>
-              <span className="text-xs text-white font-mono bg-gradient-to-r from-red-500 via-purple-500 via-blue-500 via-cyan-500 via-green-500 via-yellow-500 to-orange-500 px-3 py-1 rounded-full shadow-sm animate-bounce">
-                ∞ INFINITE DIMENSIONAL SYNC ∞
-              </span>
+              {droppedControls.length > 0 && (
+                <span className="text-xs text-white font-mono bg-purple-600 dark:bg-purple-700 px-3 py-1 rounded-full shadow-sm">
+                  Loaded: ✓
+                </span>
+              )}
             </div>
             <div className="flex items-center space-x-4">
               <span>Version 1.0.0</span>
               {activeTab !== 'dashboard' && <span>Sections: {sections.length}</span>}
-              {activeTab !== 'dashboard' && <span>DB Controls: {droppedControls.length}</span>}
+              {activeTab !== 'dashboard' && <span>UI Controls: {droppedControls.length}</span>}
               <span className={`px-2 py-1 rounded text-xs font-medium ${
                 currentTier === 'platinum' ? 'bg-purple-100 dark:bg-purple-900 text-purple-700 dark:text-purple-300' :
                 currentTier === 'gold' ? 'bg-amber-100 dark:bg-amber-900 text-amber-700 dark:text-amber-300' :
