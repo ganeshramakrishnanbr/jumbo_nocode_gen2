@@ -1095,59 +1095,7 @@ export const PreviewMode: React.FC<PreviewModeProps> = ({
     }
   };
 
-  // Render form content (separated for reuse in different layouts)
-  const renderFormContent = (theme: typeof FORM_THEMES.classic) => {
-    if (!currentSection) return null;
 
-    return (
-      <>
-        {/* Form Title */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">{currentSection.name}</h1>
-          {currentSection.description && (
-            <p className="text-gray-600 dark:text-gray-300">{currentSection.description}</p>
-          )}
-        </div>
-        
-        {/* Form Fields with theme styling */}
-        {sectionControls.length === 0 ? (
-          <div className="text-center py-16">
-            <Circle className="w-16 h-16 text-gray-400 dark:text-gray-500 mx-auto mb-4" />
-            <h3 className="text-xl font-medium text-gray-600 dark:text-gray-300 mb-2">No controls in this section</h3>
-            <p className="text-gray-500 dark:text-gray-400">Add form controls to see the preview</p>
-          </div>
-        ) : (
-          <div className={theme.fieldSpacing}>
-            {sectionControls
-              .sort((a, b) => a.y - b.y || a.x - b.x)
-              .map(control => (
-                <div key={control.id} className="relative group">
-                  {/* Themed field container */}
-                  <div className="space-y-2">
-                    {control.properties.label && (
-                      <label className={theme.labelClass}>
-                        {control.properties.required && (
-                          <span className="text-red-500 mr-1">*</span>
-                        )}
-                        {control.properties.label}
-                        {control.properties.dependencies && control.properties.dependencies.length > 0 && (
-                          <span className="ml-2 text-xs text-blue-600 dark:text-blue-400 bg-blue-100 dark:bg-blue-900 px-1 py-0.5 rounded">
-                            Conditional
-                          </span>
-                        )}
-                      </label>
-                    )}
-                    <div className="themed-input">
-                      {renderThemedControl(control, theme)}
-                    </div>
-                  </div>
-                </div>
-              ))}
-          </div>
-        )}
-      </>
-    );
-  };
 
   if (sections.length === 0) {
     return (
@@ -1390,7 +1338,54 @@ export const PreviewMode: React.FC<PreviewModeProps> = ({
 
                 {/* Form Content */}
                 <div className={tabAlignment !== 'top' ? 'flex-1' : ''}>
-                  {renderFormContent(currentTheme)}
+                  {/* Form Title */}
+                  {currentSection && (
+                    <>
+                      <div className="mb-8">
+                        <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">{currentSection.name}</h1>
+                        {currentSection.description && (
+                          <p className="text-gray-600 dark:text-gray-300">{currentSection.description}</p>
+                        )}
+                      </div>
+                      
+                      {/* Form Fields with theme styling */}
+                      {sectionControls.length === 0 ? (
+                        <div className="text-center py-16">
+                          <Circle className="w-16 h-16 text-gray-400 dark:text-gray-500 mx-auto mb-4" />
+                          <h3 className="text-xl font-medium text-gray-600 dark:text-gray-300 mb-2">No controls in this section</h3>
+                          <p className="text-gray-500 dark:text-gray-400">Add form controls to see the preview</p>
+                        </div>
+                      ) : (
+                        <div className={currentTheme.fieldSpacing}>
+                          {sectionControls
+                            .sort((a, b) => a.y - b.y || a.x - b.x)
+                            .map(control => (
+                              <div key={control.id} className="relative group">
+                                {/* Themed field container */}
+                                <div className="space-y-2">
+                                  {control.properties.label && (
+                                    <label className={currentTheme.labelClass}>
+                                      {control.properties.required && (
+                                        <span className="text-red-500 mr-1">*</span>
+                                      )}
+                                      {control.properties.label}
+                                      {control.properties.dependencies && control.properties.dependencies.length > 0 && (
+                                        <span className="ml-2 text-xs text-blue-600 dark:text-blue-400 bg-blue-100 dark:bg-blue-900 px-1 py-0.5 rounded">
+                                          Conditional
+                                        </span>
+                                      )}
+                                    </label>
+                                  )}
+                                  <div className="themed-input">
+                                    {renderThemedControl(control, currentTheme)}
+                                  </div>
+                                </div>
+                              </div>
+                            ))}
+                        </div>
+                      )}
+                    </>
+                  )}
                 </div>
               </div>
             </div>
