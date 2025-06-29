@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
+import { Zap } from 'lucide-react';
 import { CustomerTier, ControlType, Section, DroppedControl } from './types';
 import { Header } from './components/Header';
 import { Dashboard } from './components/Dashboard';
