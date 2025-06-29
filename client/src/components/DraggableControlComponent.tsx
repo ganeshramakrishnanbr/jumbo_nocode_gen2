@@ -371,7 +371,7 @@ export const DraggableControlComponent: React.FC<DraggableControlComponentProps>
                 {rowLabels.map((row: string, rowIndex: number) => (
                   <tr key={rowIndex}>
                     <td className="border border-gray-300 dark:border-gray-600 px-2 py-1 text-xs text-gray-700 dark:text-gray-300">{row.trim()}</td>
-                    {columnOptions.map((_, colIndex: number) => (
+                    {columnOptions.map((_: string, colIndex: number) => (
                       <td key={colIndex} className="border border-gray-300 dark:border-gray-600 px-2 py-1 text-center">
                         <input 
                           type={control.type === 'singleSelectiveGrid' ? 'radio' : 'checkbox'}
@@ -608,47 +608,14 @@ export const DraggableControlComponent: React.FC<DraggableControlComponentProps>
         </button>
       </div>
 
-      {/* Selection Overlay */}
+      {/* Visual feedback for drag drop */}
+      {isOver && !isDragging && (
+        <div className="absolute -inset-1 border-2 border-blue-400 border-dashed rounded-lg pointer-events-none opacity-60"></div>
+      )}
+      
+      {/* Selection indicator */}
       {isSelected && (
-        <div className="absolute -inset-2 border-2 border-blue-500 dark:border-blue-400 rounded-lg pointer-events-none">
-          {/* Control Actions */}
-          <div className="absolute -top-10 left-0 flex items-center space-x-1 pointer-events-auto">
-            <div className="bg-blue-500 dark:bg-blue-600 text-white px-2 py-1 rounded text-xs font-medium flex items-center space-x-1">
-              <Move className="w-3 h-3" />
-              <span>{control.name}</span>
-            </div>
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                onMove(control.id, 'up');
-              }}
-              className="bg-gray-600 dark:bg-gray-700 text-white p-1 rounded hover:bg-gray-700 dark:hover:bg-gray-600 transition-colors"
-              title="Move Up"
-            >
-              <ArrowUp className="w-3 h-3" />
-            </button>
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                onMove(control.id, 'down');
-              }}
-              className="bg-gray-600 dark:bg-gray-700 text-white p-1 rounded hover:bg-gray-700 dark:hover:bg-gray-600 transition-colors"
-              title="Move Down"
-            >
-              <ArrowDown className="w-3 h-3" />
-            </button>
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                onRemove(control.id);
-              }}
-              className="bg-red-500 dark:bg-red-600 text-white p-1 rounded hover:bg-red-600 dark:hover:bg-red-500 transition-colors"
-              title="Delete"
-            >
-              <Trash2 className="w-3 h-3" />
-            </button>
-          </div>
-        </div>
+        <div className="absolute -inset-1 border-2 border-blue-500 dark:border-blue-400 rounded-lg pointer-events-none"></div>
       )}
     </div>
   );
