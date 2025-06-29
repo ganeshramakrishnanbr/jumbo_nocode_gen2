@@ -89,6 +89,11 @@ export const PreviewMode: React.FC<PreviewModeProps> = ({
 
   const handleInputChange = (controlId: string, value: any) => {
     setFormData(prev => ({ ...prev, [controlId]: value }));
+    
+    // Sync with parent component if callback provided
+    if (onFormValueChange) {
+      onFormValueChange(controlId, value);
+    }
   };
 
   // Calculate form completion percentage

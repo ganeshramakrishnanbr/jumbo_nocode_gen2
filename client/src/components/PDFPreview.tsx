@@ -405,10 +405,13 @@ export const PDFPreview: React.FC<PDFPreviewProps> = ({
   };
 
   const renderCustomizationPanel = () => (
-    <div className="w-80 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex flex-col transition-colors">
-      <div className="p-4 border-b border-gray-200 dark:border-gray-700">
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-white">PDF Customization</h3>
-        <p className="text-sm text-gray-500 dark:text-gray-400">Customize your PDF appearance</p>
+    <div className="w-80 bg-gradient-to-b from-white to-gray-50 dark:from-gray-800 dark:to-gray-900 border-r border-gray-200 dark:border-gray-700 flex flex-col transition-all duration-300 shadow-xl">
+      <div className="p-6 border-b border-gray-200 dark:border-gray-700 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20">
+        <h3 className="text-xl font-bold text-gray-900 dark:text-white flex items-center">
+          <Settings className="w-5 h-5 mr-2 text-blue-600 dark:text-blue-400" />
+          PDF Studio
+        </h3>
+        <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">Create professional documents</p>
       </div>
       
       <div className="flex-1 overflow-auto">
@@ -637,39 +640,39 @@ export const PDFPreview: React.FC<PDFPreviewProps> = ({
       
       {/* Main Content */}
       <div className="flex-1 flex flex-col">
-        {/* Toolbar */}
-        <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 transition-colors">
+        {/* Modern Toolbar */}
+        <div className="bg-gradient-to-r from-white to-gray-50 dark:from-gray-800 dark:to-gray-900 border-b border-gray-200 dark:border-gray-700 transition-all duration-300 shadow-sm">
           <div className="flex items-center justify-between p-4">
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-3">
               <button
                 onClick={() => setShowCustomization(!showCustomization)}
-                className="flex items-center px-3 py-2 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg transition-colors"
+                className="flex items-center px-4 py-2 bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white rounded-xl transition-all duration-200 shadow-md hover:shadow-lg"
               >
                 <Settings className="w-4 h-4 mr-2" />
-                {showCustomization ? 'Hide' : 'Show'} Settings
+                {showCustomization ? 'Hide Studio' : 'Show Studio'}
               </button>
               
-              <div className="flex items-center space-x-2 bg-gray-100 dark:bg-gray-700 rounded-lg p-1">
+              <div className="flex items-center space-x-1 bg-gradient-to-r from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-800 rounded-xl p-1 shadow-inner">
                 <button
                   onClick={zoomOut}
-                  className="p-2 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-200 dark:hover:bg-gray-600 rounded transition-colors"
+                  className="p-2 text-gray-600 dark:text-gray-300 hover:text-white hover:bg-gradient-to-r hover:from-blue-500 hover:to-indigo-600 rounded-lg transition-all duration-200"
                   title="Zoom Out"
                 >
                   <ZoomOut className="w-4 h-4" />
                 </button>
-                <span className="px-2 py-1 text-sm text-gray-600 dark:text-gray-300 min-w-[60px] text-center">
+                <span className="px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 min-w-[60px] text-center bg-white dark:bg-gray-900 rounded-lg shadow-sm">
                   {zoomLevel}%
                 </span>
                 <button
                   onClick={zoomIn}
-                  className="p-2 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-200 dark:hover:bg-gray-600 rounded transition-colors"
+                  className="p-2 text-gray-600 dark:text-gray-300 hover:text-white hover:bg-gradient-to-r hover:from-blue-500 hover:to-indigo-600 rounded-lg transition-all duration-200"
                   title="Zoom In"
                 >
                   <ZoomIn className="w-4 h-4" />
                 </button>
                 <button
                   onClick={resetZoom}
-                  className="p-2 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-200 dark:hover:bg-gray-600 rounded transition-colors"
+                  className="p-2 text-gray-600 dark:text-gray-300 hover:text-white hover:bg-gradient-to-r hover:from-blue-500 hover:to-indigo-600 rounded-lg transition-all duration-200"
                   title="Reset Zoom"
                 >
                   <RotateCcw className="w-4 h-4" />
@@ -677,19 +680,19 @@ export const PDFPreview: React.FC<PDFPreviewProps> = ({
               </div>
             </div>
             
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center space-x-3">
               <button
                 onClick={handleGenerateSampleData}
-                className="flex items-center px-3 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors"
+                className="flex items-center px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700 text-white rounded-xl transition-all duration-200 shadow-md hover:shadow-lg hover:scale-105"
                 title="Generate sample data for testing"
               >
-                <Shuffle className="w-4 h-4 mr-1" />
+                <Shuffle className="w-4 h-4 mr-2" />
                 Sample Data
               </button>
               
               <button
                 onClick={() => setIsFullscreen(!isFullscreen)}
-                className="p-2 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-200 dark:hover:bg-gray-600 rounded transition-colors"
+                className="p-2 text-gray-600 dark:text-gray-300 hover:text-white hover:bg-gradient-to-r hover:from-gray-500 hover:to-gray-600 rounded-lg transition-all duration-200"
                 title="Toggle Fullscreen"
               >
                 <Maximize2 className="w-4 h-4" />
@@ -698,7 +701,7 @@ export const PDFPreview: React.FC<PDFPreviewProps> = ({
               <button
                 onClick={generatePDF}
                 disabled={isGenerating}
-                className="flex items-center px-4 py-2 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white rounded-lg transition-colors"
+                className="flex items-center px-6 py-2 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 disabled:from-gray-400 disabled:to-gray-500 text-white rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl hover:scale-105 disabled:hover:scale-100"
               >
                 {isGenerating ? (
                   <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
@@ -712,9 +715,9 @@ export const PDFPreview: React.FC<PDFPreviewProps> = ({
         </div>
         
         {/* PDF Preview */}
-        <div className="flex-1 overflow-auto bg-gray-100 dark:bg-gray-900 p-6 transition-colors">
+        <div className="flex-1 overflow-auto bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-black p-8 transition-all duration-300">
           <div 
-            className="mx-auto bg-white shadow-lg"
+            className="mx-auto bg-white shadow-2xl border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden"
             style={{
               width: customization.page.size === 'A4' ? '210mm' : '216mm',
               minHeight: customization.page.size === 'A4' ? '297mm' : '279mm',

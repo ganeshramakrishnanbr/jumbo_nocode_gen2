@@ -583,6 +583,8 @@ function App() {
             droppedControls={droppedControls}
             sections={sections}
             onDeleteControl={handleDeleteControl}
+            formValues={formValues}
+            onFormValueChange={updateFormValue}
           />
         );
       
