@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
-import { Zap } from 'lucide-react';
 import { CustomerTier, ControlType, Section, DroppedControl } from './types';
 import { Header } from './components/Header';
 import { Dashboard } from './components/Dashboard';
@@ -43,11 +42,6 @@ function App() {
   } | null>(null);
   const [nuclearResetInProgress, setNuclearResetInProgress] = useState(false);
 
-  // Direct UI state for bypassing database
-  const [directUIControls, setDirectUIControls] = useState<DroppedControl[]>([]);
-  const [directUIMode, setDirectUIMode] = useState(false);
-  const [directUISelectedControl, setDirectUISelectedControl] = useState<DroppedControl | null>(null);
-
   // Initialize theme
   const { theme } = useTheme();
 
@@ -55,6 +49,7 @@ function App() {
     droppedControls,
     selectedControl,
     isLoading: controlsLoading,
+    directImportMode,
     addControl,
     updateControl,
     removeControl,
@@ -64,7 +59,8 @@ function App() {
     clearSelection,
     forceRefresh,
     forceReload,
-    nuclearReset
+    nuclearReset,
+    directImportControls
   } = useDragDrop(currentQuestionnaire, isDbInitialized, refreshKey);
 
   // Initialize database and load sections
@@ -104,36 +100,8 @@ function App() {
   };
 
   const handleDrop = (controlType: ControlType, x: number, y: number) => {
-    if (directUIMode) {
-      handleDirectUIDrop(controlType, x, y);
-    } else {
-      addControl(controlType, x, y, activeSection);
-    }
+    addControl(controlType, x, y, activeSection);
     setDraggedControl(null);
-  };
-
-  const handleDirectUIDrop = (controlType: ControlType, x: number, y: number) => {
-    console.log('🚀 DIRECT UI: Adding control directly to UI state');
-    
-    const sectionControls = directUIControls.filter(c => c.sectionId === activeSection);
-    const newControl: DroppedControl = {
-      id: `direct-${controlType.type}-${Date.now()}-${Math.random().toString(36).substring(2, 8)}`,
-      type: controlType.type,
-      name: controlType.name,
-      x: 0,
-      y: sectionControls.length,
-      width: 400,
-      height: controlType.type === 'textarea' ? 100 : 50,
-      properties: controlType.properties.reduce((acc, prop) => {
-        acc[prop.name] = prop.value;
-        return acc;
-      }, {} as Record<string, any>),
-      sectionId: activeSection
-    };
-    
-    setDirectUIControls(prev => [...prev, newControl]);
-    setDirectUISelectedControl(newControl);
-    console.log('✅ DIRECT UI: Control added to direct UI state');
   };
 
   const handleDirectImport = (controls: DroppedControl[]) => {
@@ -145,11 +113,8 @@ function App() {
     });
 
     try {
-      // Switch to direct UI mode
-      setDirectUIMode(true);
-      
-      // Set controls directly in UI state
-      setDirectUIControls(controls);
+      // Use the hook's direct import function
+      const result = directImportControls(controls);
       
       // Reset refresh key to 0 to indicate successful direct import
       setRefreshKey(0);
@@ -159,9 +124,9 @@ function App() {
       
       // Show success message
       setImportResults({
-        success: controls.length,
-        total: controls.length,
-        errors: []
+        success: result.success,
+        total: result.total,
+        errors: result.errors
       });
       setShowImportDialog(true);
       
@@ -177,81 +142,23 @@ function App() {
   };
 
   const handleMoveControl = (id: string, direction: 'up' | 'down') => {
-    if (directUIMode) {
-      // Handle direct UI move
-      const control = directUIControls.find(c => c.id === id);
-      if (!control) return;
-      
-      const sectionControls = directUIControls.filter(c => c.sectionId === control.sectionId);
-      const currentIndex = sectionControls.findIndex(c => c.id === id);
-      
-      if (currentIndex === -1) return;
-      
-      const newIndex = direction === 'up' ? currentIndex - 1 : currentIndex + 1;
-      if (newIndex < 0 || newIndex >= sectionControls.length) return;
-      
-      const targetControl = sectionControls[newIndex];
-      const updatedControls = directUIControls.map(c => {
-        if (c.id === id) return { ...c, y: targetControl.y };
-        if (c.id === targetControl.id) return { ...c, y: control.y };
-        return c;
-      });
-      
-      setDirectUIControls(updatedControls);
-    } else {
-      moveControl(id, direction);
-    }
+    moveControl(id, direction);
   };
 
   const handleRemoveControl = (id: string) => {
-    if (directUIMode) {
-      setDirectUIControls(prev => prev.filter(c => c.id !== id));
-      if (directUISelectedControl?.id === id) {
-        setDirectUISelectedControl(null);
-      }
-    } else {
-      removeControl(id);
-    }
+    removeControl(id);
   };
 
   const handleReorderControl = (dragIndex: number, hoverIndex: number) => {
-    if (directUIMode) {
-      const newControls = [...directUIControls];
-      const draggedControl = newControls[dragIndex];
-      
-      newControls.splice(dragIndex, 1);
-      newControls.splice(hoverIndex, 0, draggedControl);
-      
-      const reorderedControls = newControls.map((control, index) => ({
-        ...control,
-        y: index
-      }));
-      
-      setDirectUIControls(reorderedControls);
-    } else {
-      reorderControl(dragIndex, hoverIndex);
-    }
+    reorderControl(dragIndex, hoverIndex);
   };
 
   const handleControlSelect = (control: DroppedControl) => {
-    if (directUIMode) {
-      setDirectUISelectedControl(control);
-    } else {
-      selectControl(control);
-    }
+    selectControl(control);
   };
 
   const handleControlUpdate = (id: string, updates: Partial<DroppedControl>) => {
-    if (directUIMode) {
-      setDirectUIControls(prev => prev.map(c => 
-        c.id === id ? { ...c, ...updates } : c
-      ));
-      if (directUISelectedControl?.id === id) {
-        setDirectUISelectedControl(prev => prev ? { ...prev, ...updates } : null);
-      }
-    } else {
-      updateControl(id, updates);
-    }
+    updateControl(id, updates);
   };
 
   const handleCreateSection = async (sectionData: Omit<Section, 'id' | 'controls' | 'validation'>) => {
@@ -296,16 +203,10 @@ function App() {
     
     try {
       // Move controls from deleted section to default section
-      const controlsToMove = (directUIMode ? directUIControls : droppedControls).filter(control => control.sectionId === id);
+      const controlsToMove = droppedControls.filter(control => control.sectionId === id);
       
-      if (directUIMode) {
-        setDirectUIControls(prev => prev.map(control => 
-          control.sectionId === id ? { ...control, sectionId: 'default' } : control
-        ));
-      } else {
-        for (const control of controlsToMove) {
-          await updateControl(control.id, { sectionId: 'default' });
-        }
+      for (const control of controlsToMove) {
+        await updateControl(control.id, { sectionId: 'default' });
       }
       
       // Delete section from database
@@ -334,7 +235,7 @@ function App() {
   };
 
   const handleDeleteControl = (controlId: string) => {
-    handleRemoveControl(controlId);
+    removeControl(controlId);
   };
 
   const handleImportControls = async (controls: DroppedControl[]) => {
@@ -540,7 +441,7 @@ function App() {
     setShowImportDialog(false);
     setImportResults(null);
     
-    if (!directUIMode) {
+    if (!directImportMode) {
       // Nuclear verification after dialog close for database mode
       setTimeout(async () => {
         console.log('💥 DIALOG: Nuclear verification after dialog close');
@@ -572,16 +473,6 @@ function App() {
     }
   };
 
-  // Get current controls based on mode
-  const getCurrentControls = () => {
-    return directUIMode ? directUIControls : droppedControls;
-  };
-
-  // Get current selected control
-  const getCurrentSelectedControl = () => {
-    return directUIMode ? directUISelectedControl : selectedControl;
-  };
-
   const renderContent = () => {
     if (isLoading || !isDbInitialized || nuclearResetInProgress) {
       return (
@@ -600,9 +491,6 @@ function App() {
         </div>
       );
     }
-
-    const currentControls = getCurrentControls();
-    const currentSelectedControl = getCurrentSelectedControl();
 
     switch (activeTab) {
       case 'dashboard':
@@ -628,8 +516,8 @@ function App() {
                 onDeleteSection={handleDeleteSection}
               />
               <DesignCanvas
-                droppedControls={currentControls.filter(control => control.sectionId === activeSection)}
-                selectedControl={currentSelectedControl}
+                droppedControls={droppedControls.filter(control => control.sectionId === activeSection)}
+                selectedControl={selectedControl}
                 onControlSelect={handleControlSelect}
                 onControlUpdate={handleControlUpdate}
                 onControlMove={handleMoveControl}
@@ -641,10 +529,10 @@ function App() {
               />
             </div>
             <PropertiesPanel
-              selectedControl={currentSelectedControl}
+              selectedControl={selectedControl}
               onUpdateControl={handleControlUpdate}
               sections={sections}
-              droppedControls={currentControls}
+              droppedControls={droppedControls}
             />
           </div>
         );
@@ -652,7 +540,7 @@ function App() {
       case 'preview':
         return (
           <PreviewMode
-            droppedControls={currentControls}
+            droppedControls={droppedControls}
             sections={sections}
             onDeleteControl={handleDeleteControl}
           />
@@ -661,7 +549,7 @@ function App() {
       case 'json':
         return (
           <JSONViewer
-            droppedControls={currentControls}
+            droppedControls={droppedControls}
             currentTier={currentTier}
             sections={sections}
           />
@@ -737,6 +625,7 @@ function App() {
           isOpen={showImportDialog}
           onClose={handleDialogClose}
           results={importResults}
+          directImportMode={directImportMode}
         />
         
         {/* Enhanced Footer with Direct UI Status */}
@@ -747,9 +636,9 @@ function App() {
               <span>Professional Form Builder Platform</span>
               {isDbInitialized && <span className="text-green-600 dark:text-green-400">Database Connected</span>}
               <span className="capitalize">{theme} Theme</span>
-              {directUIMode && (
+              {directImportMode && (
                 <span className="text-green-600 dark:text-green-400 animate-pulse flex items-center">
-                  <Zap className="w-3 h-3 mr-1" />
+                  <span className="w-3 h-3 mr-1">⚡</span>
                   Direct UI Mode
                 </span>
               )}
@@ -759,14 +648,14 @@ function App() {
                 RefreshKey: {refreshKey}
               </span>
               <span className="text-xs text-white font-mono bg-green-600 dark:bg-green-700 px-3 py-1 rounded-full shadow-sm">
-                Controls: {getCurrentControls().length}
+                Controls: {droppedControls.length}
               </span>
-              {getCurrentControls().length > 0 && (
+              {droppedControls.length > 0 && (
                 <span className="text-xs text-white font-mono bg-purple-600 dark:bg-purple-700 px-3 py-1 rounded-full shadow-sm">
                   Loaded: ✓
                 </span>
               )}
-              {directUIMode && (
+              {directImportMode && (
                 <span className="text-xs text-white font-mono bg-green-600 dark:bg-green-700 px-3 py-1 rounded-full shadow-sm animate-pulse">
                   Direct: ⚡
                 </span>
@@ -780,7 +669,7 @@ function App() {
             <div className="flex items-center space-x-4">
               <span>Version 1.0.0</span>
               {activeTab !== 'dashboard' && <span>Sections: {sections.length}</span>}
-              {activeTab !== 'dashboard' && <span>Mode: {directUIMode ? 'Direct UI' : 'Database'}</span>}
+              {activeTab !== 'dashboard' && <span>Mode: {directImportMode ? 'Direct UI' : 'Database'}</span>}
               <span className={`px-2 py-1 rounded text-xs font-medium ${
                 currentTier === 'platinum' ? 'bg-purple-100 dark:bg-purple-900 text-purple-700 dark:text-purple-300' :
                 currentTier === 'gold' ? 'bg-amber-100 dark:bg-amber-900 text-amber-700 dark:text-amber-300' :
