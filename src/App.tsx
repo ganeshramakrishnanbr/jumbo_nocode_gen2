@@ -46,6 +46,7 @@ function App() {
   // Direct UI state for bypassing database
   const [directUIControls, setDirectUIControls] = useState<DroppedControl[]>([]);
   const [directUIMode, setDirectUIMode] = useState(false);
+  const [directUISelectedControl, setDirectUISelectedControl] = useState<DroppedControl | null>(null);
 
   // Initialize theme
   const { theme } = useTheme();
@@ -131,6 +132,7 @@ function App() {
     };
     
     setDirectUIControls(prev => [...prev, newControl]);
+    setDirectUISelectedControl(newControl);
     console.log('✅ DIRECT UI: Control added to direct UI state');
   };
 
@@ -204,6 +206,9 @@ function App() {
   const handleRemoveControl = (id: string) => {
     if (directUIMode) {
       setDirectUIControls(prev => prev.filter(c => c.id !== id));
+      if (directUISelectedControl?.id === id) {
+        setDirectUISelectedControl(null);
+      }
     } else {
       removeControl(id);
     }
@@ -225,6 +230,27 @@ function App() {
       setDirectUIControls(reorderedControls);
     } else {
       reorderControl(dragIndex, hoverIndex);
+    }
+  };
+
+  const handleControlSelect = (control: DroppedControl) => {
+    if (directUIMode) {
+      setDirectUISelectedControl(control);
+    } else {
+      selectControl(control);
+    }
+  };
+
+  const handleControlUpdate = (id: string, updates: Partial<DroppedControl>) => {
+    if (directUIMode) {
+      setDirectUIControls(prev => prev.map(c => 
+        c.id === id ? { ...c, ...updates } : c
+      ));
+      if (directUISelectedControl?.id === id) {
+        setDirectUISelectedControl(prev => prev ? { ...prev, ...updates } : null);
+      }
+    } else {
+      updateControl(id, updates);
     }
   };
 
@@ -553,10 +579,7 @@ function App() {
 
   // Get current selected control
   const getCurrentSelectedControl = () => {
-    if (directUIMode) {
-      return directUIControls.find(c => c.id === selectedControl?.id) || null;
-    }
-    return selectedControl;
+    return directUIMode ? directUISelectedControl : selectedControl;
   };
 
   const renderContent = () => {
@@ -607,26 +630,8 @@ function App() {
               <DesignCanvas
                 droppedControls={currentControls.filter(control => control.sectionId === activeSection)}
                 selectedControl={currentSelectedControl}
-                onControlSelect={(control) => {
-                  if (directUIMode) {
-                    // Handle direct UI selection
-                    const foundControl = directUIControls.find(c => c.id === control.id);
-                    if (foundControl) {
-                      selectControl(foundControl);
-                    }
-                  } else {
-                    selectControl(control);
-                  }
-                }}
-                onControlUpdate={(id, updates) => {
-                  if (directUIMode) {
-                    setDirectUIControls(prev => prev.map(c => 
-                      c.id === id ? { ...c, ...updates } : c
-                    ));
-                  } else {
-                    updateControl(id, updates);
-                  }
-                }}
+                onControlSelect={handleControlSelect}
+                onControlUpdate={handleControlUpdate}
                 onControlMove={handleMoveControl}
                 onControlRemove={handleRemoveControl}
                 onControlReorder={handleReorderControl}
@@ -637,15 +642,7 @@ function App() {
             </div>
             <PropertiesPanel
               selectedControl={currentSelectedControl}
-              onUpdateControl={(id, updates) => {
-                if (directUIMode) {
-                  setDirectUIControls(prev => prev.map(c => 
-                    c.id === id ? { ...c, ...updates } : c
-                  ));
-                } else {
-                  updateControl(id, updates);
-                }
-              }}
+              onUpdateControl={handleControlUpdate}
               sections={sections}
               droppedControls={currentControls}
             />
