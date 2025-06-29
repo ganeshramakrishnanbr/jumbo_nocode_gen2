@@ -196,6 +196,8 @@ export const PDFPreview: React.FC<PDFPreviewProps> = ({
 
   const renderControl = (control: DroppedControl) => {
     const baseClasses = "mb-4 p-3 border border-gray-200 rounded-lg";
+    const value = effectiveFormValues[control.id];
+    const hasValue = value !== undefined && value !== null && value !== '';
     
     switch (control.type) {
       case 'text':
@@ -205,8 +207,8 @@ export const PDFPreview: React.FC<PDFPreviewProps> = ({
               {control.properties.label || control.name}
               {control.properties.required && <span className="text-red-500 ml-1">*</span>}
             </label>
-            <div className="w-full p-2 border border-gray-300 rounded bg-gray-50 text-gray-600">
-              {control.properties.placeholder || 'Text input field'}
+            <div className={`w-full p-2 border border-gray-300 rounded ${hasValue ? 'bg-blue-50 text-gray-900 font-medium' : 'bg-gray-50 text-gray-600'}`}>
+              {hasValue ? value : (control.properties.placeholder || 'Text input field')}
             </div>
           </div>
         );
@@ -218,8 +220,8 @@ export const PDFPreview: React.FC<PDFPreviewProps> = ({
               {control.properties.label || control.name}
               {control.properties.required && <span className="text-red-500 ml-1">*</span>}
             </label>
-            <div className="w-full p-2 border border-gray-300 rounded bg-gray-50 text-gray-600">
-              {control.properties.placeholder || 'email@example.com'}
+            <div className={`w-full p-2 border border-gray-300 rounded ${hasValue ? 'bg-blue-50 text-gray-900 font-medium' : 'bg-gray-50 text-gray-600'}`}>
+              {hasValue ? value : (control.properties.placeholder || 'email@example.com')}
             </div>
           </div>
         );
@@ -231,8 +233,8 @@ export const PDFPreview: React.FC<PDFPreviewProps> = ({
               {control.properties.label || control.name}
               {control.properties.required && <span className="text-red-500 ml-1">*</span>}
             </label>
-            <div className="w-full p-2 border border-gray-300 rounded bg-gray-50 text-gray-600 h-20">
-              {control.properties.placeholder || 'Multi-line text area'}
+            <div className={`w-full p-2 border border-gray-300 rounded h-20 ${hasValue ? 'bg-blue-50 text-gray-900 font-medium' : 'bg-gray-50 text-gray-600'}`}>
+              {hasValue ? value : (control.properties.placeholder || 'Multi-line text area')}
             </div>
           </div>
         );
@@ -244,10 +246,10 @@ export const PDFPreview: React.FC<PDFPreviewProps> = ({
               {control.properties.label || control.name}
               {control.properties.required && <span className="text-red-500 ml-1">*</span>}
             </label>
-            <div className="w-full p-2 border border-gray-300 rounded bg-gray-50 text-gray-600">
-              {control.properties.placeholder || 'Select an option...'}
+            <div className={`w-full p-2 border border-gray-300 rounded ${hasValue ? 'bg-blue-50 text-gray-900 font-medium' : 'bg-gray-50 text-gray-600'}`}>
+              {hasValue ? value : (control.properties.placeholder || 'Select an option...')}
             </div>
-            {control.properties.options && (
+            {!hasValue && control.properties.options && (
               <div className="text-xs text-gray-500 mt-1">
                 Options: {control.properties.options.join(', ')}
               </div>
@@ -262,14 +264,20 @@ export const PDFPreview: React.FC<PDFPreviewProps> = ({
               {control.properties.label || control.name}
               {control.properties.required && <span className="text-red-500 ml-1">*</span>}
             </label>
-            <div className="space-y-2">
-              {control.properties.options?.map((option: string, index: number) => (
-                <div key={index} className="flex items-center">
-                  <div className="w-4 h-4 border border-gray-300 rounded-full mr-2"></div>
-                  <span className="text-gray-700">{option}</span>
-                </div>
-              ))}
-            </div>
+            {hasValue ? (
+              <div className="p-2 bg-blue-50 rounded border border-blue-200">
+                <span className="text-gray-900 font-medium">Selected: {value}</span>
+              </div>
+            ) : (
+              <div className="space-y-2">
+                {control.properties.options?.map((option: string, index: number) => (
+                  <div key={index} className="flex items-center">
+                    <div className="w-4 h-4 border border-gray-300 rounded-full mr-2"></div>
+                    <span className="text-gray-700">{option}</span>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         );
       
@@ -277,11 +285,18 @@ export const PDFPreview: React.FC<PDFPreviewProps> = ({
         return (
           <div key={control.id} className={baseClasses}>
             <div className="flex items-center">
-              <div className="w-4 h-4 border border-gray-300 rounded mr-2"></div>
+              <div className={`w-4 h-4 border border-gray-300 rounded mr-2 ${hasValue && value ? 'bg-blue-500 border-blue-500' : ''}`}>
+                {hasValue && value && <CheckSquare className="w-4 h-4 text-white" />}
+              </div>
               <label className="text-sm font-medium text-gray-700">
                 {control.properties.label || control.name}
                 {control.properties.required && <span className="text-red-500 ml-1">*</span>}
               </label>
+              {hasValue && (
+                <span className="ml-2 text-sm text-blue-600 font-medium">
+                  ({value ? 'Checked' : 'Unchecked'})
+                </span>
+              )}
             </div>
           </div>
         );
@@ -293,8 +308,8 @@ export const PDFPreview: React.FC<PDFPreviewProps> = ({
               {control.properties.label || control.name}
               {control.properties.required && <span className="text-red-500 ml-1">*</span>}
             </label>
-            <div className="w-full p-2 border border-gray-300 rounded bg-gray-50 text-gray-600">
-              {control.properties.placeholder || '0'}
+            <div className={`w-full p-2 border border-gray-300 rounded ${hasValue ? 'bg-blue-50 text-gray-900 font-medium' : 'bg-gray-50 text-gray-600'}`}>
+              {hasValue ? value : (control.properties.placeholder || '0')}
             </div>
           </div>
         );
@@ -364,6 +379,39 @@ export const PDFPreview: React.FC<PDFPreviewProps> = ({
             
             {activePanel === 'header' && (
               <div className="p-4 pt-0 space-y-3">
+                {/* Logo Upload */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    Header Logo
+                  </label>
+                  <div className="space-y-2">
+                    <button
+                      onClick={() => logoInputRef.current?.click()}
+                      className="flex items-center px-3 py-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors"
+                    >
+                      <Upload className="w-4 h-4 mr-2" />
+                      Upload Logo
+                    </button>
+                    <input
+                      ref={logoInputRef}
+                      type="file"
+                      accept="image/*"
+                      onChange={handleLogoUpload}
+                      className="hidden"
+                    />
+                    {customization.header.logoUrl && (
+                      <div className="flex items-center space-x-2">
+                        <img 
+                          src={customization.header.logoUrl} 
+                          alt="Logo preview" 
+                          className="w-8 h-8 object-contain border rounded"
+                        />
+                        <span className="text-xs text-green-600">Logo uploaded</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+                
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     Title
@@ -461,6 +509,18 @@ export const PDFPreview: React.FC<PDFPreviewProps> = ({
                     />
                   </div>
                 )}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    Custom Footer Note
+                  </label>
+                  <textarea
+                    value={customization.footer.customNote}
+                    onChange={(e) => updateCustomization('footer', 'customNote', e.target.value)}
+                    placeholder="Add a custom note to appear in the footer"
+                    rows={2}
+                    className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white resize-none"
+                  />
+                </div>
               </div>
             )}
           </div>
@@ -511,6 +571,18 @@ export const PDFPreview: React.FC<PDFPreviewProps> = ({
                     <option value="portrait">Portrait</option>
                     <option value="landscape">Landscape</option>
                   </select>
+                </div>
+                <div className="flex items-center">
+                  <input
+                    type="checkbox"
+                    id="sectionPageBreaks"
+                    checked={customization.page.sectionPageBreaks}
+                    onChange={(e) => updateCustomization('page', 'sectionPageBreaks', e.target.checked)}
+                    className="mr-2"
+                  />
+                  <label htmlFor="sectionPageBreaks" className="text-sm text-gray-700 dark:text-gray-300">
+                    Start each section on a new page
+                  </label>
                 </div>
               </div>
             )}
@@ -606,20 +678,30 @@ export const PDFPreview: React.FC<PDFPreviewProps> = ({
             <div ref={previewRef} className="w-full h-full p-8">
               {/* Header */}
               <div 
-                className="mb-8 pb-4 border-b-2"
+                className="mb-8 pb-4 border-b-2 flex items-center justify-between"
                 style={{ 
-                  textAlign: customization.header.titleAlignment,
                   color: customization.header.textColor,
                   backgroundColor: customization.header.backgroundColor,
                   borderColor: selectedTemplate?.colors.border
                 }}
               >
-                <h1 className="text-2xl font-bold mb-2">{customization.header.title}</h1>
-                {customization.header.showDate && (
-                  <p className="text-sm text-gray-600">
-                    Generated on {new Date().toLocaleDateString()}
-                  </p>
-                )}
+                <div className="flex items-center space-x-4">
+                  {customization.header.showLogo && customization.header.logoUrl && (
+                    <img 
+                      src={customization.header.logoUrl} 
+                      alt="Logo" 
+                      className="h-12 w-auto object-contain"
+                    />
+                  )}
+                  <div style={{ textAlign: customization.header.titleAlignment }}>
+                    <h1 className="text-2xl font-bold mb-1">{customization.header.title}</h1>
+                    {customization.header.showDate && (
+                      <p className="text-sm text-gray-600">
+                        Generated on {new Date().toLocaleDateString()}
+                      </p>
+                    )}
+                  </div>
+                </div>
               </div>
               
               {/* Content */}
