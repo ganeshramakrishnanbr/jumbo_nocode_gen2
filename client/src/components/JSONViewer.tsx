@@ -367,6 +367,8 @@ export const JSONViewer: React.FC<JSONViewerProps> = ({
             <span>Controls: {droppedControls.length}</span>
             <span>Sections: {sections.length}</span>
             <span>Tier: {currentTier.charAt(0).toUpperCase() + currentTier.slice(1)}</span>
+            <span>Theme: {selectedTheme.charAt(0).toUpperCase() + selectedTheme.slice(1)}</span>
+            <span>Progress: {formProgress.overall}%</span>
           </div>
           <span>Generated: {new Date().toLocaleTimeString()}</span>
         </div>

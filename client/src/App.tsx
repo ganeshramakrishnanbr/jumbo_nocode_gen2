@@ -589,6 +589,14 @@ function App() {
             droppedControls={droppedControls}
             currentTier={currentTier}
             sections={sections}
+            selectedTheme="classic"
+            tabAlignment="top"
+            formProgress={{
+              overall: droppedControls.length > 0 ? Math.round((droppedControls.filter(c => c.properties.value).length / droppedControls.length) * 100) : 0,
+              required: droppedControls.filter(c => c.properties.required).length > 0 ? Math.round((droppedControls.filter(c => c.properties.required && c.properties.value).length / droppedControls.filter(c => c.properties.required).length) * 100) : 100,
+              filledCount: droppedControls.filter(c => c.properties.value).length,
+              totalCount: droppedControls.length
+            }}
           />
         );
       
