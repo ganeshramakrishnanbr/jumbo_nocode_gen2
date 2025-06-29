@@ -200,27 +200,13 @@ export const PDFPreview: React.FC<PDFPreviewProps> = ({
             img.src = customization.header.logoUrl;
           });
           
-          // Add logo to PDF with proper format detection and alignment
+          // Add logo to PDF with proper format detection - always positioned on the left
           const logoHeight = 20;
           const logoWidth = Math.min((img.width * logoHeight) / img.height, 50); // Limit width
           const format = customization.header.logoUrl.toLowerCase().includes('.png') ? 'PNG' : 'JPEG';
           
-          // Position logo based on title alignment
-          let logoX = 15; // Default left alignment
-          switch (customization.header.titleAlignment) {
-            case 'center':
-              logoX = (pageWidth - logoWidth) / 2;
-              break;
-            case 'right':
-              logoX = pageWidth - 15 - logoWidth;
-              break;
-            case 'left':
-            default:
-              logoX = 15;
-              break;
-          }
-          
-          pdf.addImage(customization.header.logoUrl, format, logoX, currentY, logoWidth, logoHeight);
+          // Logo always positioned on the left side
+          pdf.addImage(customization.header.logoUrl, format, 15, currentY, logoWidth, logoHeight);
           currentY += logoHeight + 8;
         } catch (error) {
           console.warn('Could not load logo for PDF:', error);
@@ -257,7 +243,7 @@ export const PDFPreview: React.FC<PDFPreviewProps> = ({
         pdf.setFontSize(10);
         pdf.setFont('helvetica', 'normal');
         
-        // Use the same alignment as the title
+        // Position date text based on title alignment setting
         let dateX = 15;
         let dateAlign: 'left' | 'center' | 'right' = 'left';
         
