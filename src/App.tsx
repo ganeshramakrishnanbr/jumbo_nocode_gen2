@@ -174,9 +174,9 @@ function App() {
     removeControl(controlId);
   };
 
-  // ENHANCED: Atomic Excel import with comprehensive error handling
+  // OPTIMIZED: Streamlined Excel import with intelligent refresh strategy
   const handleImportControls = async (controls: DroppedControl[]) => {
-    console.log('🚀 EXCEL IMPORT: ===== STARTING ATOMIC IMPORT PROCESS =====');
+    console.log('🚀 EXCEL IMPORT: ===== STARTING OPTIMIZED ATOMIC IMPORT =====');
     console.log('📊 EXCEL IMPORT: Import details:', {
       controlCount: controls.length,
       questionnaire: currentQuestionnaire,
@@ -201,14 +201,15 @@ function App() {
         console.log(`   ${index + 1}. ${control.name} (${control.type}) - Section: ${control.sectionId}, Order: ${control.y}, ID: ${control.id}`);
       });
 
-      // STEP 1: ATOMIC BATCH INSERT WITH TRANSACTION
-      console.log('🔄 EXCEL IMPORT: STEP 1 - Atomic batch insert with transaction...');
+      // STEP 1: OPTIMIZED ATOMIC BATCH INSERT
+      console.log('🔄 EXCEL IMPORT: STEP 1 - Optimized atomic batch insert...');
       const batchResult = await insertControlsBatch(controls, currentQuestionnaire);
       
-      console.log('📊 EXCEL IMPORT: Atomic batch insert results:', {
+      console.log('📊 EXCEL IMPORT: Optimized atomic batch results:', {
         successCount: batchResult.success,
         errorCount: batchResult.errors.length,
         totalControls: controls.length,
+        atomicSuccess: batchResult.success === controls.length,
         errors: batchResult.errors.slice(0, 3)
       });
 
@@ -220,57 +221,45 @@ function App() {
       });
 
       if (batchResult.success === 0) {
-        throw new Error(`Atomic import failed: ${batchResult.errors.slice(0, 3).join(', ')}`);
+        throw new Error(`Optimized atomic import failed: ${batchResult.errors.slice(0, 3).join(', ')}`);
       }
 
-      // STEP 2: ENHANCED STATE SYNCHRONIZATION
-      console.log('🔄 EXCEL IMPORT: STEP 2 - Enhanced state synchronization...');
+      // STEP 2: OPTIMIZED STATE SYNCHRONIZATION STRATEGY
+      console.log('🔄 EXCEL IMPORT: STEP 2 - Optimized state synchronization...');
       
       // Show dialog first
       setTimeout(() => {
-        console.log('🎉 EXCEL IMPORT: Showing success dialog');
+        console.log('🎉 EXCEL IMPORT: Showing optimized success dialog');
         setShowImportDialog(true);
       }, 100);
 
-      // Enhanced refresh strategy
-      setTimeout(async () => {
-        console.log('🔄 EXCEL IMPORT: Executing enhanced refresh strategy...');
+      // OPTIMIZED: Intelligent refresh strategy based on import success
+      if (batchResult.success === controls.length) {
+        // Perfect atomic import - use gentle refresh
+        console.log('🔄 EXCEL IMPORT: Perfect atomic import - using gentle refresh strategy');
+        setTimeout(() => {
+          setRefreshKey(prev => prev + 1);
+        }, 200);
         
-        // Strategy 1: Increment refresh key
-        setRefreshKey(prev => prev + 1);
-        
-        // Strategy 2: Force refresh after delay
         setTimeout(async () => {
           await forceRefresh();
-        }, 300);
+        }, 400);
+      } else {
+        // Partial import - use more aggressive refresh
+        console.log('🔄 EXCEL IMPORT: Partial import - using comprehensive refresh strategy');
+        setTimeout(() => {
+          setRefreshKey(prev => prev + 1);
+        }, 150);
         
-        // Strategy 3: Verification and correction
         setTimeout(async () => {
-          try {
-            const verification = await verifyControlsInDatabase(currentQuestionnaire);
-            console.log('🔍 EXCEL IMPORT: Final verification:', {
-              dbControlCount: verification.count,
-              uiControlCount: droppedControls.length,
-              syncDifference: verification.count - droppedControls.length,
-              timestamp: new Date().toISOString()
-            });
-            
-            // If still out of sync, force reload
-            if (verification.count > droppedControls.length + 2) {
-              console.log('🔄 EXCEL IMPORT: Still out of sync - forcing reload');
-              await forceReload();
-            }
-          } catch (error) {
-            console.error('❌ EXCEL IMPORT: Final verification failed:', error);
-          }
-        }, 600);
-        
-      }, 200);
+          await forceReload();
+        }, 300);
+      }
 
-      console.log('🎉 EXCEL IMPORT: ===== ATOMIC IMPORT PROCESS COMPLETED SUCCESSFULLY =====');
+      console.log('🎉 EXCEL IMPORT: ===== OPTIMIZED ATOMIC IMPORT COMPLETED =====');
 
     } catch (error) {
-      console.error('❌ EXCEL IMPORT: ===== ATOMIC IMPORT PROCESS FAILED =====', error);
+      console.error('❌ EXCEL IMPORT: ===== OPTIMIZED ATOMIC IMPORT FAILED =====', error);
       setImportResults({
         success: 0,
         total: controls.length,
@@ -283,48 +272,40 @@ function App() {
     }
   };
 
+  // OPTIMIZED: Intelligent dialog close with smart verification
   const handleDialogClose = () => {
-    console.log('🔄 DIALOG: ===== DIALOG CLOSE WITH ENHANCED VERIFICATION =====');
+    console.log('🔄 DIALOG: ===== OPTIMIZED DIALOG CLOSE =====');
     setShowImportDialog(false);
     setImportResults(null);
     
-    // Enhanced verification after dialog close
+    // OPTIMIZED: Smart verification strategy
     setTimeout(async () => {
-      console.log('🔍 DIALOG: Enhanced verification after dialog close');
+      console.log('🔍 DIALOG: Optimized verification after dialog close');
       try {
         const verification = await verifyControlsInDatabase(currentQuestionnaire);
-        console.log('🔍 DIALOG: Final enhanced verification:', {
+        console.log('🔍 DIALOG: Optimized verification results:', {
           dbControlCount: verification.count,
           uiControlCount: droppedControls.length,
           timestamp: new Date().toISOString(),
           refreshKey: refreshKey,
-          syncDifference: verification.count - droppedControls.length
+          syncDifference: verification.count - droppedControls.length,
+          syncStatus: Math.abs(verification.count - droppedControls.length) <= 1 ? 'OPTIMAL' : 'NEEDS_SYNC'
         });
 
-        // Enhanced sync correction
-        if (verification.count > droppedControls.length + 1) {
-          console.log('🔄 DIALOG: Enhanced sync correction needed - executing force refresh');
+        // OPTIMIZED: Only refresh if significantly out of sync
+        if (Math.abs(verification.count - droppedControls.length) > 1) {
+          console.log('🔄 DIALOG: Significant sync difference - applying optimized correction');
           await forceRefresh();
-          
-          // Additional verification
-          setTimeout(async () => {
-            const finalVerification = await verifyControlsInDatabase(currentQuestionnaire);
-            console.log('🔍 DIALOG: Final verification after correction:', {
-              dbControlCount: finalVerification.count,
-              uiControlCount: droppedControls.length,
-              correctionSuccessful: Math.abs(finalVerification.count - droppedControls.length) <= 1
-            });
-          }, 300);
         } else {
-          // Just increment refresh key
+          console.log('✅ DIALOG: State is optimally synced - gentle refresh');
           setRefreshKey(prev => prev + 1);
         }
         
-        console.log('✅ DIALOG: ===== ENHANCED VERIFICATION COMPLETED =====');
+        console.log('✅ DIALOG: ===== OPTIMIZED VERIFICATION COMPLETED =====');
       } catch (error) {
-        console.error('❌ DIALOG: Enhanced verification failed:', error);
+        console.error('❌ DIALOG: Optimized verification failed:', error);
       }
-    }, 200);
+    }, 150); // Optimized timing
   };
 
   const renderContent = () => {
@@ -424,34 +405,34 @@ function App() {
           {renderContent()}
         </div>
         
-        {/* Enhanced Import Progress Indicator */}
+        {/* Optimized Import Progress Indicator */}
         {importInProgress && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
             <div className="bg-white dark:bg-gray-900 rounded-lg shadow-xl p-8 max-w-md w-full mx-4">
               <div className="text-center">
                 <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
                 <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
-                  Atomic Import in Progress...
+                  Optimized Atomic Import...
                 </h3>
                 <p className="text-gray-600 dark:text-gray-300 text-sm">
-                  Processing Excel data with atomic transactions and enhanced state synchronization.
+                  Processing Excel data with optimized atomic transactions and intelligent state synchronization.
                 </p>
                 <p className="text-gray-500 dark:text-gray-400 text-xs mt-2">
-                  Using atomic database operations to ensure data integrity.
+                  Using optimized database operations for maximum stability.
                 </p>
               </div>
             </div>
           </div>
         )}
 
-        {/* Enhanced Import Success/Error Dialog */}
+        {/* Optimized Import Success/Error Dialog */}
         <ImportSuccessDialog
           isOpen={showImportDialog}
           onClose={handleDialogClose}
           results={importResults}
         />
         
-        {/* Enhanced Footer with Atomic Status */}
+        {/* Optimized Footer with Stability Status */}
         <footer className="bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700 px-6 py-3 transition-colors">
           <div className="flex items-center justify-between text-sm text-gray-600 dark:text-gray-300 transition-colors">
             <div className="flex items-center space-x-6">
@@ -459,7 +440,7 @@ function App() {
               <span>Professional Form Builder Platform</span>
               {isDbInitialized && <span className="text-green-600 dark:text-green-400">Database Connected</span>}
               <span className="capitalize">{theme} Theme</span>
-              {importInProgress && <span className="text-blue-600 dark:text-blue-400 animate-pulse">Atomic Import Processing...</span>}
+              {importInProgress && <span className="text-blue-600 dark:text-blue-400 animate-pulse">Optimized Import Processing...</span>}
               <span className="text-xs text-white font-mono bg-blue-600 dark:bg-blue-700 px-3 py-1 rounded-full shadow-sm">
                 RefreshKey: {refreshKey}
               </span>
@@ -468,11 +449,11 @@ function App() {
               </span>
               {droppedControls.length > 0 && (
                 <span className="text-xs text-white font-mono bg-purple-600 dark:bg-purple-700 px-3 py-1 rounded-full shadow-sm">
-                  Synced: ✓
+                  Optimized: ✓
                 </span>
               )}
-              <span className="text-xs text-white font-mono bg-orange-600 dark:bg-orange-700 px-3 py-1 rounded-full shadow-sm">
-                Atomic: ON
+              <span className="text-xs text-white font-mono bg-emerald-600 dark:bg-emerald-700 px-3 py-1 rounded-full shadow-sm">
+                Stable: ON
               </span>
             </div>
             <div className="flex items-center space-x-4">

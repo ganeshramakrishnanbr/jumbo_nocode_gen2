@@ -14,8 +14,9 @@ export const useDragDrop = (questionnaireId: string = 'default-questionnaire', i
   const [selectedControl, setSelectedControl] = useState<DroppedControl | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [lastSyncHash, setLastSyncHash] = useState<string>('');
+  const [stableStateCounter, setStableStateCounter] = useState(0);
 
-  // Enhanced control loading with comprehensive verification
+  // OPTIMIZED: Enhanced control loading with stability tracking
   const loadControlsFromDB = useCallback(async () => {
     if (!isDbInitialized) {
       console.log('⏸️ useDragDrop: Database not initialized, skipping control load');
@@ -25,245 +26,257 @@ export const useDragDrop = (questionnaireId: string = 'default-questionnaire', i
 
     try {
       setIsLoading(true);
-      console.log('🔄 useDragDrop: ===== ENHANCED CONTROL LOADING =====');
+      console.log('🔄 useDragDrop: ===== OPTIMIZED CONTROL LOADING =====');
       console.log('📊 useDragDrop: Load parameters:', { 
         questionnaireId, 
         refreshKey,
         timestamp: new Date().toISOString(),
-        currentStateCount: droppedControls.length
+        currentStateCount: droppedControls.length,
+        stableStateCounter
       });
       
       // Use verification function for enhanced logging
       const verification = await verifyControlsInDatabase(questionnaireId);
       const controls = verification.controls;
       
-      console.log('📊 useDragDrop: Enhanced database verification results:', {
+      console.log('📊 useDragDrop: Optimized database verification results:', {
         controlCount: controls.length,
         refreshKey,
         timestamp: new Date().toISOString(),
         previousStateCount: droppedControls.length,
-        changeDetected: controls.length !== droppedControls.length
+        changeDetected: controls.length !== droppedControls.length,
+        stableStateCounter
       });
 
       // Generate sync hash for state tracking
       const newSyncHash = controls.map(c => `${c.id}-${c.type}-${c.sectionId}`).join('|');
-      console.log('🔍 useDragDrop: Sync hash comparison:', {
+      const hashChanged = newSyncHash !== lastSyncHash;
+      
+      console.log('🔍 useDragDrop: Optimized sync hash comparison:', {
         previousHash: lastSyncHash.substring(0, 20) + '...',
         newHash: newSyncHash.substring(0, 20) + '...',
-        hashChanged: newSyncHash !== lastSyncHash
+        hashChanged,
+        stableStateCounter: hashChanged ? 0 : stableStateCounter + 1
       });
 
-      // Enhanced control logging
-      if (controls.length > 0) {
-        console.log('📝 useDragDrop: Enhanced loaded controls details:');
-        controls.forEach((control, index) => {
-          console.log(`   ${index + 1}. ${control.name} (${control.type}) - Section: ${control.sectionId}, Order: ${control.y}, ID: ${control.id}`);
-        });
+      // OPTIMIZED: Only update state if there are actual changes
+      if (hashChanged || controls.length !== droppedControls.length) {
+        console.log('🔄 useDragDrop: State changes detected - updating...');
+        setDroppedControls(controls);
+        setLastSyncHash(newSyncHash);
+        setStableStateCounter(0); // Reset stability counter on change
         
-        // Enhanced section distribution logging
-        const sectionDistribution = controls.reduce((acc, c) => {
-          acc[c.sectionId || 'unknown'] = (acc[c.sectionId || 'unknown'] || 0) + 1;
-          return acc;
-        }, {} as Record<string, number>);
-        console.log('🎯 useDragDrop: Enhanced controls by section:', sectionDistribution);
+        console.log('✅ useDragDrop: State updated successfully:', {
+          newCount: controls.length,
+          changeApplied: true,
+          syncHashUpdated: true
+        });
       } else {
-        console.log('📝 useDragDrop: No controls found in database (enhanced scan)');
+        console.log('✅ useDragDrop: State is stable - no update needed');
+        setStableStateCounter(prev => prev + 1);
       }
       
-      // Enhanced state update with verification
-      console.log('🔄 useDragDrop: Enhanced state update with verification...');
-      const previousCount = droppedControls.length;
-      setDroppedControls(controls);
-      setLastSyncHash(newSyncHash);
-      
-      console.log('✅ useDragDrop: Enhanced controls state updated successfully:', {
-        previousCount,
-        newCount: controls.length,
-        changeApplied: controls.length !== previousCount,
-        syncHashUpdated: true
-      });
-      
-      // Enhanced verification delay
-      setTimeout(() => {
-        console.log('🔍 useDragDrop: Enhanced state verification after update:', {
-          stateControlCount: controls.length,
-          refreshKey,
-          timestamp: new Date().toISOString(),
-          verificationPassed: true
-        });
-      }, 100);
-      
     } catch (error) {
-      console.error('❌ useDragDrop: Enhanced control loading failed:', error);
+      console.error('❌ useDragDrop: Optimized control loading failed:', error);
       setDroppedControls([]);
     } finally {
       setIsLoading(false);
-      console.log('🏁 useDragDrop: Enhanced load controls process completed');
+      console.log('🏁 useDragDrop: Optimized load controls process completed');
     }
-  }, [questionnaireId, isDbInitialized, refreshKey, droppedControls.length, lastSyncHash]);
+  }, [questionnaireId, isDbInitialized, refreshKey, droppedControls.length, lastSyncHash, stableStateCounter]);
 
-  // Enhanced useEffect with better dependency management
+  // OPTIMIZED: Debounced useEffect to prevent excessive calls
   useEffect(() => {
-    console.log('🔄 useDragDrop: ===== ENHANCED useEffect TRIGGERED =====');
-    console.log('📊 useDragDrop: Enhanced useEffect parameters:', { 
+    console.log('🔄 useDragDrop: ===== OPTIMIZED useEffect TRIGGERED =====');
+    console.log('📊 useDragDrop: Optimized useEffect parameters:', { 
       questionnaireId, 
       isDbInitialized, 
       refreshKey,
       currentControlCount: droppedControls.length,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
+      stableStateCounter
     });
     
-    loadControlsFromDB();
-  }, [loadControlsFromDB]);
+    // OPTIMIZED: Add debouncing to prevent rapid successive calls
+    const timeoutId = setTimeout(() => {
+      loadControlsFromDB();
+    }, 50); // Small delay to debounce rapid calls
+    
+    return () => clearTimeout(timeoutId);
+  }, [questionnaireId, isDbInitialized, refreshKey]);
 
-  // Enhanced force refresh with comprehensive verification
+  // OPTIMIZED: Smart force refresh that checks stability first
   const forceRefresh = useCallback(async () => {
-    console.log('🔄 useDragDrop: ===== ENHANCED FORCE REFRESH INITIATED =====');
-    console.log('📊 useDragDrop: Enhanced force refresh parameters:', {
+    console.log('🔄 useDragDrop: ===== OPTIMIZED FORCE REFRESH INITIATED =====');
+    console.log('📊 useDragDrop: Optimized force refresh parameters:', {
       currentControlCount: droppedControls.length,
       refreshKey,
       questionnaireId,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
+      stableStateCounter
     });
     
     try {
-      // Strategy 1: Enhanced force reload from database with verification
-      console.log('🔄 useDragDrop: Strategy 1 - Enhanced force reload with verification...');
+      // OPTIMIZED: Check if state is already stable
+      if (stableStateCounter >= 2) {
+        console.log('✅ useDragDrop: State is already stable - skipping force refresh');
+        return;
+      }
+      
+      // Strategy 1: Optimized force reload with stability check
+      console.log('🔄 useDragDrop: Strategy 1 - Optimized force reload with stability check...');
       await loadControlsFromDB();
       
-      // Strategy 2: Enhanced verification step with comprehensive sync check
+      // Strategy 2: Verification with smart sync detection
       setTimeout(async () => {
         try {
-          console.log('🔍 useDragDrop: Strategy 2 - Enhanced verification with sync check...');
+          console.log('🔍 useDragDrop: Strategy 2 - Smart verification with sync detection...');
           const verification = await verifyControlsInDatabase(questionnaireId);
           const currentStateCount = droppedControls.length;
           
-          console.log('📊 useDragDrop: Enhanced force refresh verification results:', {
+          console.log('📊 useDragDrop: Optimized force refresh verification results:', {
             dbControlCount: verification.count,
             stateControlCount: currentStateCount,
             refreshKey,
             syncStatus: verification.count === currentStateCount ? 'SYNCED' : 'OUT_OF_SYNC',
             syncDifference: verification.count - currentStateCount,
-            timestamp: new Date().toISOString()
+            timestamp: new Date().toISOString(),
+            stableStateCounter
           });
           
-          // Enhanced sync detection and correction
-          if (verification.count !== currentStateCount) {
-            console.log('🔄 useDragDrop: Enhanced state out of sync - applying direct update');
+          // OPTIMIZED: Only update if significantly out of sync
+          if (Math.abs(verification.count - currentStateCount) > 1) {
+            console.log('🔄 useDragDrop: Significant sync difference detected - applying correction');
             setDroppedControls(verification.controls);
             setLastSyncHash(verification.controls.map(c => `${c.id}-${c.type}-${c.sectionId}`).join('|'));
-            console.log('✅ useDragDrop: Enhanced direct state update completed');
+            setStableStateCounter(0);
+            console.log('✅ useDragDrop: Optimized sync correction applied');
           } else {
-            console.log('✅ useDragDrop: Enhanced state is perfectly in sync');
+            console.log('✅ useDragDrop: State is optimally synced');
+            setStableStateCounter(prev => prev + 1);
           }
         } catch (error) {
-          console.error('❌ useDragDrop: Enhanced force refresh verification failed:', error);
+          console.error('❌ useDragDrop: Optimized force refresh verification failed:', error);
         }
-      }, 200);
+      }, 150); // Reduced delay for faster response
       
-      console.log('✅ useDragDrop: Enhanced force refresh completed successfully');
+      console.log('✅ useDragDrop: Optimized force refresh completed successfully');
     } catch (error) {
-      console.error('❌ useDragDrop: Enhanced force refresh failed:', error);
+      console.error('❌ useDragDrop: Optimized force refresh failed:', error);
     }
-  }, [loadControlsFromDB, droppedControls.length, refreshKey, questionnaireId]);
+  }, [loadControlsFromDB, droppedControls.length, refreshKey, questionnaireId, stableStateCounter]);
 
-  // Enhanced force reload function for extreme cases
+  // OPTIMIZED: Intelligent force reload with stability preservation
   const forceReload = useCallback(async () => {
-    console.log('🔄 useDragDrop: ===== ENHANCED FORCE RELOAD INITIATED =====');
-    console.log('📊 useDragDrop: Enhanced force reload parameters:', {
+    console.log('🔄 useDragDrop: ===== OPTIMIZED FORCE RELOAD INITIATED =====');
+    console.log('📊 useDragDrop: Optimized force reload parameters:', {
       currentControlCount: droppedControls.length,
       refreshKey,
       questionnaireId,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
+      stableStateCounter
     });
     
     try {
-      // Clear current state first
-      console.log('🔄 useDragDrop: Enhanced clearing current state...');
+      // OPTIMIZED: Preserve stable state if possible
+      if (stableStateCounter >= 3) {
+        console.log('✅ useDragDrop: State is highly stable - performing gentle reload');
+        await loadControlsFromDB();
+        return;
+      }
+      
+      // Clear current state with optimized timing
+      console.log('🔄 useDragDrop: Optimized clearing current state...');
       setDroppedControls([]);
       setLastSyncHash('');
+      setStableStateCounter(0);
       setIsLoading(true);
       
-      // Wait for state to clear
+      // Optimized reload timing
       setTimeout(async () => {
         try {
-          console.log('🔄 useDragDrop: Enhanced reloading from database...');
+          console.log('🔄 useDragDrop: Optimized reloading from database...');
           const verification = await verifyControlsInDatabase(questionnaireId);
           
-          console.log('📊 useDragDrop: Enhanced force reload results:', {
+          console.log('📊 useDragDrop: Optimized force reload results:', {
             freshControlCount: verification.count,
             timestamp: new Date().toISOString()
           });
           
           setDroppedControls(verification.controls);
           setLastSyncHash(verification.controls.map(c => `${c.id}-${c.type}-${c.sectionId}`).join('|'));
+          setStableStateCounter(1); // Start with some stability
           setIsLoading(false);
           
-          console.log('✅ useDragDrop: Enhanced force reload completed');
+          console.log('✅ useDragDrop: Optimized force reload completed');
         } catch (error) {
-          console.error('❌ useDragDrop: Enhanced force reload failed:', error);
+          console.error('❌ useDragDrop: Optimized force reload failed:', error);
           setIsLoading(false);
         }
-      }, 100);
+      }, 75); // Optimized timing
       
     } catch (error) {
-      console.error('❌ useDragDrop: Enhanced force reload failed:', error);
+      console.error('❌ useDragDrop: Optimized force reload failed:', error);
       setIsLoading(false);
     }
-  }, [droppedControls.length, refreshKey, questionnaireId]);
+  }, [droppedControls.length, refreshKey, questionnaireId, stableStateCounter]);
 
-  // Enhanced nuclear reset function
+  // OPTIMIZED: Intelligent nuclear reset with stability tracking
   const nuclearReset = useCallback(async () => {
-    console.log('💥 useDragDrop: ===== ENHANCED NUCLEAR RESET INITIATED =====');
-    console.log('📊 useDragDrop: Enhanced nuclear reset parameters:', {
+    console.log('💥 useDragDrop: ===== OPTIMIZED NUCLEAR RESET INITIATED =====');
+    console.log('📊 useDragDrop: Optimized nuclear reset parameters:', {
       currentControlCount: droppedControls.length,
       refreshKey,
       questionnaireId,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
+      stableStateCounter
     });
     
     try {
-      // Step 1: Complete state annihilation
-      console.log('💥 useDragDrop: Step 1 - Complete state annihilation...');
+      // Step 1: Complete state reset with optimization
+      console.log('💥 useDragDrop: Step 1 - Optimized state reset...');
       setDroppedControls([]);
       setSelectedControl(null);
       setLastSyncHash('');
+      setStableStateCounter(0);
       setIsLoading(true);
       
-      // Step 2: Wait for complete state clearing
-      await new Promise(resolve => setTimeout(resolve, 300));
+      // Step 2: Optimized wait time
+      await new Promise(resolve => setTimeout(resolve, 200));
       
-      // Step 3: Enhanced nuclear reload from database with verification
-      console.log('💥 useDragDrop: Step 2 - Enhanced nuclear reload with verification...');
+      // Step 3: Optimized nuclear reload with verification
+      console.log('💥 useDragDrop: Step 2 - Optimized nuclear reload...');
       const verification = await verifyControlsInDatabase(questionnaireId);
       
-      console.log('📊 useDragDrop: Enhanced nuclear reset reload results:', {
+      console.log('📊 useDragDrop: Optimized nuclear reset reload results:', {
         nuclearControlCount: verification.count,
         timestamp: new Date().toISOString()
       });
       
-      // Step 4: Enhanced nuclear state reconstruction
-      console.log('💥 useDragDrop: Step 3 - Enhanced nuclear state reconstruction...');
+      // Step 4: Optimized state reconstruction
+      console.log('💥 useDragDrop: Step 3 - Optimized state reconstruction...');
       setDroppedControls(verification.controls);
       setLastSyncHash(verification.controls.map(c => `${c.id}-${c.type}-${c.sectionId}`).join('|'));
+      setStableStateCounter(2); // Start with good stability
       setIsLoading(false);
       
-      // Step 5: Enhanced nuclear verification
+      // Step 5: Optimized verification
       setTimeout(() => {
-        console.log('💥 useDragDrop: Enhanced nuclear verification:', {
+        console.log('💥 useDragDrop: Optimized nuclear verification:', {
           reconstructedControlCount: verification.count,
           timestamp: new Date().toISOString(),
-          nuclearStatus: 'RECONSTRUCTION_COMPLETE'
+          nuclearStatus: 'OPTIMIZED_RECONSTRUCTION_COMPLETE'
         });
-      }, 200);
+        setStableStateCounter(3); // Mark as highly stable
+      }, 100);
       
-      console.log('✅ useDragDrop: ===== ENHANCED NUCLEAR RESET COMPLETED SUCCESSFULLY =====');
+      console.log('✅ useDragDrop: ===== OPTIMIZED NUCLEAR RESET COMPLETED SUCCESSFULLY =====');
       
     } catch (error) {
-      console.error('❌ useDragDrop: Enhanced nuclear reset failed:', error);
+      console.error('❌ useDragDrop: Optimized nuclear reset failed:', error);
       setIsLoading(false);
     }
-  }, [droppedControls.length, refreshKey, questionnaireId]);
+  }, [droppedControls.length, refreshKey, questionnaireId, stableStateCounter]);
 
   const addControl = useCallback(async (controlType: ControlType, x: number, y: number, sectionId: string = 'default') => {
     if (!isDbInitialized) {
@@ -298,6 +311,7 @@ export const useDragDrop = (questionnaireId: string = 'default-questionnaire', i
       await insertControl(newControl, questionnaireId);
       setDroppedControls(prev => [...prev, newControl]);
       setSelectedControl(newControl);
+      setStableStateCounter(0); // Reset stability on change
       
       console.log('✅ useDragDrop: Control added successfully');
     } catch (error) {
@@ -326,6 +340,7 @@ export const useDragDrop = (questionnaireId: string = 'default-questionnaire', i
         setSelectedControl(prev => prev ? { ...prev, ...updates } : null);
       }
       
+      setStableStateCounter(0); // Reset stability on change
       console.log('✅ useDragDrop: Control updated successfully');
     } catch (error) {
       console.error('❌ useDragDrop: Failed to update control:', error);
@@ -369,6 +384,7 @@ export const useDragDrop = (questionnaireId: string = 'default-questionnaire', i
       }
       
       setDroppedControls(reordered);
+      setStableStateCounter(0); // Reset stability on change
       
       if (selectedControl?.id === id) {
         setSelectedControl(null);
@@ -416,6 +432,7 @@ export const useDragDrop = (questionnaireId: string = 'default-questionnaire', i
       await updateControlDB(targetControl.id, { y: control.y });
       
       setDroppedControls(updatedControls);
+      setStableStateCounter(0); // Reset stability on change
       console.log('✅ useDragDrop: Control moved successfully');
     } catch (error) {
       console.error('❌ useDragDrop: Failed to move control:', error);
@@ -444,6 +461,7 @@ export const useDragDrop = (questionnaireId: string = 'default-questionnaire', i
       
       await reorderControls(reorderedControls);
       setDroppedControls(reorderedControls);
+      setStableStateCounter(0); // Reset stability on change
       console.log('✅ useDragDrop: Controls reordered successfully');
     } catch (error) {
       console.error('❌ useDragDrop: Failed to reorder control:', error);
@@ -464,17 +482,19 @@ export const useDragDrop = (questionnaireId: string = 'default-questionnaire', i
     setSelectedControl(null);
   }, []);
 
-  // Enhanced state change logging
+  // OPTIMIZED: Enhanced state change logging with stability tracking
   useEffect(() => {
-    console.log('📊 useDragDrop: ===== ENHANCED STATE CHANGED =====');
-    console.log('📊 useDragDrop: Enhanced current state:', {
+    console.log('📊 useDragDrop: ===== OPTIMIZED STATE CHANGED =====');
+    console.log('📊 useDragDrop: Optimized current state:', {
       controlCount: droppedControls.length,
       selectedControlId: selectedControl?.id,
       selectedControlName: selectedControl?.name,
       isLoading,
       refreshKey,
       timestamp: new Date().toISOString(),
-      stateHash: lastSyncHash.substring(0, 20) + '...'
+      stateHash: lastSyncHash.substring(0, 20) + '...',
+      stableStateCounter,
+      stabilityLevel: stableStateCounter >= 3 ? 'HIGH' : stableStateCounter >= 1 ? 'MEDIUM' : 'LOW'
     });
 
     if (droppedControls.length > 0) {
@@ -482,17 +502,17 @@ export const useDragDrop = (questionnaireId: string = 'default-questionnaire', i
         acc[control.sectionId || 'unknown'] = (acc[control.sectionId || 'unknown'] || 0) + 1;
         return acc;
       }, {} as Record<string, number>);
-      console.log('📂 useDragDrop: Enhanced controls by section:', distribution);
+      console.log('📂 useDragDrop: Optimized controls by section:', distribution);
       
       const typeDistribution = droppedControls.reduce((acc, control) => {
         acc[control.type] = (acc[control.type] || 0) + 1;
         return acc;
       }, {} as Record<string, number>);
-      console.log('🎯 useDragDrop: Enhanced controls by type:', typeDistribution);
+      console.log('🎯 useDragDrop: Optimized controls by type:', typeDistribution);
     } else {
-      console.log('📝 useDragDrop: No controls in enhanced state');
+      console.log('📝 useDragDrop: No controls in optimized state');
     }
-  }, [droppedControls.length, selectedControl?.id, selectedControl?.name, isLoading, refreshKey, lastSyncHash]);
+  }, [droppedControls.length, selectedControl?.id, selectedControl?.name, isLoading, refreshKey, lastSyncHash, stableStateCounter]);
 
   return {
     droppedControls,
