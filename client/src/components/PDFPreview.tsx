@@ -28,56 +28,39 @@ export const PDFPreview: React.FC<PDFPreviewProps> = ({
 }) => {
   const [availableTemplates] = useState(() => getAvailableTemplates(currentTier));
   const [selectedTemplate, setSelectedTemplate] = useState(availableTemplates[0]);
-  const [customization, setCustomization] = useState(() => 
-    getDefaultCustomization(selectedTemplate)
+  const [customization, setCustomization] = useState<PDFCustomization>(() => 
+    getDefaultCustomization(availableTemplates[0])
   );
-  const [zoom, setZoom] = useState(100);
-  const [isFullscreen, setIsFullscreen] = useState(false);
-  const [showCustomization, setShowCustomization] = useState(true);
-  const [activePanel, setActivePanel] = useState<'header' | 'footer' | 'content' | 'page'>('content');
   const [isGenerating, setIsGenerating] = useState(false);
-  
-  // Local form values management
-  const { formValues: localFormValues, generateSampleData, updateFormValue } = useFormValues();
-  const effectiveFormValues = { ...localFormValues, ...formValues };
+  const [zoomLevel, setZoomLevel] = useState(100);
+  const [showCustomization, setShowCustomization] = useState(true);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const [activePanel, setActivePanel] = useState<'template' | 'header' | 'footer' | 'page'>('template');
   
   const previewRef = useRef<HTMLDivElement>(null);
   const logoInputRef = useRef<HTMLInputElement>(null);
+  const { generateSampleData } = useFormValues();
 
-  // Update customization when template changes
-  useEffect(() => {
-    if (selectedTemplate) {
-      setCustomization(getDefaultCustomization(selectedTemplate));
-    }
-  }, [selectedTemplate]);
+  // Combine passed formValues with any internal state
+  const effectiveFormValues = { ...formValues };
 
   const handleTemplateChange = (templateId: string) => {
     const template = availableTemplates.find(t => t.id === templateId);
     if (template) {
       setSelectedTemplate(template);
+      setCustomization(getDefaultCustomization(template));
     }
   };
 
   const updateCustomization = (section: keyof PDFCustomization, field: string, value: any) => {
-    setCustomization(prev => {
-      if (section === 'header') {
-        return { ...prev, header: { ...prev.header, [field]: value } };
-      } else if (section === 'footer') {
-        return { ...prev, footer: { ...prev.footer, [field]: value } };
-      } else if (section === 'content') {
-        return { ...prev, content: { ...prev.content, [field]: value } };
-      } else if (section === 'page') {
-        return { ...prev, page: { ...prev.page, [field]: value } };
+    setCustomization(prev => ({
+      ...prev,
+      [section]: {
+        ...prev[section],
+        [field]: value
       }
-      return prev;
-    });
+    }));
   };
-
-  const handleZoom = (delta: number) => {
-    setZoom(prev => Math.max(25, Math.min(200, prev + delta)));
-  };
-
-  const resetZoom = () => setZoom(100);
 
   const handleLogoUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -86,7 +69,6 @@ export const PDFPreview: React.FC<PDFPreviewProps> = ({
       reader.onload = (e) => {
         const logoUrl = e.target?.result as string;
         updateCustomization('header', 'logoUrl', logoUrl);
-        updateCustomization('header', 'showLogo', true);
       };
       reader.readAsDataURL(file);
     }
@@ -94,6 +76,171 @@ export const PDFPreview: React.FC<PDFPreviewProps> = ({
 
   const handleGenerateSampleData = () => {
     generateSampleData(droppedControls);
+  };
+
+  const zoomIn = () => setZoomLevel(prev => Math.min(prev + 25, 200));
+  const zoomOut = () => setZoomLevel(prev => Math.max(prev - 25, 50));
+  const resetZoom = () => setZoomLevel(100);
+
+  const generateSinglePagePDF = async (pdf: jsPDF) => {
+    const canvas = await html2canvas(previewRef.current!, {
+      scale: 2,
+      useCORS: true,
+      allowTaint: true,
+      backgroundColor: '#ffffff',
+      logging: false,
+      imageTimeout: 0,
+      onclone: (clonedDoc) => {
+        // Ensure all images are loaded
+        const images = clonedDoc.querySelectorAll('img');
+        images.forEach(img => {
+          if (!img.complete) {
+            img.onload = () => console.log('Image loaded for PDF generation');
+          }
+        });
+      }
+    });
+
+    const imgData = canvas.toDataURL('image/png');
+    const pageWidth = pdf.internal.pageSize.getWidth();
+    const pageHeight = pdf.internal.pageSize.getHeight();
+    const imgWidth = pageWidth - 20; // 10mm margin on each side
+    const imgHeight = (canvas.height * imgWidth) / canvas.width;
+    
+    // Smart pagination to prevent overflow
+    if (imgHeight > pageHeight - 20) {
+      // Content is too tall, split into multiple pages
+      const sectionsPerPage = Math.ceil(imgHeight / (pageHeight - 40));
+      const sectionHeight = canvas.height / sectionsPerPage;
+      
+      for (let i = 0; i < sectionsPerPage; i++) {
+        if (i > 0) pdf.addPage();
+        
+        const sectionCanvas = document.createElement('canvas');
+        const sectionCtx = sectionCanvas.getContext('2d')!;
+        sectionCanvas.width = canvas.width;
+        sectionCanvas.height = sectionHeight;
+        
+        sectionCtx.drawImage(canvas, 0, -i * sectionHeight);
+        const sectionImgData = sectionCanvas.toDataURL('image/png');
+        const sectionImgHeight = (sectionHeight * imgWidth) / canvas.width;
+        
+        pdf.addImage(sectionImgData, 'PNG', 10, 10, imgWidth, sectionImgHeight);
+      }
+    } else {
+      pdf.addImage(imgData, 'PNG', 10, 10, imgWidth, imgHeight);
+    }
+  };
+
+  const generatePDFWithPageBreaks = async (pdf: jsPDF) => {
+    const pageWidth = pdf.internal.pageSize.getWidth();
+    const pageHeight = pdf.internal.pageSize.getHeight();
+    let currentY = 20;
+
+    // Add header with logo if present
+    const addHeader = async () => {
+      if (customization.header.logoUrl) {
+        try {
+          // Create a temporary image element to get proper dimensions
+          const img = new Image();
+          img.crossOrigin = 'anonymous';
+          
+          await new Promise<void>((resolve, reject) => {
+            img.onload = () => resolve();
+            img.onerror = () => reject();
+            img.src = customization.header.logoUrl;
+          });
+          
+          // Add logo to PDF
+          const logoHeight = 15;
+          const logoWidth = (img.width * logoHeight) / img.height;
+          pdf.addImage(customization.header.logoUrl, 'PNG', 10, currentY, logoWidth, logoHeight);
+          currentY += logoHeight + 5;
+        } catch (error) {
+          console.warn('Could not load logo for PDF:', error);
+        }
+      }
+
+      // Add title
+      pdf.setFontSize(18);
+      pdf.setFont('helvetica', 'bold');
+      pdf.text(customization.header.title, pageWidth / 2, currentY, { align: 'center' });
+      currentY += 10;
+
+      if (customization.header.showDate) {
+        pdf.setFontSize(10);
+        pdf.setFont('helvetica', 'normal');
+        pdf.text(`Generated on ${new Date().toLocaleDateString()}`, pageWidth / 2, currentY, { align: 'center' });
+        currentY += 8;
+      }
+      
+      currentY += 5; // Extra spacing after header
+    };
+
+    await addHeader();
+
+    // Process each section
+    for (const section of sections) {
+      const sectionControls = droppedControls.filter(control => control.sectionId === section.id);
+      if (sectionControls.length === 0) continue;
+
+      // Check if we need a new page for this section
+      if (currentY > pageHeight - 60) {
+        pdf.addPage();
+        currentY = 20;
+        await addHeader();
+      }
+
+      // Add section title
+      pdf.setFontSize(14);
+      pdf.setFont('helvetica', 'bold');
+      pdf.text(section.name, 10, currentY);
+      currentY += 8;
+
+      // Add section controls
+      for (const control of sectionControls) {
+        const controlHeight = 15; // Estimated height per control
+        
+        // Check if control would overflow to next page
+        if (currentY + controlHeight > pageHeight - 30) {
+          pdf.addPage();
+          currentY = 20;
+          await addHeader();
+        }
+
+        // Add control
+        pdf.setFontSize(10);
+        pdf.setFont('helvetica', 'normal');
+        
+        const label = control.properties.label || control.name;
+        const value = effectiveFormValues[control.id] || control.properties.placeholder || '';
+        
+        pdf.text(`${label}:`, 10, currentY);
+        pdf.setFont('helvetica', 'bold');
+        pdf.text(value.toString(), 60, currentY);
+        pdf.setFont('helvetica', 'normal');
+        
+        currentY += controlHeight;
+      }
+      
+      currentY += 5; // Extra spacing between sections
+    }
+
+    // Add footer to all pages
+    const totalPages = pdf.getNumberOfPages();
+    for (let i = 1; i <= totalPages; i++) {
+      pdf.setPage(i);
+      
+      if (customization.footer.customNote) {
+        pdf.setFontSize(8);
+        pdf.text(customization.footer.customNote, pageWidth / 2, pageHeight - 15, { align: 'center' });
+      }
+      
+      if (customization.footer.showPageNumbers) {
+        pdf.setFontSize(8);
+        pdf.text(`Page ${i} of ${totalPages}`, pageWidth - 20, pageHeight - 10, { align: 'right' });
+      }
+    }
   };
 
   const generatePDF = async () => {
@@ -109,22 +256,11 @@ export const PDFPreview: React.FC<PDFPreviewProps> = ({
       });
 
       if (customization.page.sectionPageBreaks && sections.length > 0) {
-        // Generate PDF with page breaks for sections
+        // Generate PDF with page breaks for sections and overflow prevention
         await generatePDFWithPageBreaks(pdf);
       } else {
-        // Generate single-page PDF
-        const canvas = await html2canvas(previewRef.current, {
-          scale: 2,
-          useCORS: true,
-          allowTaint: true,
-          backgroundColor: '#ffffff'
-        });
-
-        const imgData = canvas.toDataURL('image/png');
-        const imgWidth = pdf.internal.pageSize.getWidth();
-        const imgHeight = (canvas.height * imgWidth) / canvas.width;
-        
-        pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
+        // Generate single-page PDF with smart overflow handling
+        await generateSinglePagePDF(pdf);
       }
       
       // Add metadata
@@ -145,75 +281,15 @@ export const PDFPreview: React.FC<PDFPreviewProps> = ({
     }
   };
 
-  const generatePDFWithPageBreaks = async (pdf: jsPDF) => {
-    // Implementation for section-based page breaks
-    // This is a simplified version - in production, you'd want more sophisticated layout
-    
-    for (let i = 0; i < sections.length; i++) {
-      if (i > 0) {
-        pdf.addPage();
-      }
-      
-      // Add header to each page
-      if (customization.header.showLogo && customization.header.logoUrl) {
-        // Add logo (simplified)
-        pdf.setFontSize(16);
-        pdf.text('Logo', 20, 20);
-      }
-      
-      if (customization.header.title) {
-        pdf.setFontSize(18);
-        pdf.text(customization.header.title, 20, customization.header.showLogo ? 35 : 20);
-      }
-      
-      // Add section content
-      const section = sections[i];
-      const sectionControls = droppedControls.filter(control => control.sectionId === section.id);
-      
-      pdf.setFontSize(14);
-      pdf.text(section.name, 20, 50);
-      
-      let yPosition = 65;
-      sectionControls.forEach(control => {
-        const value = effectiveFormValues[control.id] || '';
-        pdf.setFontSize(12);
-        pdf.text(`${control.properties.label || control.name}:`, 20, yPosition);
-        pdf.text(String(value), 20, yPosition + 5);
-        yPosition += 15;
-      });
-      
-      // Add footer
-      if (customization.footer.showPageNumbers) {
-        pdf.setFontSize(10);
-        pdf.text(`Page ${i + 1} of ${sections.length}`, 20, pdf.internal.pageSize.getHeight() - 20);
-      }
-      
-      if (customization.footer.customNote) {
-        pdf.text(customization.footer.customNote, 20, pdf.internal.pageSize.getHeight() - 10);
-      }
-    }
-  };
-
   const renderControl = (control: DroppedControl) => {
     const baseClasses = "mb-4 p-3 border border-gray-200 rounded-lg";
     const value = effectiveFormValues[control.id];
     const hasValue = value !== undefined && value !== null && value !== '';
-    
+
     switch (control.type) {
       case 'text':
-        return (
-          <div key={control.id} className={baseClasses}>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              {control.properties.label || control.name}
-              {control.properties.required && <span className="text-red-500 ml-1">*</span>}
-            </label>
-            <div className={`w-full p-2 border border-gray-300 rounded ${hasValue ? 'bg-blue-50 text-gray-900 font-medium' : 'bg-gray-50 text-gray-600'}`}>
-              {hasValue ? value : (control.properties.placeholder || 'Text input field')}
-            </div>
-          </div>
-        );
-      
       case 'email':
+      case 'phone':
         return (
           <div key={control.id} className={baseClasses}>
             <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -221,7 +297,7 @@ export const PDFPreview: React.FC<PDFPreviewProps> = ({
               {control.properties.required && <span className="text-red-500 ml-1">*</span>}
             </label>
             <div className={`w-full p-2 border border-gray-300 rounded ${hasValue ? 'bg-blue-50 text-gray-900 font-medium' : 'bg-gray-50 text-gray-600'}`}>
-              {hasValue ? value : (control.properties.placeholder || 'email@example.com')}
+              {hasValue ? value : (control.properties.placeholder || 'Enter text...')}
             </div>
           </div>
         );
@@ -233,8 +309,8 @@ export const PDFPreview: React.FC<PDFPreviewProps> = ({
               {control.properties.label || control.name}
               {control.properties.required && <span className="text-red-500 ml-1">*</span>}
             </label>
-            <div className={`w-full p-2 border border-gray-300 rounded h-20 ${hasValue ? 'bg-blue-50 text-gray-900 font-medium' : 'bg-gray-50 text-gray-600'}`}>
-              {hasValue ? value : (control.properties.placeholder || 'Multi-line text area')}
+            <div className={`w-full p-2 border border-gray-300 rounded min-h-[80px] ${hasValue ? 'bg-blue-50 text-gray-900 font-medium' : 'bg-gray-50 text-gray-600'}`}>
+              {hasValue ? value : (control.properties.placeholder || 'Enter detailed text...')}
             </div>
           </div>
         );
@@ -247,13 +323,23 @@ export const PDFPreview: React.FC<PDFPreviewProps> = ({
               {control.properties.required && <span className="text-red-500 ml-1">*</span>}
             </label>
             <div className={`w-full p-2 border border-gray-300 rounded ${hasValue ? 'bg-blue-50 text-gray-900 font-medium' : 'bg-gray-50 text-gray-600'}`}>
-              {hasValue ? value : (control.properties.placeholder || 'Select an option...')}
+              {hasValue ? value : 'Select an option...'}
             </div>
-            {!hasValue && control.properties.options && (
-              <div className="text-xs text-gray-500 mt-1">
-                Options: {control.properties.options.join(', ')}
+          </div>
+        );
+      
+      case 'checkbox':
+        return (
+          <div key={control.id} className={baseClasses}>
+            <div className="flex items-center">
+              <div className={`w-4 h-4 border border-gray-300 rounded mr-2 flex items-center justify-center ${hasValue && value ? 'bg-blue-600 border-blue-600' : 'bg-white'}`}>
+                {hasValue && value && <CheckSquare className="w-3 h-3 text-white" />}
               </div>
-            )}
+              <label className="text-sm font-medium text-gray-700">
+                {control.properties.label || control.name}
+                {control.properties.required && <span className="text-red-500 ml-1">*</span>}
+              </label>
+            </div>
           </div>
         );
       
@@ -264,39 +350,28 @@ export const PDFPreview: React.FC<PDFPreviewProps> = ({
               {control.properties.label || control.name}
               {control.properties.required && <span className="text-red-500 ml-1">*</span>}
             </label>
-            {hasValue ? (
-              <div className="p-2 bg-blue-50 rounded border border-blue-200">
-                <span className="text-gray-900 font-medium">Selected: {value}</span>
-              </div>
-            ) : (
-              <div className="space-y-2">
-                {control.properties.options?.map((option: string, index: number) => (
-                  <div key={index} className="flex items-center">
-                    <div className="w-4 h-4 border border-gray-300 rounded-full mr-2"></div>
-                    <span className="text-gray-700">{option}</span>
+            <div className="space-y-2">
+              {control.properties.options?.map((option: string, index: number) => (
+                <div key={index} className="flex items-center">
+                  <div className={`w-4 h-4 border border-gray-300 rounded-full mr-2 ${hasValue && value === option ? 'bg-blue-600 border-blue-600' : 'bg-white'}`}>
+                    {hasValue && value === option && <div className="w-2 h-2 bg-white rounded-full mx-auto mt-0.5" />}
                   </div>
-                ))}
-              </div>
-            )}
+                  <span className="text-sm text-gray-700">{option}</span>
+                </div>
+              ))}
+            </div>
           </div>
         );
       
-      case 'checkbox':
+      case 'date':
         return (
           <div key={control.id} className={baseClasses}>
-            <div className="flex items-center">
-              <div className={`w-4 h-4 border border-gray-300 rounded mr-2 ${hasValue && value ? 'bg-blue-500 border-blue-500' : ''}`}>
-                {hasValue && value && <CheckSquare className="w-4 h-4 text-white" />}
-              </div>
-              <label className="text-sm font-medium text-gray-700">
-                {control.properties.label || control.name}
-                {control.properties.required && <span className="text-red-500 ml-1">*</span>}
-              </label>
-              {hasValue && (
-                <span className="ml-2 text-sm text-blue-600 font-medium">
-                  ({value ? 'Checked' : 'Unchecked'})
-                </span>
-              )}
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              {control.properties.label || control.name}
+              {control.properties.required && <span className="text-red-500 ml-1">*</span>}
+            </label>
+            <div className={`w-full p-2 border border-gray-300 rounded ${hasValue ? 'bg-blue-50 text-gray-900 font-medium' : 'bg-gray-50 text-gray-600'}`}>
+              {hasValue ? new Date(value).toLocaleDateString() : 'Select date...'}
             </div>
           </div>
         );
@@ -354,240 +429,203 @@ export const PDFPreview: React.FC<PDFPreviewProps> = ({
             ))}
           </select>
           <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-            {selectedTemplate?.description}
+            Tier: {selectedTemplate?.tier}
           </p>
         </div>
 
-        {/* Customization Panels */}
-        <div className="space-y-1">
-          {/* Header Section */}
-          <div className="border-b border-gray-200 dark:border-gray-700">
-            <button
-              onClick={() => setActivePanel(activePanel === 'header' ? 'content' : 'header')}
-              className="w-full flex items-center justify-between p-4 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
-            >
-              <div className="flex items-center space-x-2">
-                <Layout className="w-4 h-4 text-blue-600 dark:text-blue-400" />
-                <span className="font-medium text-gray-900 dark:text-white">Header</span>
-              </div>
-              {activePanel === 'header' ? (
-                <ChevronDown className="w-4 h-4 text-gray-400" />
-              ) : (
-                <ChevronRight className="w-4 h-4 text-gray-400" />
-              )}
-            </button>
-            
-            {activePanel === 'header' && (
-              <div className="p-4 pt-0 space-y-3">
-                {/* Logo Upload */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    Header Logo
-                  </label>
-                  <div className="space-y-2">
-                    <button
-                      onClick={() => logoInputRef.current?.click()}
-                      className="flex items-center px-3 py-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors"
-                    >
-                      <Upload className="w-4 h-4 mr-2" />
-                      Upload Logo
-                    </button>
-                    <input
-                      ref={logoInputRef}
-                      type="file"
-                      accept="image/*"
-                      onChange={handleLogoUpload}
-                      className="hidden"
-                    />
-                    {customization.header.logoUrl && (
-                      <div className="flex items-center space-x-2">
-                        <img 
-                          src={customization.header.logoUrl} 
-                          alt="Logo preview" 
-                          className="w-8 h-8 object-contain border rounded"
-                        />
-                        <span className="text-xs text-green-600">Logo uploaded</span>
-                      </div>
-                    )}
-                  </div>
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    Title
-                  </label>
-                  <input
-                    type="text"
-                    value={customization.header.title}
-                    onChange={(e) => updateCustomization('header', 'title', e.target.value)}
-                    className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    Title Alignment
-                  </label>
-                  <select
-                    value={customization.header.titleAlignment}
-                    onChange={(e) => updateCustomization('header', 'titleAlignment', e.target.value)}
-                    className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                  >
-                    <option value="left">Left</option>
-                    <option value="center">Center</option>
-                    <option value="right">Right</option>
-                  </select>
-                </div>
-                <div className="flex items-center">
-                  <input
-                    type="checkbox"
-                    id="showDate"
-                    checked={customization.header.showDate}
-                    onChange={(e) => updateCustomization('header', 'showDate', e.target.checked)}
-                    className="mr-2"
-                  />
-                  <label htmlFor="showDate" className="text-sm text-gray-700 dark:text-gray-300">
-                    Show Date
-                  </label>
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* Footer Section */}
-          <div className="border-b border-gray-200 dark:border-gray-700">
-            <button
-              onClick={() => setActivePanel(activePanel === 'footer' ? 'content' : 'footer')}
-              className="w-full flex items-center justify-between p-4 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
-            >
-              <div className="flex items-center space-x-2">
-                <AlignCenter className="w-4 h-4 text-green-600 dark:text-green-400" />
-                <span className="font-medium text-gray-900 dark:text-white">Footer</span>
-              </div>
-              {activePanel === 'footer' ? (
-                <ChevronDown className="w-4 h-4 text-gray-400" />
-              ) : (
-                <ChevronRight className="w-4 h-4 text-gray-400" />
-              )}
-            </button>
-            
-            {activePanel === 'footer' && (
-              <div className="p-4 pt-0 space-y-3">
-                <div className="flex items-center">
-                  <input
-                    type="checkbox"
-                    id="showPageNumbers"
-                    checked={customization.footer.showPageNumbers}
-                    onChange={(e) => updateCustomization('footer', 'showPageNumbers', e.target.checked)}
-                    className="mr-2"
-                  />
-                  <label htmlFor="showPageNumbers" className="text-sm text-gray-700 dark:text-gray-300">
-                    Show Page Numbers
-                  </label>
-                </div>
-                <div className="flex items-center">
-                  <input
-                    type="checkbox"
-                    id="showCompanyInfo"
-                    checked={customization.footer.showCompanyInfo}
-                    onChange={(e) => updateCustomization('footer', 'showCompanyInfo', e.target.checked)}
-                    className="mr-2"
-                  />
-                  <label htmlFor="showCompanyInfo" className="text-sm text-gray-700 dark:text-gray-300">
-                    Show Company Info
-                  </label>
-                </div>
-                {customization.footer.showCompanyInfo && (
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      Company Name
-                    </label>
-                    <input
-                      type="text"
-                      value={customization.footer.companyName}
-                      onChange={(e) => updateCustomization('footer', 'companyName', e.target.value)}
-                      className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                    />
-                  </div>
-                )}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    Custom Footer Note
-                  </label>
-                  <textarea
-                    value={customization.footer.customNote}
-                    onChange={(e) => updateCustomization('footer', 'customNote', e.target.value)}
-                    placeholder="Add a custom note to appear in the footer"
-                    rows={2}
-                    className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white resize-none"
-                  />
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* Page Settings */}
-          <div className="border-b border-gray-200 dark:border-gray-700">
-            <button
-              onClick={() => setActivePanel(activePanel === 'page' ? 'content' : 'page')}
-              className="w-full flex items-center justify-between p-4 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
-            >
-              <div className="flex items-center space-x-2">
-                <FileText className="w-4 h-4 text-purple-600 dark:text-purple-400" />
-                <span className="font-medium text-gray-900 dark:text-white">Page Settings</span>
-              </div>
-              {activePanel === 'page' ? (
-                <ChevronDown className="w-4 h-4 text-gray-400" />
-              ) : (
-                <ChevronRight className="w-4 h-4 text-gray-400" />
-              )}
-            </button>
-            
-            {activePanel === 'page' && (
-              <div className="p-4 pt-0 space-y-3">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    Page Size
-                  </label>
-                  <select
-                    value={customization.page.size}
-                    onChange={(e) => updateCustomization('page', 'size', e.target.value)}
-                    className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                  >
-                    <option value="A4">A4</option>
-                    <option value="Letter">Letter</option>
-                    <option value="Legal">Legal</option>
-                    <option value="A3">A3</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    Orientation
-                  </label>
-                  <select
-                    value={customization.page.orientation}
-                    onChange={(e) => updateCustomization('page', 'orientation', e.target.value)}
-                    className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                  >
-                    <option value="portrait">Portrait</option>
-                    <option value="landscape">Landscape</option>
-                  </select>
-                </div>
-                <div className="flex items-center">
-                  <input
-                    type="checkbox"
-                    id="sectionPageBreaks"
-                    checked={customization.page.sectionPageBreaks}
-                    onChange={(e) => updateCustomization('page', 'sectionPageBreaks', e.target.checked)}
-                    className="mr-2"
-                  />
-                  <label htmlFor="sectionPageBreaks" className="text-sm text-gray-700 dark:text-gray-300">
-                    Start each section on a new page
-                  </label>
-                </div>
-              </div>
-            )}
+        {/* Panel Navigation */}
+        <div className="border-b border-gray-200 dark:border-gray-700">
+          <div className="flex">
+            {(['template', 'header', 'footer', 'page'] as const).map((panel) => (
+              <button
+                key={panel}
+                onClick={() => setActivePanel(panel)}
+                className={`flex-1 p-3 text-sm font-medium border-b-2 transition-colors ${
+                  activePanel === panel
+                    ? 'border-blue-500 text-blue-600 dark:text-blue-400'
+                    : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
+                }`}
+              >
+                {panel.charAt(0).toUpperCase() + panel.slice(1)}
+              </button>
+            ))}
           </div>
         </div>
+
+        {/* Header Panel */}
+        {activePanel === 'header' && (
+          <div className="p-4 space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Logo
+              </label>
+              <div className="space-y-2">
+                <button
+                  onClick={() => logoInputRef.current?.click()}
+                  className="w-full p-2 border border-dashed border-gray-300 dark:border-gray-600 rounded-lg text-sm text-gray-600 dark:text-gray-400 hover:border-gray-400 dark:hover:border-gray-500 transition-colors"
+                >
+                  <Upload className="w-4 h-4 mx-auto mb-1" />
+                  Click to upload logo
+                </button>
+                <input
+                  ref={logoInputRef}
+                  type="file"
+                  accept="image/*"
+                  onChange={handleLogoUpload}
+                  className="hidden"
+                />
+                {customization.header.logoUrl && (
+                  <div className="flex items-center space-x-2">
+                    <img 
+                      src={customization.header.logoUrl} 
+                      alt="Logo preview" 
+                      className="w-8 h-8 object-contain border rounded"
+                    />
+                    <span className="text-xs text-green-600">Logo uploaded</span>
+                  </div>
+                )}
+              </div>
+            </div>
+            
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Title
+              </label>
+              <input
+                type="text"
+                value={customization.header.title}
+                onChange={(e) => updateCustomization('header', 'title', e.target.value)}
+                className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Title Alignment
+              </label>
+              <select
+                value={customization.header.titleAlignment}
+                onChange={(e) => updateCustomization('header', 'titleAlignment', e.target.value)}
+                className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+              >
+                <option value="left">Left</option>
+                <option value="center">Center</option>
+                <option value="right">Right</option>
+              </select>
+            </div>
+            <div className="flex items-center">
+              <input
+                type="checkbox"
+                id="showDate"
+                checked={customization.header.showDate}
+                onChange={(e) => updateCustomization('header', 'showDate', e.target.checked)}
+                className="mr-2"
+              />
+              <label htmlFor="showDate" className="text-sm text-gray-700 dark:text-gray-300">
+                Show Date
+              </label>
+            </div>
+          </div>
+        )}
+
+        {/* Footer Panel */}
+        {activePanel === 'footer' && (
+          <div className="p-4 space-y-4">
+            <div className="flex items-center">
+              <input
+                type="checkbox"
+                id="showPageNumbers"
+                checked={customization.footer.showPageNumbers}
+                onChange={(e) => updateCustomization('footer', 'showPageNumbers', e.target.checked)}
+                className="mr-2"
+              />
+              <label htmlFor="showPageNumbers" className="text-sm text-gray-700 dark:text-gray-300">
+                Show Page Numbers
+              </label>
+            </div>
+            <div className="flex items-center">
+              <input
+                type="checkbox"
+                id="showCompanyInfo"
+                checked={customization.footer.showCompanyInfo}
+                onChange={(e) => updateCustomization('footer', 'showCompanyInfo', e.target.checked)}
+                className="mr-2"
+              />
+              <label htmlFor="showCompanyInfo" className="text-sm text-gray-700 dark:text-gray-300">
+                Show Company Info
+              </label>
+            </div>
+            {customization.footer.showCompanyInfo && (
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Company Name
+                </label>
+                <input
+                  type="text"
+                  value={customization.footer.companyName}
+                  onChange={(e) => updateCustomization('footer', 'companyName', e.target.value)}
+                  className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                />
+              </div>
+            )}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Custom Footer Note
+              </label>
+              <textarea
+                value={customization.footer.customNote}
+                onChange={(e) => updateCustomization('footer', 'customNote', e.target.value)}
+                className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                rows={3}
+                placeholder="Add a custom note to appear in the footer..."
+              />
+            </div>
+          </div>
+        )}
+
+        {/* Page Panel */}
+        {activePanel === 'page' && (
+          <div className="p-4 space-y-4">
+            <div className="flex items-center">
+              <input
+                type="checkbox"
+                id="sectionPageBreaks"
+                checked={customization.page.sectionPageBreaks}
+                onChange={(e) => updateCustomization('page', 'sectionPageBreaks', e.target.checked)}
+                className="mr-2"
+              />
+              <label htmlFor="sectionPageBreaks" className="text-sm text-gray-700 dark:text-gray-300">
+                Start each section on a new page
+              </label>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Page Size
+              </label>
+              <select
+                value={customization.page.size}
+                onChange={(e) => updateCustomization('page', 'size', e.target.value)}
+                className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+              >
+                <option value="A4">A4</option>
+                <option value="Letter">Letter</option>
+                <option value="Legal">Legal</option>
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Orientation
+              </label>
+              <select
+                value={customization.page.orientation}
+                onChange={(e) => updateCustomization('page', 'orientation', e.target.value)}
+                className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+              >
+                <option value="portrait">Portrait</option>
+                <option value="landscape">Landscape</option>
+              </select>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
@@ -600,30 +638,30 @@ export const PDFPreview: React.FC<PDFPreviewProps> = ({
       {/* Main Content */}
       <div className="flex-1 flex flex-col">
         {/* Toolbar */}
-        <div className="border-b border-gray-200 dark:border-gray-700 p-4 bg-gray-50 dark:bg-gray-700 transition-colors">
-          <div className="flex items-center justify-between">
+        <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 transition-colors">
+          <div className="flex items-center justify-between p-4">
             <div className="flex items-center space-x-4">
               <button
                 onClick={() => setShowCustomization(!showCustomization)}
-                className="flex items-center px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
+                className="flex items-center px-3 py-2 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg transition-colors"
               >
-                <Settings className="w-4 h-4 mr-1" />
-                {showCustomization ? 'Hide' : 'Show'} Panel
+                <Settings className="w-4 h-4 mr-2" />
+                {showCustomization ? 'Hide' : 'Show'} Settings
               </button>
               
-              <div className="flex items-center space-x-2">
+              <div className="flex items-center space-x-2 bg-gray-100 dark:bg-gray-700 rounded-lg p-1">
                 <button
-                  onClick={() => handleZoom(-25)}
+                  onClick={zoomOut}
                   className="p-2 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-200 dark:hover:bg-gray-600 rounded transition-colors"
                   title="Zoom Out"
                 >
                   <ZoomOut className="w-4 h-4" />
                 </button>
-                <span className="text-sm text-gray-600 dark:text-gray-300 min-w-[60px] text-center">
-                  {zoom}%
+                <span className="px-2 py-1 text-sm text-gray-600 dark:text-gray-300 min-w-[60px] text-center">
+                  {zoomLevel}%
                 </span>
                 <button
-                  onClick={() => handleZoom(25)}
+                  onClick={zoomIn}
                   className="p-2 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-200 dark:hover:bg-gray-600 rounded transition-colors"
                   title="Zoom In"
                 >
@@ -677,29 +715,25 @@ export const PDFPreview: React.FC<PDFPreviewProps> = ({
         <div className="flex-1 overflow-auto bg-gray-100 dark:bg-gray-900 p-6 transition-colors">
           <div 
             className="mx-auto bg-white shadow-lg"
-            style={{ 
-              transform: `scale(${zoom / 100})`,
+            style={{
+              width: customization.page.size === 'A4' ? '210mm' : '216mm',
+              minHeight: customization.page.size === 'A4' ? '297mm' : '279mm',
+              transform: `scale(${zoomLevel / 100})`,
               transformOrigin: 'top center',
-              width: customization.page.orientation === 'portrait' ? '210mm' : '297mm',
-              minHeight: customization.page.orientation === 'portrait' ? '297mm' : '210mm'
+              marginBottom: zoomLevel < 100 ? '40px' : '0'
             }}
+            ref={previewRef}
           >
-            <div ref={previewRef} className="w-full h-full p-8">
+            <div className="p-8">
               {/* Header */}
-              <div 
-                className="mb-8 pb-4 border-b-2 flex items-center justify-between"
-                style={{ 
-                  color: customization.header.textColor,
-                  backgroundColor: customization.header.backgroundColor,
-                  borderColor: selectedTemplate?.colors.border
-                }}
-              >
-                <div className="flex items-center space-x-4">
-                  {customization.header.showLogo && customization.header.logoUrl && (
+              <div className="mb-6">
+                <div className="flex items-start justify-between mb-4">
+                  {customization.header.logoUrl && (
                     <img 
                       src={customization.header.logoUrl} 
-                      alt="Logo" 
+                      alt="Company Logo" 
                       className="h-12 w-auto object-contain"
+                      crossOrigin="anonymous"
                     />
                   )}
                   <div style={{ textAlign: customization.header.titleAlignment }}>
