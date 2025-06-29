@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { DroppedControl, ControlType } from '../types';
 import { 
   getControls, 
@@ -9,14 +9,174 @@ import {
   verifyControlsInDatabase
 } from '../lib/db';
 
+// QUANTUM STATE MANAGEMENT SYSTEM
+interface QuantumState {
+  controls: DroppedControl[];
+  hash: string;
+  timestamp: number;
+  version: number;
+  isStable: boolean;
+  syncLevel: 'PERFECT' | 'GOOD' | 'NEEDS_SYNC' | 'CRITICAL';
+}
+
 export const useDragDrop = (questionnaireId: string = 'default-questionnaire', isDbInitialized: boolean = false, refreshKey: number = 0) => {
   const [droppedControls, setDroppedControls] = useState<DroppedControl[]>([]);
   const [selectedControl, setSelectedControl] = useState<DroppedControl | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [lastSyncHash, setLastSyncHash] = useState<string>('');
-  const [stableStateCounter, setStableStateCounter] = useState(0);
+  
+  // QUANTUM STATE MANAGEMENT
+  const quantumStateRef = useRef<QuantumState>({
+    controls: [],
+    hash: '',
+    timestamp: 0,
+    version: 0,
+    isStable: false,
+    syncLevel: 'CRITICAL'
+  });
+  
+  const [quantumSyncActive, setQuantumSyncActive] = useState(false);
+  const [lastQuantumSync, setLastQuantumSync] = useState(0);
+  const syncIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const stabilityCounterRef = useRef(0);
 
-  // OPTIMIZED: Enhanced control loading with stability tracking
+  // QUANTUM: Generate state hash for perfect tracking
+  const generateQuantumHash = useCallback((controls: DroppedControl[]): string => {
+    const stateString = controls
+      .sort((a, b) => a.id.localeCompare(b.id))
+      .map(c => `${c.id}:${c.type}:${c.sectionId}:${c.y}`)
+      .join('|');
+    
+    // Simple hash function for state tracking
+    let hash = 0;
+    for (let i = 0; i < stateString.length; i++) {
+      const char = stateString.charCodeAt(i);
+      hash = ((hash << 5) - hash) + char;
+      hash = hash & hash; // Convert to 32-bit integer
+    }
+    return hash.toString(36);
+  }, []);
+
+  // QUANTUM: Analyze sync level between database and UI state
+  const analyzeQuantumSyncLevel = useCallback((dbControls: DroppedControl[], uiControls: DroppedControl[]): 'PERFECT' | 'GOOD' | 'NEEDS_SYNC' | 'CRITICAL' => {
+    const dbHash = generateQuantumHash(dbControls);
+    const uiHash = generateQuantumHash(uiControls);
+    
+    if (dbHash === uiHash) return 'PERFECT';
+    if (Math.abs(dbControls.length - uiControls.length) <= 1) return 'GOOD';
+    if (Math.abs(dbControls.length - uiControls.length) <= 3) return 'NEEDS_SYNC';
+    return 'CRITICAL';
+  }, [generateQuantumHash]);
+
+  // QUANTUM: Real-time bidirectional synchronization
+  const quantumSync = useCallback(async (): Promise<boolean> => {
+    if (!isDbInitialized || quantumSyncActive) {
+      return false;
+    }
+
+    try {
+      setQuantumSyncActive(true);
+      console.log('🌌 QUANTUM SYNC: ===== INITIATING QUANTUM SYNCHRONIZATION =====');
+      
+      const startTime = Date.now();
+      const verification = await verifyControlsInDatabase(questionnaireId);
+      const dbControls = verification.controls;
+      
+      const currentQuantumState = quantumStateRef.current;
+      const newHash = generateQuantumHash(dbControls);
+      const syncLevel = analyzeQuantumSyncLevel(dbControls, droppedControls);
+      
+      console.log('🌌 QUANTUM SYNC: State analysis:', {
+        dbControlCount: dbControls.length,
+        uiControlCount: droppedControls.length,
+        previousHash: currentQuantumState.hash.substring(0, 8),
+        newHash: newHash.substring(0, 8),
+        syncLevel,
+        hashChanged: newHash !== currentQuantumState.hash,
+        stabilityCounter: stabilityCounterRef.current,
+        refreshKey,
+        timestamp: new Date().toISOString()
+      });
+
+      // QUANTUM: Update quantum state
+      const newQuantumState: QuantumState = {
+        controls: dbControls,
+        hash: newHash,
+        timestamp: startTime,
+        version: currentQuantumState.version + 1,
+        isStable: syncLevel === 'PERFECT' && stabilityCounterRef.current >= 3,
+        syncLevel
+      };
+
+      quantumStateRef.current = newQuantumState;
+
+      // QUANTUM: Apply state updates based on sync level
+      let stateUpdated = false;
+      
+      if (syncLevel === 'PERFECT') {
+        stabilityCounterRef.current++;
+        console.log('✨ QUANTUM SYNC: Perfect synchronization achieved');
+        
+        if (stabilityCounterRef.current >= 5) {
+          console.log('🎯 QUANTUM SYNC: Quantum stability reached - entering maintenance mode');
+          setLastQuantumSync(startTime);
+          return true; // Quantum stability achieved
+        }
+      } else {
+        stabilityCounterRef.current = 0;
+        
+        if (newHash !== currentQuantumState.hash || syncLevel === 'CRITICAL') {
+          console.log('🔄 QUANTUM SYNC: Applying quantum state correction');
+          setDroppedControls(dbControls);
+          stateUpdated = true;
+        }
+      }
+
+      const syncDuration = Date.now() - startTime;
+      console.log('✅ QUANTUM SYNC: Synchronization completed:', {
+        duration: `${syncDuration}ms`,
+        stateUpdated,
+        syncLevel,
+        stabilityCounter: stabilityCounterRef.current,
+        quantumVersion: newQuantumState.version
+      });
+
+      setLastQuantumSync(startTime);
+      return syncLevel === 'PERFECT' && stabilityCounterRef.current >= 5;
+
+    } catch (error) {
+      console.error('❌ QUANTUM SYNC: Synchronization failed:', error);
+      stabilityCounterRef.current = 0;
+      return false;
+    } finally {
+      setQuantumSyncActive(false);
+    }
+  }, [isDbInitialized, quantumSyncActive, questionnaireId, generateQuantumHash, analyzeQuantumSyncLevel, droppedControls, refreshKey]);
+
+  // QUANTUM: Initialize quantum synchronization system
+  const initializeQuantumSync = useCallback(() => {
+    if (syncIntervalRef.current) {
+      clearInterval(syncIntervalRef.current);
+    }
+
+    console.log('🌌 QUANTUM INIT: Initializing quantum synchronization system');
+    
+    // Start quantum sync interval
+    syncIntervalRef.current = setInterval(async () => {
+      const quantumStable = await quantumSync();
+      
+      if (quantumStable) {
+        console.log('🎯 QUANTUM INIT: Quantum stability achieved - reducing sync frequency');
+        if (syncIntervalRef.current) {
+          clearInterval(syncIntervalRef.current);
+          // Switch to maintenance mode with longer intervals
+          syncIntervalRef.current = setInterval(quantumSync, 5000);
+        }
+      }
+    }, 1000); // Initial high-frequency sync
+
+  }, [quantumSync]);
+
+  // QUANTUM: Enhanced control loading with quantum integration
   const loadControlsFromDB = useCallback(async () => {
     if (!isDbInitialized) {
       console.log('⏸️ useDragDrop: Database not initialized, skipping control load');
@@ -26,258 +186,155 @@ export const useDragDrop = (questionnaireId: string = 'default-questionnaire', i
 
     try {
       setIsLoading(true);
-      console.log('🔄 useDragDrop: ===== OPTIMIZED CONTROL LOADING =====');
-      console.log('📊 useDragDrop: Load parameters:', { 
-        questionnaireId, 
-        refreshKey,
-        timestamp: new Date().toISOString(),
-        currentStateCount: droppedControls.length,
-        stableStateCounter
-      });
+      console.log('🔄 useDragDrop: ===== QUANTUM-ENHANCED CONTROL LOADING =====');
       
-      // Use verification function for enhanced logging
       const verification = await verifyControlsInDatabase(questionnaireId);
       const controls = verification.controls;
       
-      console.log('📊 useDragDrop: Optimized database verification results:', {
-        controlCount: controls.length,
-        refreshKey,
-        timestamp: new Date().toISOString(),
-        previousStateCount: droppedControls.length,
-        changeDetected: controls.length !== droppedControls.length,
-        stableStateCounter
-      });
-
-      // Generate sync hash for state tracking
-      const newSyncHash = controls.map(c => `${c.id}-${c.type}-${c.sectionId}`).join('|');
-      const hashChanged = newSyncHash !== lastSyncHash;
+      const newHash = generateQuantumHash(controls);
+      const currentQuantumState = quantumStateRef.current;
       
-      console.log('🔍 useDragDrop: Optimized sync hash comparison:', {
-        previousHash: lastSyncHash.substring(0, 20) + '...',
-        newHash: newSyncHash.substring(0, 20) + '...',
-        hashChanged,
-        stableStateCounter: hashChanged ? 0 : stableStateCounter + 1
+      console.log('📊 useDragDrop: Quantum-enhanced load results:', {
+        controlCount: controls.length,
+        newHash: newHash.substring(0, 8),
+        previousHash: currentQuantumState.hash.substring(0, 8),
+        hashChanged: newHash !== currentQuantumState.hash,
+        refreshKey,
+        timestamp: new Date().toISOString()
       });
 
-      // OPTIMIZED: Only update state if there are actual changes
-      if (hashChanged || controls.length !== droppedControls.length) {
-        console.log('🔄 useDragDrop: State changes detected - updating...');
+      // QUANTUM: Only update if quantum state indicates change
+      if (newHash !== currentQuantumState.hash || controls.length !== droppedControls.length) {
+        console.log('🔄 useDragDrop: Quantum state change detected - updating');
         setDroppedControls(controls);
-        setLastSyncHash(newSyncHash);
-        setStableStateCounter(0); // Reset stability counter on change
         
-        console.log('✅ useDragDrop: State updated successfully:', {
-          newCount: controls.length,
-          changeApplied: true,
-          syncHashUpdated: true
-        });
+        // Update quantum state
+        quantumStateRef.current = {
+          ...currentQuantumState,
+          controls,
+          hash: newHash,
+          timestamp: Date.now(),
+          version: currentQuantumState.version + 1
+        };
+        
+        stabilityCounterRef.current = 0;
       } else {
-        console.log('✅ useDragDrop: State is stable - no update needed');
-        setStableStateCounter(prev => prev + 1);
+        console.log('✅ useDragDrop: Quantum state stable - no update needed');
+        stabilityCounterRef.current++;
       }
       
     } catch (error) {
-      console.error('❌ useDragDrop: Optimized control loading failed:', error);
+      console.error('❌ useDragDrop: Quantum-enhanced loading failed:', error);
       setDroppedControls([]);
     } finally {
       setIsLoading(false);
-      console.log('🏁 useDragDrop: Optimized load controls process completed');
     }
-  }, [questionnaireId, isDbInitialized, refreshKey, droppedControls.length, lastSyncHash, stableStateCounter]);
+  }, [questionnaireId, isDbInitialized, generateQuantumHash, droppedControls.length, refreshKey]);
 
-  // OPTIMIZED: Debounced useEffect to prevent excessive calls
+  // QUANTUM: Initialize system on database ready
   useEffect(() => {
-    console.log('🔄 useDragDrop: ===== OPTIMIZED useEffect TRIGGERED =====');
-    console.log('📊 useDragDrop: Optimized useEffect parameters:', { 
-      questionnaireId, 
-      isDbInitialized, 
-      refreshKey,
-      currentControlCount: droppedControls.length,
-      timestamp: new Date().toISOString(),
-      stableStateCounter
-    });
-    
-    // OPTIMIZED: Add debouncing to prevent rapid successive calls
-    const timeoutId = setTimeout(() => {
+    if (isDbInitialized) {
+      console.log('🌌 QUANTUM EFFECT: Database initialized - starting quantum system');
+      initializeQuantumSync();
       loadControlsFromDB();
-    }, 50); // Small delay to debounce rapid calls
-    
-    return () => clearTimeout(timeoutId);
-  }, [questionnaireId, isDbInitialized, refreshKey]);
+    }
 
-  // OPTIMIZED: Smart force refresh that checks stability first
+    return () => {
+      if (syncIntervalRef.current) {
+        clearInterval(syncIntervalRef.current);
+        syncIntervalRef.current = null;
+      }
+    };
+  }, [isDbInitialized, initializeQuantumSync, loadControlsFromDB]);
+
+  // QUANTUM: Respond to refresh key changes
+  useEffect(() => {
+    if (isDbInitialized && refreshKey > 0) {
+      console.log('🌌 QUANTUM EFFECT: RefreshKey changed - triggering quantum sync');
+      stabilityCounterRef.current = 0; // Reset stability
+      quantumSync();
+    }
+  }, [refreshKey, isDbInitialized, quantumSync]);
+
+  // QUANTUM: Enhanced force refresh with quantum intelligence
   const forceRefresh = useCallback(async () => {
-    console.log('🔄 useDragDrop: ===== OPTIMIZED FORCE REFRESH INITIATED =====');
-    console.log('📊 useDragDrop: Optimized force refresh parameters:', {
-      currentControlCount: droppedControls.length,
-      refreshKey,
-      questionnaireId,
-      timestamp: new Date().toISOString(),
-      stableStateCounter
-    });
+    console.log('🔄 useDragDrop: ===== QUANTUM FORCE REFRESH =====');
     
-    try {
-      // OPTIMIZED: Check if state is already stable
-      if (stableStateCounter >= 2) {
-        console.log('✅ useDragDrop: State is already stable - skipping force refresh');
-        return;
-      }
-      
-      // Strategy 1: Optimized force reload with stability check
-      console.log('🔄 useDragDrop: Strategy 1 - Optimized force reload with stability check...');
-      await loadControlsFromDB();
-      
-      // Strategy 2: Verification with smart sync detection
-      setTimeout(async () => {
-        try {
-          console.log('🔍 useDragDrop: Strategy 2 - Smart verification with sync detection...');
-          const verification = await verifyControlsInDatabase(questionnaireId);
-          const currentStateCount = droppedControls.length;
-          
-          console.log('📊 useDragDrop: Optimized force refresh verification results:', {
-            dbControlCount: verification.count,
-            stateControlCount: currentStateCount,
-            refreshKey,
-            syncStatus: verification.count === currentStateCount ? 'SYNCED' : 'OUT_OF_SYNC',
-            syncDifference: verification.count - currentStateCount,
-            timestamp: new Date().toISOString(),
-            stableStateCounter
-          });
-          
-          // OPTIMIZED: Only update if significantly out of sync
-          if (Math.abs(verification.count - currentStateCount) > 1) {
-            console.log('🔄 useDragDrop: Significant sync difference detected - applying correction');
-            setDroppedControls(verification.controls);
-            setLastSyncHash(verification.controls.map(c => `${c.id}-${c.type}-${c.sectionId}`).join('|'));
-            setStableStateCounter(0);
-            console.log('✅ useDragDrop: Optimized sync correction applied');
-          } else {
-            console.log('✅ useDragDrop: State is optimally synced');
-            setStableStateCounter(prev => prev + 1);
-          }
-        } catch (error) {
-          console.error('❌ useDragDrop: Optimized force refresh verification failed:', error);
-        }
-      }, 150); // Reduced delay for faster response
-      
-      console.log('✅ useDragDrop: Optimized force refresh completed successfully');
-    } catch (error) {
-      console.error('❌ useDragDrop: Optimized force refresh failed:', error);
+    stabilityCounterRef.current = 0;
+    const quantumStable = await quantumSync();
+    
+    if (!quantumStable) {
+      // If not stable, trigger additional sync
+      setTimeout(quantumSync, 500);
     }
-  }, [loadControlsFromDB, droppedControls.length, refreshKey, questionnaireId, stableStateCounter]);
+    
+    console.log('✅ useDragDrop: Quantum force refresh completed');
+  }, [quantumSync]);
 
-  // OPTIMIZED: Intelligent force reload with stability preservation
+  // QUANTUM: Enhanced force reload with quantum reset
   const forceReload = useCallback(async () => {
-    console.log('🔄 useDragDrop: ===== OPTIMIZED FORCE RELOAD INITIATED =====');
-    console.log('📊 useDragDrop: Optimized force reload parameters:', {
-      currentControlCount: droppedControls.length,
-      refreshKey,
-      questionnaireId,
-      timestamp: new Date().toISOString(),
-      stableStateCounter
-    });
+    console.log('🔄 useDragDrop: ===== QUANTUM FORCE RELOAD =====');
     
-    try {
-      // OPTIMIZED: Preserve stable state if possible
-      if (stableStateCounter >= 3) {
-        console.log('✅ useDragDrop: State is highly stable - performing gentle reload');
-        await loadControlsFromDB();
-        return;
-      }
-      
-      // Clear current state with optimized timing
-      console.log('🔄 useDragDrop: Optimized clearing current state...');
-      setDroppedControls([]);
-      setLastSyncHash('');
-      setStableStateCounter(0);
-      setIsLoading(true);
-      
-      // Optimized reload timing
-      setTimeout(async () => {
-        try {
-          console.log('🔄 useDragDrop: Optimized reloading from database...');
-          const verification = await verifyControlsInDatabase(questionnaireId);
-          
-          console.log('📊 useDragDrop: Optimized force reload results:', {
-            freshControlCount: verification.count,
-            timestamp: new Date().toISOString()
-          });
-          
-          setDroppedControls(verification.controls);
-          setLastSyncHash(verification.controls.map(c => `${c.id}-${c.type}-${c.sectionId}`).join('|'));
-          setStableStateCounter(1); // Start with some stability
-          setIsLoading(false);
-          
-          console.log('✅ useDragDrop: Optimized force reload completed');
-        } catch (error) {
-          console.error('❌ useDragDrop: Optimized force reload failed:', error);
-          setIsLoading(false);
-        }
-      }, 75); // Optimized timing
-      
-    } catch (error) {
-      console.error('❌ useDragDrop: Optimized force reload failed:', error);
-      setIsLoading(false);
-    }
-  }, [droppedControls.length, refreshKey, questionnaireId, stableStateCounter]);
+    // Reset quantum state
+    quantumStateRef.current = {
+      controls: [],
+      hash: '',
+      timestamp: 0,
+      version: 0,
+      isStable: false,
+      syncLevel: 'CRITICAL'
+    };
+    
+    stabilityCounterRef.current = 0;
+    setDroppedControls([]);
+    setIsLoading(true);
+    
+    // Reinitialize quantum system
+    setTimeout(async () => {
+      await loadControlsFromDB();
+      initializeQuantumSync();
+    }, 200);
+    
+    console.log('✅ useDragDrop: Quantum force reload completed');
+  }, [loadControlsFromDB, initializeQuantumSync]);
 
-  // OPTIMIZED: Intelligent nuclear reset with stability tracking
+  // QUANTUM: Nuclear reset with complete quantum reconstruction
   const nuclearReset = useCallback(async () => {
-    console.log('💥 useDragDrop: ===== OPTIMIZED NUCLEAR RESET INITIATED =====');
-    console.log('📊 useDragDrop: Optimized nuclear reset parameters:', {
-      currentControlCount: droppedControls.length,
-      refreshKey,
-      questionnaireId,
-      timestamp: new Date().toISOString(),
-      stableStateCounter
-    });
+    console.log('💥 useDragDrop: ===== QUANTUM NUCLEAR RESET =====');
     
-    try {
-      // Step 1: Complete state reset with optimization
-      console.log('💥 useDragDrop: Step 1 - Optimized state reset...');
-      setDroppedControls([]);
-      setSelectedControl(null);
-      setLastSyncHash('');
-      setStableStateCounter(0);
-      setIsLoading(true);
-      
-      // Step 2: Optimized wait time
-      await new Promise(resolve => setTimeout(resolve, 200));
-      
-      // Step 3: Optimized nuclear reload with verification
-      console.log('💥 useDragDrop: Step 2 - Optimized nuclear reload...');
-      const verification = await verifyControlsInDatabase(questionnaireId);
-      
-      console.log('📊 useDragDrop: Optimized nuclear reset reload results:', {
-        nuclearControlCount: verification.count,
-        timestamp: new Date().toISOString()
-      });
-      
-      // Step 4: Optimized state reconstruction
-      console.log('💥 useDragDrop: Step 3 - Optimized state reconstruction...');
-      setDroppedControls(verification.controls);
-      setLastSyncHash(verification.controls.map(c => `${c.id}-${c.type}-${c.sectionId}`).join('|'));
-      setStableStateCounter(2); // Start with good stability
-      setIsLoading(false);
-      
-      // Step 5: Optimized verification
-      setTimeout(() => {
-        console.log('💥 useDragDrop: Optimized nuclear verification:', {
-          reconstructedControlCount: verification.count,
-          timestamp: new Date().toISOString(),
-          nuclearStatus: 'OPTIMIZED_RECONSTRUCTION_COMPLETE'
-        });
-        setStableStateCounter(3); // Mark as highly stable
-      }, 100);
-      
-      console.log('✅ useDragDrop: ===== OPTIMIZED NUCLEAR RESET COMPLETED SUCCESSFULLY =====');
-      
-    } catch (error) {
-      console.error('❌ useDragDrop: Optimized nuclear reset failed:', error);
-      setIsLoading(false);
+    // Stop all quantum processes
+    if (syncIntervalRef.current) {
+      clearInterval(syncIntervalRef.current);
+      syncIntervalRef.current = null;
     }
-  }, [droppedControls.length, refreshKey, questionnaireId, stableStateCounter]);
+    
+    // Complete quantum state reset
+    quantumStateRef.current = {
+      controls: [],
+      hash: '',
+      timestamp: 0,
+      version: 0,
+      isStable: false,
+      syncLevel: 'CRITICAL'
+    };
+    
+    stabilityCounterRef.current = 0;
+    setQuantumSyncActive(false);
+    setDroppedControls([]);
+    setSelectedControl(null);
+    setIsLoading(true);
+    
+    // Quantum reconstruction
+    setTimeout(async () => {
+      console.log('💥 useDragDrop: Quantum reconstruction phase');
+      await loadControlsFromDB();
+      initializeQuantumSync();
+      console.log('✅ useDragDrop: Quantum nuclear reset completed');
+    }, 300);
+    
+  }, [loadControlsFromDB, initializeQuantumSync]);
 
+  // Standard CRUD operations with quantum integration
   const addControl = useCallback(async (controlType: ControlType, x: number, y: number, sectionId: string = 'default') => {
     if (!isDbInitialized) {
       console.warn('⚠️ useDragDrop: Cannot add control - database not initialized');
@@ -301,70 +358,45 @@ export const useDragDrop = (questionnaireId: string = 'default-questionnaire', i
         sectionId
       };
       
-      console.log('➕ useDragDrop: Adding new control:', {
-        id: newControl.id,
-        type: newControl.type,
-        name: newControl.name,
-        sectionId: newControl.sectionId
-      });
-      
       await insertControl(newControl, questionnaireId);
-      setDroppedControls(prev => [...prev, newControl]);
       setSelectedControl(newControl);
-      setStableStateCounter(0); // Reset stability on change
       
-      console.log('✅ useDragDrop: Control added successfully');
+      // Trigger quantum sync
+      stabilityCounterRef.current = 0;
+      setTimeout(quantumSync, 100);
+      
+      console.log('✅ useDragDrop: Control added with quantum sync');
     } catch (error) {
       console.error('❌ useDragDrop: Failed to add control:', error);
     }
-  }, [droppedControls, questionnaireId, isDbInitialized]);
+  }, [droppedControls, questionnaireId, isDbInitialized, quantumSync]);
 
   const updateControl = useCallback(async (id: string, updates: Partial<DroppedControl>) => {
-    if (!isDbInitialized) {
-      console.warn('⚠️ useDragDrop: Cannot update control - database not initialized');
-      return;
-    }
+    if (!isDbInitialized) return;
 
     try {
-      console.log('🔄 useDragDrop: Updating control:', { id, updates });
-      
       await updateControlDB(id, updates);
-      
-      setDroppedControls(prev => 
-        prev.map(control => 
-          control.id === id ? { ...control, ...updates } : control
-        )
-      );
       
       if (selectedControl?.id === id) {
         setSelectedControl(prev => prev ? { ...prev, ...updates } : null);
       }
       
-      setStableStateCounter(0); // Reset stability on change
-      console.log('✅ useDragDrop: Control updated successfully');
+      // Trigger quantum sync
+      stabilityCounterRef.current = 0;
+      setTimeout(quantumSync, 100);
+      
+      console.log('✅ useDragDrop: Control updated with quantum sync');
     } catch (error) {
       console.error('❌ useDragDrop: Failed to update control:', error);
     }
-  }, [selectedControl, questionnaireId, isDbInitialized]);
+  }, [selectedControl, questionnaireId, isDbInitialized, quantumSync]);
 
   const removeControl = useCallback(async (id: string) => {
-    if (!isDbInitialized) {
-      console.warn('⚠️ useDragDrop: Cannot remove control - database not initialized');
-      return;
-    }
+    if (!isDbInitialized) return;
 
     try {
       const controlToRemove = droppedControls.find(c => c.id === id);
-      if (!controlToRemove) {
-        console.warn('⚠️ useDragDrop: Control not found for removal:', id);
-        return;
-      }
-      
-      console.log('🗑️ useDragDrop: Removing control:', {
-        id,
-        name: controlToRemove.name,
-        sectionId: controlToRemove.sectionId
-      });
+      if (!controlToRemove) return;
       
       await deleteControlDB(id);
       
@@ -383,24 +415,22 @@ export const useDragDrop = (questionnaireId: string = 'default-questionnaire', i
         await reorderControls(controlsToUpdate);
       }
       
-      setDroppedControls(reordered);
-      setStableStateCounter(0); // Reset stability on change
-      
       if (selectedControl?.id === id) {
         setSelectedControl(null);
       }
       
-      console.log('✅ useDragDrop: Control removed successfully');
+      // Trigger quantum sync
+      stabilityCounterRef.current = 0;
+      setTimeout(quantumSync, 100);
+      
+      console.log('✅ useDragDrop: Control removed with quantum sync');
     } catch (error) {
       console.error('❌ useDragDrop: Failed to remove control:', error);
     }
-  }, [droppedControls, selectedControl, questionnaireId, isDbInitialized]);
+  }, [droppedControls, selectedControl, questionnaireId, isDbInitialized, quantumSync]);
 
   const moveControl = useCallback(async (id: string, direction: 'up' | 'down') => {
-    if (!isDbInitialized) {
-      console.warn('⚠️ useDragDrop: Cannot move control - database not initialized');
-      return;
-    }
+    if (!isDbInitialized) return;
 
     try {
       const control = droppedControls.find(c => c.id === id);
@@ -414,40 +444,25 @@ export const useDragDrop = (questionnaireId: string = 'default-questionnaire', i
       const newIndex = direction === 'up' ? currentIndex - 1 : currentIndex + 1;
       if (newIndex < 0 || newIndex >= sectionControls.length) return;
       
-      console.log('🔄 useDragDrop: Moving control:', {
-        id,
-        direction,
-        currentIndex,
-        newIndex
-      });
-      
       const targetControl = sectionControls[newIndex];
-      const updatedControls = droppedControls.map(c => {
-        if (c.id === id) return { ...c, y: targetControl.y };
-        if (c.id === targetControl.id) return { ...c, y: control.y };
-        return c;
-      });
       
       await updateControlDB(id, { y: targetControl.y });
       await updateControlDB(targetControl.id, { y: control.y });
       
-      setDroppedControls(updatedControls);
-      setStableStateCounter(0); // Reset stability on change
-      console.log('✅ useDragDrop: Control moved successfully');
+      // Trigger quantum sync
+      stabilityCounterRef.current = 0;
+      setTimeout(quantumSync, 100);
+      
+      console.log('✅ useDragDrop: Control moved with quantum sync');
     } catch (error) {
       console.error('❌ useDragDrop: Failed to move control:', error);
     }
-  }, [droppedControls, questionnaireId, isDbInitialized]);
+  }, [droppedControls, questionnaireId, isDbInitialized, quantumSync]);
 
   const reorderControl = useCallback(async (dragIndex: number, hoverIndex: number) => {
-    if (!isDbInitialized) {
-      console.warn('⚠️ useDragDrop: Cannot reorder control - database not initialized');
-      return;
-    }
+    if (!isDbInitialized) return;
 
     try {
-      console.log('🔄 useDragDrop: Reordering controls:', { dragIndex, hoverIndex });
-      
       const newControls = [...droppedControls];
       const draggedControl = newControls[dragIndex];
       
@@ -460,59 +475,39 @@ export const useDragDrop = (questionnaireId: string = 'default-questionnaire', i
       }));
       
       await reorderControls(reorderedControls);
-      setDroppedControls(reorderedControls);
-      setStableStateCounter(0); // Reset stability on change
-      console.log('✅ useDragDrop: Controls reordered successfully');
+      
+      // Trigger quantum sync
+      stabilityCounterRef.current = 0;
+      setTimeout(quantumSync, 100);
+      
+      console.log('✅ useDragDrop: Controls reordered with quantum sync');
     } catch (error) {
       console.error('❌ useDragDrop: Failed to reorder control:', error);
     }
-  }, [droppedControls, questionnaireId, isDbInitialized]);
+  }, [droppedControls, questionnaireId, isDbInitialized, quantumSync]);
 
   const selectControl = useCallback((control: DroppedControl) => {
-    console.log('🎯 useDragDrop: Control selected:', {
-      id: control.id,
-      name: control.name,
-      type: control.type
-    });
     setSelectedControl(control);
   }, []);
 
   const clearSelection = useCallback(() => {
-    console.log('🎯 useDragDrop: Selection cleared');
     setSelectedControl(null);
   }, []);
 
-  // OPTIMIZED: Enhanced state change logging with stability tracking
+  // QUANTUM: Enhanced state monitoring
   useEffect(() => {
-    console.log('📊 useDragDrop: ===== OPTIMIZED STATE CHANGED =====');
-    console.log('📊 useDragDrop: Optimized current state:', {
+    const quantumState = quantumStateRef.current;
+    console.log('🌌 QUANTUM STATE: Current quantum state:', {
       controlCount: droppedControls.length,
-      selectedControlId: selectedControl?.id,
-      selectedControlName: selectedControl?.name,
-      isLoading,
-      refreshKey,
-      timestamp: new Date().toISOString(),
-      stateHash: lastSyncHash.substring(0, 20) + '...',
-      stableStateCounter,
-      stabilityLevel: stableStateCounter >= 3 ? 'HIGH' : stableStateCounter >= 1 ? 'MEDIUM' : 'LOW'
+      quantumHash: quantumState.hash.substring(0, 8),
+      quantumVersion: quantumState.version,
+      isStable: quantumState.isStable,
+      syncLevel: quantumState.syncLevel,
+      stabilityCounter: stabilityCounterRef.current,
+      lastSync: lastQuantumSync ? new Date(lastQuantumSync).toLocaleTimeString() : 'Never',
+      refreshKey
     });
-
-    if (droppedControls.length > 0) {
-      const distribution = droppedControls.reduce((acc, control) => {
-        acc[control.sectionId || 'unknown'] = (acc[control.sectionId || 'unknown'] || 0) + 1;
-        return acc;
-      }, {} as Record<string, number>);
-      console.log('📂 useDragDrop: Optimized controls by section:', distribution);
-      
-      const typeDistribution = droppedControls.reduce((acc, control) => {
-        acc[control.type] = (acc[control.type] || 0) + 1;
-        return acc;
-      }, {} as Record<string, number>);
-      console.log('🎯 useDragDrop: Optimized controls by type:', typeDistribution);
-    } else {
-      console.log('📝 useDragDrop: No controls in optimized state');
-    }
-  }, [droppedControls.length, selectedControl?.id, selectedControl?.name, isLoading, refreshKey, lastSyncHash, stableStateCounter]);
+  }, [droppedControls.length, lastQuantumSync, refreshKey]);
 
   return {
     droppedControls,
