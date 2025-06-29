@@ -75,7 +75,17 @@ export const PDFPreview: React.FC<PDFPreviewProps> = ({
   };
 
   const handleGenerateSampleData = () => {
-    generateSampleData(droppedControls);
+    const sampleData = generateSampleData(droppedControls);
+    
+    // Update form values to sync with parent component
+    Object.entries(sampleData).forEach(([controlId, value]) => {
+      if (onFormValueChange) {
+        onFormValueChange(controlId, value);
+      }
+    });
+    
+    // Force re-render of the preview
+    updatePreview();
   };
 
   const zoomIn = () => setZoomLevel(prev => Math.min(prev + 25, 200));
@@ -142,20 +152,21 @@ export const PDFPreview: React.FC<PDFPreviewProps> = ({
       if (customization.header.logoUrl) {
         try {
           // Create a temporary image element to get proper dimensions
-          const img = new Image();
+          const img = document.createElement('img');
           img.crossOrigin = 'anonymous';
           
           await new Promise<void>((resolve, reject) => {
             img.onload = () => resolve();
-            img.onerror = () => reject();
+            img.onerror = () => reject(new Error('Failed to load image'));
             img.src = customization.header.logoUrl;
           });
           
-          // Add logo to PDF
-          const logoHeight = 15;
-          const logoWidth = (img.width * logoHeight) / img.height;
-          pdf.addImage(customization.header.logoUrl, 'PNG', 10, currentY, logoWidth, logoHeight);
-          currentY += logoHeight + 5;
+          // Add logo to PDF with proper format detection
+          const logoHeight = 20;
+          const logoWidth = Math.min((img.width * logoHeight) / img.height, 50); // Limit width
+          const format = customization.header.logoUrl.toLowerCase().includes('.png') ? 'PNG' : 'JPEG';
+          pdf.addImage(customization.header.logoUrl, format, 15, currentY, logoWidth, logoHeight);
+          currentY += logoHeight + 8;
         } catch (error) {
           console.warn('Could not load logo for PDF:', error);
         }
@@ -215,12 +226,42 @@ export const PDFPreview: React.FC<PDFPreviewProps> = ({
         const label = control.properties.label || control.name;
         const value = effectiveFormValues[control.id] || control.properties.placeholder || '';
         
-        pdf.text(`${label}:`, 10, currentY);
+        // Use proper text wrapping for labels and values
+        const maxWidth = pageWidth - 30;
+        const labelWidth = maxWidth * 0.3; // 30% for label
+        const valueWidth = maxWidth * 0.65; // 65% for value
+        
+        // Wrap label text
+        const labelLines = pdf.splitTextToSize(`${label}:`, labelWidth);
+        const valueLines = pdf.splitTextToSize(value.toString(), valueWidth);
+        
+        // Calculate required height for this control
+        const maxLines = Math.max(labelLines.length, valueLines.length);
+        const lineHeight = 5;
+        const requiredHeight = maxLines * lineHeight + 3;
+        
+        // Check if we need a new page
+        if (currentY + requiredHeight > pageHeight - 30) {
+          pdf.addPage();
+          currentY = 20;
+          await addHeader();
+        }
+        
+        // Render label
+        pdf.setFont('helvetica', 'normal');
+        labelLines.forEach((line: string, index: number) => {
+          pdf.text(line, 15, currentY + (index * lineHeight));
+        });
+        
+        // Render value
         pdf.setFont('helvetica', 'bold');
-        pdf.text(value.toString(), 60, currentY);
+        valueLines.forEach((line: string, index: number) => {
+          pdf.text(line, 15 + labelWidth + 10, currentY + (index * lineHeight));
+        });
+        
         pdf.setFont('helvetica', 'normal');
         
-        currentY += controlHeight;
+        currentY += requiredHeight;
       }
       
       currentY += 5; // Extra spacing between sections
