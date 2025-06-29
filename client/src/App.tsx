@@ -3,6 +3,7 @@ import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { CustomerTier, ControlType, Section, DroppedControl } from './types';
 import { Header } from './components/Header';
+import { DashboardDesigner } from './components/DashboardDesigner';
 import { Dashboard } from './components/Dashboard';
 import { ControlLibrary } from './components/ControlLibrary';
 import { DesignCanvas } from './components/DesignCanvas';
@@ -27,7 +28,7 @@ import {
 
 function App() {
   const [currentTier, setCurrentTier] = useState<CustomerTier>('platinum');
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'design' | 'preview' | 'pdf' | 'json'>('dashboard');
+  const [activeTab, setActiveTab] = useState<'dashboardDesigner' | 'dashboard' | 'design' | 'preview' | 'pdf' | 'json'>('dashboardDesigner');
   const [draggedControl, setDraggedControl] = useState<ControlType | null>(null);
   const [currentQuestionnaire, setCurrentQuestionnaire] = useState<string>('default-questionnaire');
   const [sections, setSections] = useState<Section[]>([]);
@@ -43,6 +44,25 @@ function App() {
     errors: string[];
   } | null>(null);
   const [nuclearResetInProgress, setNuclearResetInProgress] = useState(false);
+  const [dashboardConfig, setDashboardConfig] = useState({
+    template: 'minimal',
+    theme: 'blue',
+    customColors: {
+      primary: '#3B82F6',
+      secondary: '#8B5CF6',
+      accent: '#10B981'
+    },
+    appearance: 'light' as 'light' | 'dark',
+    layout: {
+      sidebar: false,
+      header: true,
+      footer: false
+    },
+    branding: {
+      title: 'Analytics Dashboard',
+      subtitle: 'Monitor your business performance'
+    }
+  });
 
   // Initialize theme and form values
   const { theme } = useTheme();

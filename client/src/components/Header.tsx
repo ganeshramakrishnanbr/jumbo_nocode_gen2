@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { CustomerTier } from '../types';
 import { TIER_CONFIGS } from '../data/tiers';
-import { Settings, Download, Upload, Save, Eye, Code, BarChart3, FileSpreadsheet, Zap, FileText, Menu, X } from 'lucide-react';
+import { Settings, Download, Upload, Save, Eye, Code, BarChart3, FileSpreadsheet, Zap, FileText, Menu, X, Layout } from 'lucide-react';
 import { ThemeToggle } from './ThemeToggle';
 import { ExcelImportModal } from './ExcelImportModal';
 import { DirectImportModal } from './DirectImportModal';
@@ -11,8 +11,8 @@ import { DroppedControl } from '../types';
 interface HeaderProps {
   currentTier: CustomerTier;
   onTierChange: (tier: CustomerTier) => void;
-  activeTab: 'dashboard' | 'design' | 'preview' | 'pdf' | 'json';
-  onTabChange: (tab: 'dashboard' | 'design' | 'preview' | 'pdf' | 'json') => void;
+  activeTab: 'dashboardDesigner' | 'dashboard' | 'design' | 'preview' | 'pdf' | 'json';
+  onTabChange: (tab: 'dashboardDesigner' | 'dashboard' | 'design' | 'preview' | 'pdf' | 'json') => void;
   onImportControls?: (controls: DroppedControl[]) => void;
   onDirectImport?: (controls: DroppedControl[]) => void;
 }
@@ -52,6 +52,7 @@ export const Header: React.FC<HeaderProps> = ({
   };
 
   const tabs = [
+    { key: 'dashboardDesigner', label: 'Dashboard Designer', icon: Layout },
     { key: 'dashboard', label: 'Dashboard', icon: BarChart3 },
     { key: 'design', label: 'Design', icon: Settings },
     { key: 'preview', label: 'Preview', icon: Eye },
