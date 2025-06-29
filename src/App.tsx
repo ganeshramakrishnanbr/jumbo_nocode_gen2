@@ -176,13 +176,23 @@ function App() {
 
   const handleImportControls = async (controls: DroppedControl[]) => {
     try {
+      console.log('Starting import of', controls.length, 'controls');
+      
       // Insert all imported controls into the database
       for (const control of controls) {
         await insertControl(control, currentQuestionnaire);
+        console.log('Inserted control:', control.id, control.name);
       }
       
       // Force refresh the controls by incrementing refresh key
+      console.log('Triggering refresh...');
       setRefreshKey(prev => prev + 1);
+      
+      // Also manually refresh controls to ensure they're loaded
+      setTimeout(async () => {
+        await refreshControls();
+        console.log('Manual refresh completed');
+      }, 100);
       
       // Show success message
       console.log(`Successfully imported ${controls.length} controls`);

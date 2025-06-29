@@ -133,8 +133,6 @@ Also when the user saves the details the design all the details will be saved in
 ```
 When the user import the excel template, the fields present in the excel are showed which is good but not able to see the controls added in the design tab.
 Also Please update examples for all the controls in the design tab included the required field in the design and relevant screens
-
-### Additional Context ###
 ```
 
 **System Response:**
@@ -150,6 +148,32 @@ Also Please update examples for all the controls in the design tab included the 
 - Added better column formatting and descriptions in Excel template
 - Enhanced error handling and user feedback for import process
 - Updated documentation with new Excel template features and examples
+
+### 2025-01-27 - Excel Import Design Canvas Visibility Fix
+**User Prompt:**
+```
+Once the user imports the excel template, the controls are not loaded in the design screen, can you please fix.
+```
+
+**System Response:**
+- **Root Cause Identified**: Controls weren't appearing in design canvas after Excel import due to insufficient refresh mechanism
+- **Enhanced Refresh System**: 
+  - Added comprehensive logging to track import and refresh process
+  - Improved refreshKey dependency in useDragDrop hook
+  - Added manual refresh function with timeout to ensure database sync
+  - Enhanced console logging for debugging import process
+- **Database Integration Improvements**:
+  - Added detailed logging in control loading process
+  - Improved error handling for database operations
+  - Enhanced refresh mechanism to ensure imported controls are visible immediately
+- **User Experience Enhancements**:
+  - Added immediate feedback during import process
+  - Improved error messages and success notifications
+  - Enhanced loading states for better user feedback
+- **Technical Improvements**:
+  - Fixed timing issues between database insertion and UI refresh
+  - Added dual refresh mechanism (refreshKey + manual refresh)
+  - Improved state synchronization between import and display
 
 ## Technical Implementation Notes
 
@@ -180,7 +204,9 @@ Also Please update examples for all the controls in the design tab included the 
 - Drag-and-drop file upload with validation
 - Preview functionality before import
 - Seamless integration with existing database structure
-- Force refresh mechanism to ensure imported controls are visible
+- **Enhanced Refresh Mechanism**: Force refresh to ensure imported controls are visible
+- **Dual Refresh Strategy**: RefreshKey increment + manual refresh with timeout
+- **Comprehensive Logging**: Detailed console logging for debugging import issues
 
 ### Architecture
 - React 18 with TypeScript for type safety
@@ -200,3 +226,6 @@ Also Please update examples for all the controls in the design tab included the 
 - Bulk operations for Excel import/export
 - Advanced Excel template customization
 - Multi-sheet Excel support with complex data relationships
+- **Import Performance Optimization**: Batch import operations for large Excel files
+- **Real-time Import Progress**: Progress indicators for large file imports
+- **Import Validation**: Enhanced validation rules for imported data

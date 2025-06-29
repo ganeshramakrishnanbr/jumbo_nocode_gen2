@@ -23,7 +23,9 @@ export const useDragDrop = (questionnaireId: string = 'default-questionnaire', i
 
       try {
         setIsLoading(true);
+        console.log('Loading controls from database...', { questionnaireId, refreshKey });
         const controls = await getControls(questionnaireId);
+        console.log('Loaded controls:', controls.length, controls);
         setDroppedControls(controls);
       } catch (error) {
         console.error('Failed to load controls:', error);
@@ -40,7 +42,9 @@ export const useDragDrop = (questionnaireId: string = 'default-questionnaire', i
     if (!isDbInitialized) return;
 
     try {
+      console.log('Manually refreshing controls...');
       const controls = await getControls(questionnaireId);
+      console.log('Manual refresh loaded:', controls.length, 'controls');
       setDroppedControls(controls);
     } catch (error) {
       console.error('Failed to refresh controls:', error);
