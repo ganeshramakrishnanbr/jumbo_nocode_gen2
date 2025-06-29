@@ -1,5 +1,5 @@
 import React, { useRef } from 'react';
-import { useDrag, useDrop } from 'react-dnd';
+import { useDrag, useDrop, DropTargetMonitor } from 'react-dnd';
 import { DroppedControl } from '../types';
 import { Move, Trash2, ArrowUp, ArrowDown, GripVertical } from 'lucide-react';
 
@@ -34,9 +34,9 @@ export const DraggableControlComponent: React.FC<DraggableControlComponentProps>
     }),
   });
 
-  const [, drop] = useDrop({
+  const [{ isOver }, drop] = useDrop({
     accept: 'CONTROL_ITEM',
-    hover: (item: { index: number; id: string }) => {
+    hover: (item: { index: number; id: string }, monitor: DropTargetMonitor) => {
       if (!ref.current) return;
       
       const dragIndex = item.index;
@@ -44,9 +44,31 @@ export const DraggableControlComponent: React.FC<DraggableControlComponentProps>
       
       if (dragIndex === hoverIndex) return;
       
+      // Get the bounding rectangle of the hovered element
+      const hoverBoundingRect = ref.current.getBoundingClientRect();
+      
+      // Get vertical middle
+      const hoverMiddleY = (hoverBoundingRect.bottom - hoverBoundingRect.top) / 2;
+      
+      // Determine mouse position
+      const clientOffset = monitor.getClientOffset();
+      if (!clientOffset) return;
+      
+      // Get pixels to the top
+      const hoverClientY = clientOffset.y - hoverBoundingRect.top;
+      
+      // Only perform the move when the mouse has crossed half of the items height
+      // When dragging downwards, only move when the cursor is below 50%
+      // When dragging upwards, only move when the cursor is above 50%
+      if (dragIndex < hoverIndex && hoverClientY < hoverMiddleY) return;
+      if (dragIndex > hoverIndex && hoverClientY > hoverMiddleY) return;
+      
       onReorder(dragIndex, hoverIndex);
       item.index = hoverIndex;
     },
+    collect: (monitor) => ({
+      isOver: monitor.isOver(),
+    }),
   });
 
   // Connect drag and drop
@@ -524,19 +546,26 @@ export const DraggableControlComponent: React.FC<DraggableControlComponentProps>
   return (
     <div
       ref={ref}
-      className={`flex items-start space-x-6 p-4 rounded-lg transition-all cursor-pointer ${
-        isSelected
-          ? 'bg-blue-50 dark:bg-blue-900/20 border-2 border-blue-300 dark:border-blue-600'
-          : 'hover:bg-gray-50 dark:hover:bg-gray-800 border-2 border-transparent'
-      } ${isDragging ? 'opacity-50' : ''}`}
+      className={`group relative flex items-start space-x-4 p-4 rounded-lg transition-all ${
+        isDragging 
+          ? 'opacity-30 scale-105 shadow-lg z-50 bg-white dark:bg-gray-900 border-2 border-blue-400' 
+          : isOver 
+            ? 'bg-blue-50 dark:bg-blue-900/30 border-2 border-blue-300 dark:border-blue-600' 
+            : isSelected
+              ? 'bg-blue-50 dark:bg-blue-900/20 border-2 border-blue-300 dark:border-blue-600'
+              : 'hover:bg-gray-50 dark:hover:bg-gray-800 border-2 border-transparent'
+      }`}
       onClick={(e) => {
         e.stopPropagation();
         onSelect();
       }}
     >
       {/* Drag Handle */}
-      <div className="flex-shrink-0 pt-2 cursor-move">
-        <GripVertical className="w-4 h-4 text-gray-400 dark:text-gray-500" />
+      <div 
+        className="flex-shrink-0 pt-2 cursor-move opacity-60 group-hover:opacity-100 transition-opacity"
+        {...drag}
+      >
+        <GripVertical className="w-5 h-5 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300" />
       </div>
 
       {/* Label Column */}
@@ -559,11 +588,24 @@ export const DraggableControlComponent: React.FC<DraggableControlComponentProps>
         {renderControl()}
       </div>
 
-      {/* Order Indicator */}
-      <div className="w-8 flex-shrink-0 flex items-center justify-center">
+      {/* Actions Column */}
+      <div className="flex-shrink-0 flex items-center space-x-2">
+        {/* Order Indicator */}
         <span className="text-xs text-gray-400 dark:text-gray-500 bg-gray-100 dark:bg-gray-700 rounded-full w-6 h-6 flex items-center justify-center transition-colors">
           {index + 1}
         </span>
+        
+        {/* Always visible delete button */}
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            onRemove(control.id);
+          }}
+          className="opacity-0 group-hover:opacity-100 bg-red-500 hover:bg-red-600 text-white p-1.5 rounded-full transition-all duration-200 hover:scale-110"
+          title="Delete Control"
+        >
+          <Trash2 className="w-3 h-3" />
+        </button>
       </div>
 
       {/* Selection Overlay */}
