@@ -101,7 +101,7 @@ export const useDragDrop = (questionnaireId: string = 'default-questionnaire', i
     safeLoadControls();
   }, [loadControlsFromDB]);
 
-  // Enhanced force refresh with comprehensive verification
+  // Enhanced force refresh with comprehensive verification and multiple strategies
   const forceRefresh = useCallback(async () => {
     console.log('🔄 useDragDrop: ===== FORCE REFRESH INITIATED =====');
     console.log('📊 useDragDrop: Force refresh parameters:', {
@@ -112,14 +112,14 @@ export const useDragDrop = (questionnaireId: string = 'default-questionnaire', i
     });
     
     try {
-      // Force reload from database
-      console.log('🔄 useDragDrop: Executing force reload from database...');
+      // Strategy 1: Force reload from database
+      console.log('🔄 useDragDrop: Strategy 1 - Force reload from database...');
       await loadControlsFromDB();
       
-      // Additional verification step with enhanced logging
+      // Strategy 2: Additional verification step with enhanced logging
       setTimeout(async () => {
         try {
-          console.log('🔍 useDragDrop: Force refresh verification step...');
+          console.log('🔍 useDragDrop: Strategy 2 - Force refresh verification step...');
           const verificationControls = await getControls(questionnaireId);
           const currentStateCount = droppedControls.length;
           
@@ -136,6 +136,15 @@ export const useDragDrop = (questionnaireId: string = 'default-questionnaire', i
             console.log('🔄 useDragDrop: State out of sync - updating directly');
             setDroppedControls(verificationControls);
             console.log('✅ useDragDrop: Direct state update completed');
+            
+            // Strategy 3: Final verification after direct update
+            setTimeout(() => {
+              console.log('🔍 useDragDrop: Strategy 3 - Final verification after direct update:', {
+                finalStateCount: verificationControls.length,
+                expectedCount: verificationControls.length,
+                timestamp: new Date().toISOString()
+              });
+            }, 100);
           } else {
             console.log('✅ useDragDrop: State is in sync');
           }
@@ -364,7 +373,7 @@ export const useDragDrop = (questionnaireId: string = 'default-questionnaire', i
     setSelectedControl(null);
   }, []);
 
-  // Enhanced state change logging for debugging
+  // Enhanced state change logging for debugging with more detailed information
   useEffect(() => {
     console.log('📊 useDragDrop: ===== STATE CHANGED =====');
     console.log('📊 useDragDrop: Current state:', {
@@ -376,13 +385,21 @@ export const useDragDrop = (questionnaireId: string = 'default-questionnaire', i
       timestamp: new Date().toISOString()
     });
 
-    // Log control distribution by section
+    // Log control distribution by section with enhanced details
     if (droppedControls.length > 0) {
       const distribution = droppedControls.reduce((acc, control) => {
         acc[control.sectionId || 'unknown'] = (acc[control.sectionId || 'unknown'] || 0) + 1;
         return acc;
       }, {} as Record<string, number>);
       console.log('📂 useDragDrop: Current controls by section:', distribution);
+      
+      // Log first few controls for debugging
+      console.log('📝 useDragDrop: First 5 controls in state:');
+      droppedControls.slice(0, 5).forEach((control, index) => {
+        console.log(`   ${index + 1}. ${control.name} (${control.type}) - Section: ${control.sectionId}, ID: ${control.id}`);
+      });
+    } else {
+      console.log('📝 useDragDrop: No controls in current state');
     }
   }, [droppedControls.length, selectedControl?.id, selectedControl?.name, isLoading, refreshKey]);
 

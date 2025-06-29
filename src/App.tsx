@@ -195,6 +195,7 @@ function App() {
       activeSection,
       currentControlCount: droppedControls.length,
       dbInitialized: isDbInitialized,
+      refreshKey: refreshKey,
       timestamp: new Date().toISOString()
     });
 
@@ -209,7 +210,7 @@ function App() {
     try {
       console.log('📝 EXCEL IMPORT: Raw Excel data received:');
       controls.forEach((control, index) => {
-        console.log(`   ${index + 1}. ${control.name} (${control.type}) - Section: ${control.sectionId}, Order: ${control.y}`);
+        console.log(`   ${index + 1}. ${control.name} (${control.type}) - Section: ${control.sectionId}, Order: ${control.y}, ID: ${control.id}`);
       });
 
       // STEP 1: COMPREHENSIVE DATA VALIDATION
@@ -301,7 +302,7 @@ function App() {
         errors: errors
       });
 
-      // STEP 3: COMPREHENSIVE STATE REFRESH STRATEGY
+      // STEP 3: COMPREHENSIVE STATE REFRESH STRATEGY WITH ENHANCED VERIFICATION
       console.log('🔄 EXCEL IMPORT: STEP 3 - Executing comprehensive refresh strategy...');
       
       // Strategy 1: Immediate refresh key update (0ms)
@@ -391,7 +392,7 @@ function App() {
   };
 
   const handleDialogClose = () => {
-    console.log('🔄 DIALOG: ===== DIALOG CLOSE AND SCREEN REFRESH =====');
+    console.log('🔄 DIALOG: ===== DIALOG CLOSE AND COMPREHENSIVE SCREEN REFRESH =====');
     setShowImportDialog(false);
     setImportResults(null);
     
@@ -410,13 +411,35 @@ function App() {
         try {
           await forceRefresh();
           
-          // Final state verification
+          // Final state verification with enhanced logging
           const finalControls = await getControls(currentQuestionnaire);
           console.log('🔍 DIALOG: Final state verification:', {
             dbControlCount: finalControls.length,
             uiControlCount: droppedControls.length,
-            timestamp: new Date().toISOString()
+            timestamp: new Date().toISOString(),
+            refreshKey: refreshKey
           });
+
+          // If still out of sync, force one more refresh
+          if (finalControls.length > droppedControls.length) {
+            console.log('🔄 DIALOG: Still out of sync - forcing final refresh');
+            setRefreshKey(prev => prev + 1);
+            
+            // Wait and verify one more time
+            setTimeout(async () => {
+              try {
+                await forceRefresh();
+                const ultimateControls = await getControls(currentQuestionnaire);
+                console.log('🔍 DIALOG: Ultimate verification:', {
+                  dbControlCount: ultimateControls.length,
+                  uiControlCount: droppedControls.length,
+                  finalRefreshKey: refreshKey + 1
+                });
+              } catch (error) {
+                console.error('❌ DIALOG: Ultimate verification failed:', error);
+              }
+            }, 200);
+          }
           
           console.log('✅ DIALOG: ===== SCREEN REFRESH COMPLETED =====');
         } catch (error) {
@@ -557,12 +580,17 @@ function App() {
               {isDbInitialized && <span className="text-green-600 dark:text-green-400">Database Connected</span>}
               <span className="capitalize">{theme} Theme</span>
               {importInProgress && <span className="text-blue-600 dark:text-blue-400 animate-pulse">Import Processing...</span>}
-              <span className="text-xs text-gray-500 dark:text-gray-400">RefreshKey: {refreshKey}</span>
+              <span className="text-xs text-gray-500 dark:text-gray-400 font-mono bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded">
+                RefreshKey: {refreshKey}
+              </span>
+              <span className="text-xs text-gray-500 dark:text-gray-400">
+                Controls: {droppedControls.length}
+              </span>
             </div>
             <div className="flex items-center space-x-4">
               <span>Version 1.0.0</span>
               {activeTab !== 'dashboard' && <span>Sections: {sections.length}</span>}
-              {activeTab !== 'dashboard' && <span>Controls: {droppedControls.length}</span>}
+              {activeTab !== 'dashboard' && <span>DB Controls: {droppedControls.length}</span>}
               <span className={`px-2 py-1 rounded text-xs font-medium ${
                 currentTier === 'platinum' ? 'bg-purple-100 dark:bg-purple-900 text-purple-700 dark:text-purple-300' :
                 currentTier === 'gold' ? 'bg-amber-100 dark:bg-amber-900 text-amber-700 dark:text-amber-300' :
