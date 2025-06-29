@@ -36,9 +36,10 @@ The application follows a full-stack monolithic architecture with clear separati
 2. **Form builder interface** with drag-and-drop controls from a component library
 3. **Section-based form organization** with visual management
 4. **Real-time preview mode** for form testing
-5. **JSON export/import** for form definitions
-6. **Excel template system** for bulk form creation
-7. **Dashboard with analytics** showing form usage statistics
+5. **PDF Preview functionality** with real-time generation, tier-based templates, and customization options
+6. **JSON export/import** for form definitions with expandable sections
+7. **Excel template system** for bulk form creation
+8. **Dashboard with analytics** showing form usage statistics
 
 ## Data Flow
 
@@ -101,6 +102,7 @@ Changelog:
 - June 29, 2025. Initial setup and migration from Bolt
 - June 29, 2025. Enhanced Excel import with dynamic section creation
 - June 29, 2025. Preserved original Bolt documentation in docs/ folder and .bolt file
+- June 29, 2025. Added comprehensive PDF Preview functionality with real-time generation and tier-based templates
 ```
 
 ## User Preferences
