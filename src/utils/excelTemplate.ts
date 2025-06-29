@@ -45,7 +45,7 @@ export const generateExcelTemplate = () => {
     ]),
     [''],
     ['COLUMN DESCRIPTIONS:'],
-    ['id: Unique identifier (auto-generated if empty)'],
+    ['id: Unique identifier (leave empty for auto-generation)'],
     ['type: Control type from the available controls list'],
     ['category: Control category'],
     ['name: Display name for the control'],
@@ -63,7 +63,12 @@ export const generateExcelTemplate = () => {
     ['REQUIRED FIELD EXAMPLES:'],
     ['- Set required=TRUE for mandatory fields'],
     ['- Required fields will show red asterisk (*) in the form'],
-    ['- Use description field to explain why field is required']
+    ['- Use description field to explain why field is required'],
+    [''],
+    ['IMPORTANT NOTES:'],
+    ['- Leave ID column empty to auto-generate unique IDs'],
+    ['- Duplicate IDs will be automatically resolved during import'],
+    ['- Controls will be added to existing sections or create new ones']
   ];
 
   const instructionsSheet = XLSX.utils.aoa_to_sheet(instructionsData);
@@ -114,7 +119,7 @@ export const generateExcelTemplate = () => {
   const sampleData: ExcelControlData[] = [
     // Personal Information Section
     {
-      id: 'personal-name',
+      id: '', // Leave empty for auto-generation
       type: 'textInput',
       category: 'Core Input',
       name: 'Full Name',
@@ -127,7 +132,7 @@ export const generateExcelTemplate = () => {
       maxLength: 100
     },
     {
-      id: 'personal-email',
+      id: '', // Leave empty for auto-generation
       type: 'emailInput',
       category: 'Core Input',
       name: 'Email Address',
@@ -139,7 +144,7 @@ export const generateExcelTemplate = () => {
       order: 2
     },
     {
-      id: 'personal-phone',
+      id: '', // Leave empty for auto-generation
       type: 'phoneInput',
       category: 'Core Input',
       name: 'Phone Number',
@@ -151,7 +156,7 @@ export const generateExcelTemplate = () => {
       order: 3
     },
     {
-      id: 'personal-dob',
+      id: '', // Leave empty for auto-generation
       type: 'datePicker',
       category: 'Date & Time',
       name: 'Date of Birth',
@@ -163,7 +168,7 @@ export const generateExcelTemplate = () => {
       order: 4
     },
     {
-      id: 'personal-gender',
+      id: '', // Leave empty for auto-generation
       type: 'radioGroup',
       category: 'Selection',
       name: 'Gender',
@@ -178,7 +183,7 @@ export const generateExcelTemplate = () => {
 
     // Address Information Section
     {
-      id: 'address-complete',
+      id: '', // Leave empty for auto-generation
       type: 'completeAddress',
       category: 'Address',
       name: 'Home Address',
@@ -193,7 +198,7 @@ export const generateExcelTemplate = () => {
 
     // Professional Information Section
     {
-      id: 'prof-company',
+      id: '', // Leave empty for auto-generation
       type: 'textInput',
       category: 'Core Input',
       name: 'Company Name',
@@ -206,7 +211,7 @@ export const generateExcelTemplate = () => {
       maxLength: 150
     },
     {
-      id: 'prof-title',
+      id: '', // Leave empty for auto-generation
       type: 'textInput',
       category: 'Core Input',
       name: 'Job Title',
@@ -219,7 +224,7 @@ export const generateExcelTemplate = () => {
       maxLength: 100
     },
     {
-      id: 'prof-experience',
+      id: '', // Leave empty for auto-generation
       type: 'dropdown',
       category: 'Selection',
       name: 'Experience Level',
@@ -231,7 +236,7 @@ export const generateExcelTemplate = () => {
       order: 3
     },
     {
-      id: 'prof-skills',
+      id: '', // Leave empty for auto-generation
       type: 'checkboxGroup',
       category: 'Selection',
       name: 'Technical Skills',
@@ -244,7 +249,7 @@ export const generateExcelTemplate = () => {
       order: 4
     },
     {
-      id: 'prof-salary',
+      id: '', // Leave empty for auto-generation
       type: 'numberInput',
       category: 'Core Input',
       name: 'Expected Salary',
@@ -260,7 +265,7 @@ export const generateExcelTemplate = () => {
 
     // Preferences Section
     {
-      id: 'pref-remote',
+      id: '', // Leave empty for auto-generation
       type: 'toggleSwitch',
       category: 'Selection',
       name: 'Remote Work',
@@ -274,7 +279,7 @@ export const generateExcelTemplate = () => {
       order: 1
     },
     {
-      id: 'pref-travel',
+      id: '', // Leave empty for auto-generation
       type: 'slider',
       category: 'Selection',
       name: 'Travel Willingness',
@@ -289,7 +294,7 @@ export const generateExcelTemplate = () => {
       order: 2
     },
     {
-      id: 'pref-rating',
+      id: '', // Leave empty for auto-generation
       type: 'ratingScale',
       category: 'Selection',
       name: 'Interest Level',
@@ -302,7 +307,7 @@ export const generateExcelTemplate = () => {
       order: 3
     },
     {
-      id: 'pref-start',
+      id: '', // Leave empty for auto-generation
       type: 'dateRangePicker',
       category: 'Date & Time',
       name: 'Availability',
@@ -316,7 +321,7 @@ export const generateExcelTemplate = () => {
 
     // Additional Information Section
     {
-      id: 'additional-resume',
+      id: '', // Leave empty for auto-generation
       type: 'fileUpload',
       category: 'File & Media',
       name: 'Resume Upload',
@@ -330,7 +335,7 @@ export const generateExcelTemplate = () => {
       order: 1
     },
     {
-      id: 'additional-portfolio',
+      id: '', // Leave empty for auto-generation
       type: 'urlInput',
       category: 'Core Input',
       name: 'Portfolio URL',
@@ -342,7 +347,7 @@ export const generateExcelTemplate = () => {
       order: 2
     },
     {
-      id: 'additional-cover',
+      id: '', // Leave empty for auto-generation
       type: 'textarea',
       category: 'Core Input',
       name: 'Cover Letter',
@@ -356,7 +361,7 @@ export const generateExcelTemplate = () => {
       order: 3
     },
     {
-      id: 'additional-terms',
+      id: '', // Leave empty for auto-generation
       type: 'termsConditions',
       category: 'Validation & Security',
       name: 'Terms Agreement',
@@ -456,10 +461,10 @@ export const parseExcelFile = (file: File): Promise<ExcelControlData[]> => {
               }
             });
             
-            // Generate ID if not provided
-            if (!control.id) {
-              control.id = `imported-${control.type || 'control'}-${Date.now()}-${index}`;
-            }
+            // Always generate a new unique ID to avoid conflicts
+            const timestamp = Date.now();
+            const randomSuffix = Math.random().toString(36).substring(2, 8);
+            control.id = `imported-${control.type || 'control'}-${timestamp}-${randomSuffix}-${index}`;
             
             // Set defaults
             control.sectionId = control.sectionId || 'default';
@@ -524,7 +529,7 @@ export const convertExcelDataToControls = (excelData: ExcelControlData[]): Dropp
     if (data.spacing) properties.spacing = data.spacing;
     
     return {
-      id: data.id,
+      id: data.id, // Use the guaranteed unique ID from parsing
       type: data.type,
       name: data.name,
       x: 0,

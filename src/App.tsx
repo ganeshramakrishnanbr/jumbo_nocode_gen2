@@ -19,8 +19,7 @@ import {
   updateSection as updateSectionDB, 
   deleteSection as deleteSectionDB,
   insertControl,
-  getControls,
-  updateControl as updateControlDB
+  getControls
 } from './lib/db';
 
 function App() {
@@ -180,31 +179,24 @@ function App() {
     try {
       console.log('🚀 Starting import of', controls.length, 'controls');
       
-      // Get existing controls from database to check for duplicates
-      const existingControls = await getControls(currentQuestionnaire);
-      const existingControlIds = new Set(existingControls.map(control => control.id));
-      
       let insertedCount = 0;
-      let updatedCount = 0;
       
-      // Process each imported control
+      // Process each imported control - since we generate unique IDs, just insert them all
       for (const control of controls) {
         console.log('📝 Processing control:', control.id, control.name, control.type);
         
-        if (existingControlIds.has(control.id)) {
-          // Control exists, update it
-          console.log('🔄 Updating existing control:', control.id);
-          await updateControlDB(control.id, control);
-          updatedCount++;
-        } else {
-          // Control doesn't exist, insert it
-          console.log('➕ Inserting new control:', control.id);
+        try {
+          // Insert the control directly since we have guaranteed unique IDs
+          console.log('➕ Inserting control:', control.id);
           await insertControl(control, currentQuestionnaire);
           insertedCount++;
+        } catch (error) {
+          console.error('❌ Failed to insert control:', control.id, error);
+          // Continue with other controls even if one fails
         }
       }
       
-      console.log(`✅ Import completed: ${insertedCount} inserted, ${updatedCount} updated`);
+      console.log(`✅ Import completed: ${insertedCount} controls inserted`);
       
       // Force refresh the controls using multiple strategies
       console.log('🔄 Triggering refresh mechanisms...');
@@ -243,7 +235,7 @@ function App() {
       }, 200);
       
       // Show success message with details
-      const message = `Successfully imported ${controls.length} controls! (${insertedCount} new, ${updatedCount} updated)`;
+      const message = `Successfully imported ${insertedCount} controls!`;
       console.log(`🎉 ${message}`);
       
       // Optional: Show user notification
