@@ -98,7 +98,9 @@ The application is configured for deployment on Replit with the following strate
 
 ```
 Changelog:
-- June 29, 2025. Initial setup
+- June 29, 2025. Initial setup and migration from Bolt
+- June 29, 2025. Enhanced Excel import with dynamic section creation
+- June 29, 2025. Preserved original Bolt documentation in docs/ folder and .bolt file
 ```
 
 ## User Preferences

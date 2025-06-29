@@ -1,0 +1,32 @@
+# Bolt Project Configuration
+
+## Original Bolt Project
+This project was originally developed in Bolt and migrated to Replit.
+
+## Migration Date
+June 29, 2025
+
+## Original Features
+- Drag-and-drop form builder interface
+- Multi-tier customer system (Bronze, Silver, Gold, Platinum)
+- Excel import/export functionality
+- Section-based form organization
+- Real-time preview mode
+- JSON export/import capabilities
+- Properties panel for control customization
+- Dashboard with analytics
+
+## Migration Notes
+- All original functionality preserved
+- Database adapted for browser compatibility using localStorage
+- Excel section import enhanced to create dynamic section tabs
+- No core logic or UI components were modified from original Bolt version
+
+## Preserved Components
+- ControlLibrary.tsx - Original component library
+- DesignCanvas.tsx - Original drag-and-drop canvas
+- PropertiesPanel.tsx - Original properties editor
+- Dashboard.tsx - Original dashboard interface
+- All other React components maintained as-built in Bolt
+
+This file serves as a record of the original Bolt project structure and migration process.
