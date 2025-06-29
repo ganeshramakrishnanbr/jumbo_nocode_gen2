@@ -1,12 +1,76 @@
 import React, { useState } from 'react';
 import { DroppedControl, Section } from '../types';
-import { CheckCircle, AlertCircle, Circle, ChevronRight, Trash2 } from 'lucide-react';
+import { CheckCircle, AlertCircle, Circle, ChevronRight, Trash2, Palette, Layout, Maximize2, Grid3X3, AlignLeft, Sparkles } from 'lucide-react';
 
 interface PreviewModeProps {
   droppedControls: DroppedControl[];
   sections: Section[];
   onDeleteControl?: (controlId: string) => void;
 }
+
+// Theme definitions for modern layouts
+const FORM_THEMES = {
+  classic: {
+    name: 'Classic',
+    icon: AlignLeft,
+    description: 'Traditional form layout with labels above fields',
+    containerClass: 'max-w-2xl mx-auto bg-white dark:bg-gray-900 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 p-8',
+    sectionTabsClass: 'flex space-x-1 mb-8 bg-gray-100 dark:bg-gray-800 p-1 rounded-lg',
+    activeTabClass: 'px-6 py-3 rounded-md bg-white dark:bg-gray-700 text-blue-600 dark:text-blue-400 font-medium shadow-sm',
+    inactiveTabClass: 'px-6 py-3 rounded-md text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 transition-colors',
+    fieldSpacing: 'space-y-6',
+    labelClass: 'block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2',
+    inputClass: 'w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white'
+  },
+  modern: {
+    name: 'Modern Card',
+    icon: Layout,
+    description: 'Clean card-based design with floating labels',
+    containerClass: 'max-w-4xl mx-auto bg-gradient-to-br from-white to-gray-50 dark:from-gray-900 dark:to-gray-800 rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-700 p-10',
+    sectionTabsClass: 'flex space-x-2 mb-10 bg-white dark:bg-gray-900 p-2 rounded-xl shadow-inner',
+    activeTabClass: 'px-8 py-4 rounded-lg bg-gradient-to-r from-blue-500 to-purple-600 text-white font-semibold shadow-lg transform scale-105 transition-all',
+    inactiveTabClass: 'px-8 py-4 rounded-lg text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 transition-all',
+    fieldSpacing: 'space-y-8',
+    labelClass: 'block text-sm font-semibold text-gray-800 dark:text-gray-200 mb-3',
+    inputClass: 'w-full px-5 py-4 border-2 border-gray-200 dark:border-gray-600 rounded-xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-white shadow-sm'
+  },
+  minimal: {
+    name: 'Minimal',
+    icon: Maximize2,
+    description: 'Clean minimal design with subtle borders',
+    containerClass: 'max-w-3xl mx-auto bg-white dark:bg-gray-900 rounded-none border-t-4 border-blue-500 p-12',
+    sectionTabsClass: 'flex space-x-8 mb-12 border-b border-gray-200 dark:border-gray-700',
+    activeTabClass: 'pb-4 border-b-2 border-blue-500 text-blue-600 dark:text-blue-400 font-medium',
+    inactiveTabClass: 'pb-4 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 transition-colors',
+    fieldSpacing: 'space-y-10',
+    labelClass: 'block text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400 mb-2 font-medium',
+    inputClass: 'w-full px-0 py-3 border-0 border-b border-gray-300 dark:border-gray-600 focus:ring-0 focus:border-blue-500 bg-transparent text-gray-900 dark:text-white text-lg'
+  },
+  compact: {
+    name: 'Compact Grid',
+    icon: Grid3X3,
+    description: 'Space-efficient grid layout for dense forms',
+    containerClass: 'max-w-5xl mx-auto bg-white dark:bg-gray-900 rounded-lg shadow-md border border-gray-200 dark:border-gray-700 p-6',
+    sectionTabsClass: 'flex space-x-1 mb-6 bg-gray-50 dark:bg-gray-800 p-1 rounded',
+    activeTabClass: 'px-4 py-2 rounded bg-white dark:bg-gray-700 text-blue-600 dark:text-blue-400 font-medium text-sm shadow-sm',
+    inactiveTabClass: 'px-4 py-2 rounded text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 text-sm transition-colors',
+    fieldSpacing: 'grid grid-cols-1 md:grid-cols-2 gap-4',
+    labelClass: 'block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1',
+    inputClass: 'w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded focus:ring-1 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-sm'
+  },
+  luxury: {
+    name: 'Luxury',
+    icon: Sparkles,
+    description: 'Premium design with elegant styling',
+    containerClass: 'max-w-4xl mx-auto bg-gradient-to-b from-white via-gray-50 to-white dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 rounded-3xl shadow-2xl border border-gray-300 dark:border-gray-600 p-12 relative overflow-hidden',
+    sectionTabsClass: 'flex space-x-3 mb-12 bg-gradient-to-r from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-700 p-3 rounded-2xl',
+    activeTabClass: 'px-10 py-5 rounded-xl bg-gradient-to-r from-amber-400 via-yellow-500 to-orange-500 text-white font-bold shadow-xl transform scale-105 transition-all',
+    inactiveTabClass: 'px-10 py-5 rounded-xl text-gray-700 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-gray-600/50 transition-all font-medium',
+    fieldSpacing: 'space-y-10',
+    labelClass: 'block text-sm font-bold text-gray-800 dark:text-gray-200 mb-4 tracking-wide',
+    inputClass: 'w-full px-6 py-5 border-2 border-gray-300 dark:border-gray-600 rounded-2xl focus:ring-4 focus:ring-amber-500/30 focus:border-amber-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-white shadow-lg text-lg'
+  }
+};
 
 export const PreviewMode: React.FC<PreviewModeProps> = ({
   droppedControls,
@@ -15,6 +79,8 @@ export const PreviewMode: React.FC<PreviewModeProps> = ({
 }) => {
   const [activeSection, setActiveSection] = useState(0);
   const [formData, setFormData] = useState<Record<string, any>>({});
+  const [selectedTheme, setSelectedTheme] = useState<keyof typeof FORM_THEMES>('classic');
+  const [showThemeSelector, setShowThemeSelector] = useState(false);
 
   const handleInputChange = (controlId: string, value: any) => {
     setFormData(prev => ({ ...prev, [controlId]: value }));
@@ -530,7 +596,7 @@ export const PreviewMode: React.FC<PreviewModeProps> = ({
         
         return (
           <div className="space-y-2">
-            {rankedItems.map((rankedItem: any, index: number) => (
+            {rankedItems.map((rankedItem: { item: string; rank: number }, index: number) => (
               <div key={index} className="flex items-center space-x-3 p-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800">
                 <span className="w-8 h-8 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded-full flex items-center justify-center text-sm font-medium">
                   {index + 1}
@@ -903,6 +969,102 @@ export const PreviewMode: React.FC<PreviewModeProps> = ({
     }
   };
 
+  // Render control with theme-specific styling
+  const renderThemedControl = (control: DroppedControl, theme: typeof FORM_THEMES.classic) => {
+    const value = formData[control.id];
+    
+    // Apply theme input classes to input elements
+    const getThemedInputProps = (additionalClasses = '') => ({
+      className: `${theme.inputClass} ${additionalClasses}`,
+      value: value || '',
+      onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => 
+        handleInputChange(control.id, e.target.value)
+    });
+
+    switch (control.type) {
+      case 'textInput':
+        return <input type="text" placeholder={control.properties.placeholder || 'Enter text...'} {...getThemedInputProps()} />;
+      
+      case 'textarea':
+        return (
+          <textarea
+            placeholder={control.properties.placeholder || 'Enter multiple lines...'}
+            rows={control.properties.rows || 4}
+            className={theme.inputClass}
+            value={value || ''}
+            onChange={(e) => handleInputChange(control.id, e.target.value)}
+          />
+        );
+      
+      case 'numberInput':
+        return (
+          <input
+            type="number"
+            min={control.properties.min}
+            max={control.properties.max}
+            step={control.properties.step}
+            placeholder="Enter number..."
+            {...getThemedInputProps()}
+          />
+        );
+
+      case 'emailInput':
+        return <input type="email" placeholder={control.properties.placeholder || 'Enter email address...'} {...getThemedInputProps()} />;
+
+      case 'phoneInput':
+        return <input type="tel" placeholder={control.properties.placeholder || '(555) 123-4567'} {...getThemedInputProps()} />;
+
+      case 'dropdown':
+        const options = control.properties.options?.split(',') || ['Option 1', 'Option 2'];
+        return (
+          <select className={theme.inputClass} value={value || ''} onChange={(e) => handleInputChange(control.id, e.target.value)}>
+            <option value="">Select an option...</option>
+            {options.map((option: string, index: number) => (
+              <option key={index} value={option.trim()}>
+                {option.trim()}
+              </option>
+            ))}
+          </select>
+        );
+
+      case 'checkbox':
+        return (
+          <div className="flex items-center space-x-2">
+            <input
+              type="checkbox"
+              checked={Boolean(value)}
+              onChange={(e) => handleInputChange(control.id, e.target.checked)}
+              className="text-blue-600 focus:ring-blue-500 rounded bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600"
+            />
+            <span className="text-gray-700 dark:text-gray-300">{control.properties.text || 'Check this option'}</span>
+          </div>
+        );
+
+      case 'radioButtons':
+        const radioOptions = control.properties.options?.split(',') || ['Option 1', 'Option 2'];
+        return (
+          <div className="space-y-2">
+            {radioOptions.map((option: string, index: number) => (
+              <div key={index} className="flex items-center space-x-2">
+                <input
+                  type="radio"
+                  name={control.id}
+                  value={option.trim()}
+                  checked={value === option.trim()}
+                  onChange={(e) => handleInputChange(control.id, e.target.value)}
+                  className="text-blue-600 focus:ring-blue-500"
+                />
+                <span className="text-gray-700 dark:text-gray-300">{option.trim()}</span>
+              </div>
+            ))}
+          </div>
+        );
+
+      default:
+        return renderControl(control);
+    }
+  };
+
   if (sections.length === 0) {
     return (
       <div className="flex-1 bg-gray-50 dark:bg-gray-800 flex items-center justify-center transition-colors">
@@ -920,10 +1082,60 @@ export const PreviewMode: React.FC<PreviewModeProps> = ({
     .filter(c => c.sectionId === currentSection?.id)
     .filter(isControlVisible); // Apply visibility filter
 
+  const currentTheme = FORM_THEMES[selectedTheme];
+
   return (
     <div className="flex-1 bg-gray-50 dark:bg-gray-800 flex h-full transition-colors">
-      {/* Section Tabs - Fixed width sidebar */}
+      {/* Theme Selector & Section Tabs - Fixed width sidebar */}
       <div className="w-80 bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-700 flex flex-col transition-colors">
+        {/* Theme Selector */}
+        <div className="p-4 border-b border-gray-200 dark:border-gray-700 flex-shrink-0">
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="font-medium text-gray-900 dark:text-white transition-colors">Theme Selection</h3>
+            <button
+              onClick={() => setShowThemeSelector(!showThemeSelector)}
+              className="p-2 bg-gray-100 dark:bg-gray-800 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+              title="Toggle Theme Selector"
+            >
+              <Palette className="w-4 h-4 text-gray-600 dark:text-gray-400" />
+            </button>
+          </div>
+          
+          {showThemeSelector && (
+            <div className="space-y-2 mb-4">
+              {Object.entries(FORM_THEMES).map(([key, theme]) => {
+                const IconComponent = theme.icon;
+                return (
+                  <button
+                    key={key}
+                    onClick={() => {
+                      setSelectedTheme(key as keyof typeof FORM_THEMES);
+                      setShowThemeSelector(false);
+                    }}
+                    className={`w-full flex items-center space-x-3 p-3 rounded-lg text-left transition-all ${
+                      selectedTheme === key
+                        ? 'bg-blue-50 dark:bg-blue-900/20 border-2 border-blue-300 dark:border-blue-600'
+                        : 'hover:bg-gray-50 dark:hover:bg-gray-800 border-2 border-transparent'
+                    }`}
+                  >
+                    <IconComponent className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+                    <div>
+                      <p className="font-medium text-gray-900 dark:text-white text-sm">{theme.name}</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">{theme.description}</p>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          )}
+          
+          <div className="flex items-center space-x-2 text-sm text-gray-600 dark:text-gray-400">
+            <currentTheme.icon className="w-4 h-4" />
+            <span>Current: {currentTheme.name}</span>
+          </div>
+        </div>
+
+        {/* Section Navigation */}
         <div className="p-4 border-b border-gray-200 dark:border-gray-700 flex-shrink-0">
           <h3 className="font-medium text-gray-900 dark:text-white transition-colors">Form Sections</h3>
           <p className="text-sm text-gray-500 dark:text-gray-400 mt-1 transition-colors">
@@ -957,61 +1169,76 @@ export const PreviewMode: React.FC<PreviewModeProps> = ({
         </div>
       </div>
 
-      {/* Form Content - Scrollable area */}
+      {/* Form Content - Scrollable area with theme */}
       <div className="flex-1 flex flex-col h-full">
         <div className="flex-1 overflow-y-auto">
-          <div className="p-6">
-            {currentSection && (
-              <>
-                <div className="bg-white dark:bg-gray-900 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 mb-6 transition-colors">
-                  <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2 transition-colors">{currentSection.name}</h2>
-                  {currentSection.description && (
-                    <p className="text-gray-600 dark:text-gray-300 mb-6 transition-colors">{currentSection.description}</p>
-                  )}
+          <div className="p-8">
+            {/* Themed Form Container */}
+            <div className={currentTheme.containerClass}>
+              {/* Section Tabs using theme */}
+              {sections.length > 1 && (
+                <div className={currentTheme.sectionTabsClass}>
+                  {sections.map((section, index) => (
+                    <button
+                      key={section.id}
+                      onClick={() => setActiveSection(index)}
+                      className={activeSection === index ? currentTheme.activeTabClass : currentTheme.inactiveTabClass}
+                    >
+                      {section.name}
+                    </button>
+                  ))}
+                </div>
+              )}
+
+              {/* Form Title */}
+              {currentSection && (
+                <>
+                  <div className="mb-8">
+                    <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">{currentSection.name}</h1>
+                    {currentSection.description && (
+                      <p className="text-gray-600 dark:text-gray-300">{currentSection.description}</p>
+                    )}
+                  </div>
                   
+                  {/* Form Fields with theme styling */}
                   {sectionControls.length === 0 ? (
-                    <div className="text-center py-8">
-                      <p className="text-gray-500 dark:text-gray-400 transition-colors">No visible controls in this section</p>
+                    <div className="text-center py-16">
+                      <Circle className="w-16 h-16 text-gray-400 dark:text-gray-500 mx-auto mb-4" />
+                      <h3 className="text-xl font-medium text-gray-600 dark:text-gray-300 mb-2">No controls in this section</h3>
+                      <p className="text-gray-500 dark:text-gray-400">Add form controls to see the preview</p>
                     </div>
                   ) : (
-                    <div className="space-y-6">
+                    <div className={currentTheme.fieldSpacing}>
                       {sectionControls
                         .sort((a, b) => a.y - b.y || a.x - b.x)
                         .map(control => (
-                          <div key={control.id} className="space-y-2 relative group">
-                            {/* Delete button for controls (except first control) */}
-                            {control.y > 0 && onDeleteControl && (
-                              <button
-                                onClick={(e) => handleDeleteControl(control.id, e)}
-                                className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity z-10 flex items-center justify-center hover:bg-red-600"
-                                title="Delete Control"
-                              >
-                                <Trash2 className="w-3 h-3" />
-                              </button>
-                            )}
-                            
-                            {control.properties.label && (
-                              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 transition-colors">
-                                {control.properties.required && (
-                                  <span className="text-red-500 mr-1">*</span>
-                                )}
-                                {control.properties.label}
-                                {/* Dependency indicator */}
-                                {control.properties.dependencies && control.properties.dependencies.length > 0 && (
-                                  <span className="ml-2 text-xs text-blue-600 dark:text-blue-400 bg-blue-100 dark:bg-blue-900 px-1 py-0.5 rounded">
-                                    Conditional
-                                  </span>
-                                )}
-                              </label>
-                            )}
-                            {renderControl(control)}
+                          <div key={control.id} className="relative group">
+                            {/* Themed field container */}
+                            <div className="space-y-2">
+                              {control.properties.label && (
+                                <label className={currentTheme.labelClass}>
+                                  {control.properties.required && (
+                                    <span className="text-red-500 mr-1">*</span>
+                                  )}
+                                  {control.properties.label}
+                                  {control.properties.dependencies && control.properties.dependencies.length > 0 && (
+                                    <span className="ml-2 text-xs text-blue-600 dark:text-blue-400 bg-blue-100 dark:bg-blue-900 px-1 py-0.5 rounded">
+                                      Conditional
+                                    </span>
+                                  )}
+                                </label>
+                              )}
+                              <div className="themed-input">
+                                {renderThemedControl(control, currentTheme)}
+                              </div>
+                            </div>
                           </div>
                         ))}
                     </div>
                   )}
-                </div>
-              </>
-            )}
+                </>
+              )}
+            </div>
           </div>
         </div>
 
