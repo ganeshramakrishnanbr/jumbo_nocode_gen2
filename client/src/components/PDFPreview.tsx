@@ -56,7 +56,7 @@ export const PDFPreview: React.FC<PDFPreviewProps> = ({
     setCustomization(prev => ({
       ...prev,
       [section]: {
-        ...prev[section],
+        ...(prev[section] as any),
         [field]: value
       }
     }));
@@ -227,7 +227,7 @@ export const PDFPreview: React.FC<PDFPreviewProps> = ({
     }
 
     // Add footer to all pages
-    const totalPages = pdf.getNumberOfPages();
+    const totalPages = (pdf as any).internal.getNumberOfPages();
     for (let i = 1; i <= totalPages; i++) {
       pdf.setPage(i);
       
@@ -429,7 +429,7 @@ export const PDFPreview: React.FC<PDFPreviewProps> = ({
             ))}
           </select>
           <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-            Tier: {selectedTemplate?.tier}
+            Tier: {selectedTemplate?.tierRequired}
           </p>
         </div>
 

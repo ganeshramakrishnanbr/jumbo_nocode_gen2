@@ -6,6 +6,8 @@ interface PreviewModeProps {
   droppedControls: DroppedControl[];
   sections: Section[];
   onDeleteControl?: (controlId: string) => void;
+  formValues?: { [controlId: string]: any };
+  onFormValueChange?: (controlId: string, value: any) => void;
 }
 
 // Theme definitions for modern layouts
@@ -75,10 +77,12 @@ const FORM_THEMES = {
 export const PreviewMode: React.FC<PreviewModeProps> = ({
   droppedControls,
   sections,
-  onDeleteControl
+  onDeleteControl,
+  formValues = {},
+  onFormValueChange
 }) => {
   const [activeSection, setActiveSection] = useState(0);
-  const [formData, setFormData] = useState<Record<string, any>>({});
+  const [formData, setFormData] = useState<Record<string, any>>(formValues);
   const [selectedTheme, setSelectedTheme] = useState<keyof typeof FORM_THEMES>('classic');
   const [showThemeSelector, setShowThemeSelector] = useState(false);
   const [tabAlignment, setTabAlignment] = useState<'top' | 'left' | 'right'>('top');
