@@ -200,7 +200,7 @@ function App() {
       console.log('🧹 NUCLEAR RESET: Step 1 - Clearing all React state...');
       setRefreshKey(0);
       setSections([]);
-      setSelectedControl(null);
+      clearSelection();
       setIsLoading(true);
       
       // Step 2: Force hook reset
