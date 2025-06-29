@@ -30,6 +30,7 @@ function App() {
   const [activeSection, setActiveSection] = useState('default');
   const [isDbInitialized, setIsDbInitialized] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [refreshKey, setRefreshKey] = useState(0); // Add refresh key for force updates
 
   // Initialize theme
   const { theme } = useTheme();
@@ -44,8 +45,9 @@ function App() {
     moveControl,
     reorderControl,
     selectControl,
-    clearSelection
-  } = useDragDrop(currentQuestionnaire, isDbInitialized);
+    clearSelection,
+    refreshControls // Add refresh function from hook
+  } = useDragDrop(currentQuestionnaire, isDbInitialized, refreshKey);
 
   // Initialize database and load sections
   useEffect(() => {
@@ -179,8 +181,11 @@ function App() {
         await insertControl(control, currentQuestionnaire);
       }
       
-      // Refresh the controls list
-      window.location.reload(); // Simple refresh to reload all data
+      // Force refresh the controls by incrementing refresh key
+      setRefreshKey(prev => prev + 1);
+      
+      // Show success message
+      console.log(`Successfully imported ${controls.length} controls`);
     } catch (error) {
       console.error('Failed to import controls:', error);
     }

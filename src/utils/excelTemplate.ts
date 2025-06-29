@@ -58,13 +58,18 @@ export const generateExcelTemplate = () => {
     ['order: Display order within the section'],
     [''],
     ['EXAMPLE USAGE:'],
-    ['See the "Design" sheet for sample data and examples']
+    ['See the "Design" sheet for sample data and examples'],
+    [''],
+    ['REQUIRED FIELD EXAMPLES:'],
+    ['- Set required=TRUE for mandatory fields'],
+    ['- Required fields will show red asterisk (*) in the form'],
+    ['- Use description field to explain why field is required']
   ];
 
   const instructionsSheet = XLSX.utils.aoa_to_sheet(instructionsData);
   XLSX.utils.book_append_sheet(workbook, instructionsSheet, 'Instructions');
 
-  // Design Sheet with Sample Data
+  // Design Sheet with Enhanced Sample Data
   const designHeaders = [
     'id',
     'type',
@@ -107,133 +112,262 @@ export const generateExcelTemplate = () => {
   ];
 
   const sampleData: ExcelControlData[] = [
+    // Personal Information Section
     {
-      id: 'sample-text-1',
+      id: 'personal-name',
       type: 'textInput',
       category: 'Core Input',
       name: 'Full Name',
       label: 'Full Name',
-      placeholder: 'Enter your full name',
+      placeholder: 'Enter your complete legal name',
       required: true,
-      description: 'Please enter your complete name',
-      sectionId: 'default',
+      description: 'Required for identification purposes',
+      sectionId: 'personal-info',
       order: 1,
       maxLength: 100
     },
     {
-      id: 'sample-email-1',
+      id: 'personal-email',
       type: 'emailInput',
       category: 'Core Input',
       name: 'Email Address',
       label: 'Email Address',
-      placeholder: 'Enter your email address',
+      placeholder: 'your.email@example.com',
       required: true,
-      description: 'We will use this to contact you',
-      sectionId: 'default',
+      description: 'Primary contact email - required for account creation',
+      sectionId: 'personal-info',
       order: 2
     },
     {
-      id: 'sample-phone-1',
+      id: 'personal-phone',
       type: 'phoneInput',
       category: 'Core Input',
       name: 'Phone Number',
       label: 'Phone Number',
       placeholder: '(555) 123-4567',
       required: false,
-      description: 'Optional contact number',
-      sectionId: 'default',
+      description: 'Optional backup contact method',
+      sectionId: 'personal-info',
       order: 3
     },
     {
-      id: 'sample-dropdown-1',
-      type: 'dropdown',
-      category: 'Selection',
-      name: 'Country',
-      label: 'Country',
+      id: 'personal-dob',
+      type: 'datePicker',
+      category: 'Date & Time',
+      name: 'Date of Birth',
+      label: 'Date of Birth',
       required: true,
-      options: 'United States,Canada,United Kingdom,Australia,Germany,France,Japan',
-      description: 'Select your country',
-      sectionId: 'default',
+      format: 'YYYY-MM-DD',
+      description: 'Required for age verification',
+      sectionId: 'personal-info',
       order: 4
     },
     {
-      id: 'sample-radio-1',
+      id: 'personal-gender',
       type: 'radioGroup',
       category: 'Selection',
       name: 'Gender',
       label: 'Gender',
       required: false,
-      options: 'Male,Female,Other,Prefer not to say',
+      options: 'Male,Female,Non-binary,Prefer not to say',
       layout: 'horizontal',
       description: 'Optional demographic information',
-      sectionId: 'default',
+      sectionId: 'personal-info',
       order: 5
     },
+
+    // Address Information Section
     {
-      id: 'sample-checkbox-1',
+      id: 'address-complete',
+      type: 'completeAddress',
+      category: 'Address',
+      name: 'Home Address',
+      label: 'Home Address',
+      required: true,
+      includeAddressLine2: true,
+      defaultCountry: 'US',
+      description: 'Complete mailing address required for shipping',
+      sectionId: 'address-info',
+      order: 1
+    },
+
+    // Professional Information Section
+    {
+      id: 'prof-company',
+      type: 'textInput',
+      category: 'Core Input',
+      name: 'Company Name',
+      label: 'Company/Organization',
+      placeholder: 'Enter your company name',
+      required: false,
+      description: 'Current employer or organization',
+      sectionId: 'professional-info',
+      order: 1,
+      maxLength: 150
+    },
+    {
+      id: 'prof-title',
+      type: 'textInput',
+      category: 'Core Input',
+      name: 'Job Title',
+      label: 'Job Title',
+      placeholder: 'e.g., Software Engineer, Manager',
+      required: false,
+      description: 'Your current position or role',
+      sectionId: 'professional-info',
+      order: 2,
+      maxLength: 100
+    },
+    {
+      id: 'prof-experience',
+      type: 'dropdown',
+      category: 'Selection',
+      name: 'Experience Level',
+      label: 'Years of Experience',
+      required: true,
+      options: 'Less than 1 year,1-2 years,3-5 years,6-10 years,11-15 years,More than 15 years',
+      description: 'Total years of professional experience',
+      sectionId: 'professional-info',
+      order: 3
+    },
+    {
+      id: 'prof-skills',
       type: 'checkboxGroup',
       category: 'Selection',
-      name: 'Interests',
-      label: 'Areas of Interest',
+      name: 'Technical Skills',
+      label: 'Technical Skills',
       required: false,
-      options: 'Technology,Sports,Music,Travel,Reading,Cooking,Art,Gaming',
+      options: 'JavaScript,Python,Java,C++,React,Angular,Vue.js,Node.js,SQL,MongoDB,AWS,Docker',
       layout: 'vertical',
-      description: 'Select all that apply',
-      sectionId: 'default',
-      order: 6
+      description: 'Select all technologies you are proficient in',
+      sectionId: 'professional-info',
+      order: 4
     },
     {
-      id: 'sample-textarea-1',
-      type: 'textarea',
+      id: 'prof-salary',
+      type: 'numberInput',
       category: 'Core Input',
-      name: 'Comments',
-      label: 'Additional Comments',
-      placeholder: 'Please share any additional information...',
+      name: 'Expected Salary',
+      label: 'Expected Annual Salary (USD)',
       required: false,
-      rows: 4,
-      maxLength: 500,
-      description: 'Optional feedback or comments',
-      sectionId: 'default',
-      order: 7
+      min: 30000,
+      max: 500000,
+      step: 1000,
+      description: 'Optional salary expectation',
+      sectionId: 'professional-info',
+      order: 5
+    },
+
+    // Preferences Section
+    {
+      id: 'pref-remote',
+      type: 'toggleSwitch',
+      category: 'Selection',
+      name: 'Remote Work',
+      label: 'Open to Remote Work',
+      required: false,
+      onLabel: 'Yes',
+      offLabel: 'No',
+      defaultValue: false,
+      description: 'Willing to work remotely',
+      sectionId: 'preferences',
+      order: 1
     },
     {
-      id: 'sample-date-1',
-      type: 'datePicker',
-      category: 'Date & Time',
-      name: 'Birth Date',
-      label: 'Date of Birth',
+      id: 'pref-travel',
+      type: 'slider',
+      category: 'Selection',
+      name: 'Travel Willingness',
+      label: 'Willingness to Travel (%)',
       required: false,
-      format: 'YYYY-MM-DD',
-      description: 'Optional birth date',
-      sectionId: 'default',
-      order: 8
+      min: 0,
+      max: 100,
+      step: 5,
+      defaultValue: 25,
+      description: 'Percentage of time willing to travel for work',
+      sectionId: 'preferences',
+      order: 2
     },
     {
-      id: 'sample-rating-1',
+      id: 'pref-rating',
       type: 'ratingScale',
       category: 'Selection',
-      name: 'Satisfaction',
-      label: 'Overall Satisfaction',
-      required: false,
+      name: 'Interest Level',
+      label: 'Interest in this Position',
+      required: true,
       scaleType: 'stars',
       maxValue: 5,
-      description: 'Rate your experience',
-      sectionId: 'default',
-      order: 9
+      description: 'Rate your interest level (required)',
+      sectionId: 'preferences',
+      order: 3
     },
     {
-      id: 'sample-file-1',
+      id: 'pref-start',
+      type: 'dateRangePicker',
+      category: 'Date & Time',
+      name: 'Availability',
+      label: 'Available Start Date Range',
+      required: false,
+      format: 'YYYY-MM-DD',
+      description: 'When you could potentially start',
+      sectionId: 'preferences',
+      order: 4
+    },
+
+    // Additional Information Section
+    {
+      id: 'additional-resume',
       type: 'fileUpload',
       category: 'File & Media',
-      name: 'Resume',
+      name: 'Resume Upload',
       label: 'Upload Resume',
-      required: false,
+      required: true,
       accept: '.pdf,.doc,.docx',
       multiple: false,
       maxSize: 10,
-      description: 'Upload your resume (PDF or Word format)',
-      sectionId: 'default',
-      order: 10
+      description: 'Required: Upload your current resume (PDF or Word)',
+      sectionId: 'additional-info',
+      order: 1
+    },
+    {
+      id: 'additional-portfolio',
+      type: 'urlInput',
+      category: 'Core Input',
+      name: 'Portfolio URL',
+      label: 'Portfolio/LinkedIn URL',
+      placeholder: 'https://www.linkedin.com/in/yourname',
+      required: false,
+      description: 'Link to your professional portfolio or LinkedIn profile',
+      sectionId: 'additional-info',
+      order: 2
+    },
+    {
+      id: 'additional-cover',
+      type: 'textarea',
+      category: 'Core Input',
+      name: 'Cover Letter',
+      label: 'Cover Letter / Additional Information',
+      placeholder: 'Tell us why you are interested in this position...',
+      required: false,
+      rows: 6,
+      maxLength: 1000,
+      description: 'Optional cover letter or additional information',
+      sectionId: 'additional-info',
+      order: 3
+    },
+    {
+      id: 'additional-terms',
+      type: 'termsConditions',
+      category: 'Validation & Security',
+      name: 'Terms Agreement',
+      label: 'Terms and Conditions',
+      required: true,
+      text: 'I agree to the terms and conditions and privacy policy',
+      linkText: 'View Terms',
+      linkUrl: '/terms',
+      description: 'Required: Must agree to terms to proceed',
+      sectionId: 'additional-info',
+      order: 4
     }
   ];
 
@@ -252,14 +386,15 @@ export const generateExcelTemplate = () => {
   // Set column widths for better readability
   const columnWidths = designHeaders.map(header => {
     switch (header) {
-      case 'id': return { wch: 15 };
-      case 'type': return { wch: 18 };
+      case 'id': return { wch: 18 };
+      case 'type': return { wch: 20 };
       case 'category': return { wch: 15 };
-      case 'name': return { wch: 20 };
-      case 'label': return { wch: 20 };
-      case 'placeholder': return { wch: 25 };
-      case 'options': return { wch: 40 };
-      case 'description': return { wch: 30 };
+      case 'name': return { wch: 25 };
+      case 'label': return { wch: 25 };
+      case 'placeholder': return { wch: 35 };
+      case 'options': return { wch: 50 };
+      case 'description': return { wch: 40 };
+      case 'sectionId': return { wch: 18 };
       default: return { wch: 12 };
     }
   });

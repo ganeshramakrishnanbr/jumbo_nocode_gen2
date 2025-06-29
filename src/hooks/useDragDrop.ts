@@ -8,12 +8,12 @@ import {
   reorderControls 
 } from '../lib/db';
 
-export const useDragDrop = (questionnaireId: string = 'default-questionnaire', isDbInitialized: boolean = false) => {
+export const useDragDrop = (questionnaireId: string = 'default-questionnaire', isDbInitialized: boolean = false, refreshKey: number = 0) => {
   const [droppedControls, setDroppedControls] = useState<DroppedControl[]>([]);
   const [selectedControl, setSelectedControl] = useState<DroppedControl | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Load controls from database only when database is initialized
+  // Load controls from database when database is initialized or refresh key changes
   useEffect(() => {
     const loadControls = async () => {
       if (!isDbInitialized) {
@@ -33,6 +33,18 @@ export const useDragDrop = (questionnaireId: string = 'default-questionnaire', i
     };
 
     loadControls();
+  }, [questionnaireId, isDbInitialized, refreshKey]); // Add refreshKey as dependency
+
+  // Function to manually refresh controls
+  const refreshControls = useCallback(async () => {
+    if (!isDbInitialized) return;
+
+    try {
+      const controls = await getControls(questionnaireId);
+      setDroppedControls(controls);
+    } catch (error) {
+      console.error('Failed to refresh controls:', error);
+    }
   }, [questionnaireId, isDbInitialized]);
 
   const addControl = useCallback(async (controlType: ControlType, x: number, y: number, sectionId: string = 'default') => {
@@ -203,6 +215,7 @@ export const useDragDrop = (questionnaireId: string = 'default-questionnaire', i
     moveControl,
     reorderControl,
     selectControl,
-    clearSelection
+    clearSelection,
+    refreshControls
   };
 };
