@@ -229,7 +229,9 @@ export const getDefaultCustomization = (template: PDFTemplate) => ({
   template: template.id,
   header: {
     showLogo: false,
+    logoUrl: '',
     logoPosition: 'left' as const,
+    logoSize: 'medium' as const,
     title: 'Form Survey',
     titleAlignment: 'center' as const,
     customText: '',
@@ -244,6 +246,7 @@ export const getDefaultCustomization = (template: PDFTemplate) => ({
     showPageNumbers: true,
     pageNumberFormat: 'simple' as const,
     customText: '',
+    customNote: '',
     backgroundColor: template.colors.background,
     textColor: template.colors.text
   },
@@ -254,11 +257,13 @@ export const getDefaultCustomization = (template: PDFTemplate) => ({
     questionSpacing: 15,
     sectionSpacing: 25,
     showRequiredIndicators: true,
+    showFilledValues: true,
     colorScheme: 'default'
   },
   page: {
     size: 'A4' as const,
     orientation: 'portrait' as const,
+    sectionPageBreaks: false,
     margins: template.margins
   }
 });

@@ -185,7 +185,9 @@ export interface PDFCustomization {
   template: string;
   header: {
     showLogo: boolean;
+    logoUrl: string;
     logoPosition: 'left' | 'center' | 'right';
+    logoSize: 'small' | 'medium' | 'large';
     title: string;
     titleAlignment: 'left' | 'center' | 'right';
     customText: string;
@@ -200,6 +202,7 @@ export interface PDFCustomization {
     showPageNumbers: boolean;
     pageNumberFormat: 'simple' | 'total' | 'custom';
     customText: string;
+    customNote: string;
     backgroundColor: string;
     textColor: string;
   };
@@ -210,11 +213,13 @@ export interface PDFCustomization {
     questionSpacing: number;
     sectionSpacing: number;
     showRequiredIndicators: boolean;
+    showFilledValues: boolean;
     colorScheme: string;
   };
   page: {
     size: 'A4' | 'Letter' | 'Legal' | 'A3';
     orientation: 'portrait' | 'landscape';
+    sectionPageBreaks: boolean;
     margins: {
       top: number;
       bottom: number;

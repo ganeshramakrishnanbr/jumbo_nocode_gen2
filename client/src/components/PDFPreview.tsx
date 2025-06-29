@@ -2,23 +2,29 @@ import React, { useState, useEffect, useRef } from 'react';
 import { 
   FileText, Settings, Download, ZoomIn, ZoomOut, RotateCcw, 
   Palette, Layout, Eye, Copy, Save, RefreshCw, Maximize2,
-  ChevronDown, ChevronRight, Image, Type, AlignCenter
+  ChevronDown, ChevronRight, Image, Type, AlignCenter, Upload,
+  FileImage, CheckSquare, Shuffle
 } from 'lucide-react';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 import { DroppedControl, Section, CustomerTier, PDFCustomization, PDFExportSettings } from '../types';
 import { PDF_TEMPLATES, getAvailableTemplates, getDefaultCustomization } from '../data/pdfTemplates';
+import { useFormValues } from '../hooks/useFormValues';
 
 interface PDFPreviewProps {
   droppedControls: DroppedControl[];
   sections: Section[];
   currentTier: CustomerTier;
+  formValues?: { [controlId: string]: any };
+  onFormValueChange?: (controlId: string, value: any) => void;
 }
 
 export const PDFPreview: React.FC<PDFPreviewProps> = ({
   droppedControls,
   sections,
-  currentTier
+  currentTier,
+  formValues = {},
+  onFormValueChange
 }) => {
   const [availableTemplates] = useState(() => getAvailableTemplates(currentTier));
   const [selectedTemplate, setSelectedTemplate] = useState(availableTemplates[0]);
@@ -31,7 +37,12 @@ export const PDFPreview: React.FC<PDFPreviewProps> = ({
   const [activePanel, setActivePanel] = useState<'header' | 'footer' | 'content' | 'page'>('content');
   const [isGenerating, setIsGenerating] = useState(false);
   
+  // Local form values management
+  const { formValues: localFormValues, generateSampleData, updateFormValue } = useFormValues();
+  const effectiveFormValues = { ...localFormValues, ...formValues };
+  
   const previewRef = useRef<HTMLDivElement>(null);
+  const logoInputRef = useRef<HTMLInputElement>(null);
 
   // Update customization when template changes
   useEffect(() => {
@@ -68,18 +79,27 @@ export const PDFPreview: React.FC<PDFPreviewProps> = ({
 
   const resetZoom = () => setZoom(100);
 
+  const handleLogoUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const logoUrl = e.target?.result as string;
+        updateCustomization('header', 'logoUrl', logoUrl);
+        updateCustomization('header', 'showLogo', true);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleGenerateSampleData = () => {
+    generateSampleData(droppedControls);
+  };
+
   const generatePDF = async () => {
     setIsGenerating(true);
     try {
       if (!previewRef.current) return;
-
-      // Capture the preview content as canvas
-      const canvas = await html2canvas(previewRef.current, {
-        scale: 2,
-        useCORS: true,
-        allowTaint: true,
-        backgroundColor: '#ffffff'
-      });
 
       // Create PDF
       const pdf = new jsPDF({
@@ -88,11 +108,24 @@ export const PDFPreview: React.FC<PDFPreviewProps> = ({
         format: customization.page.size.toLowerCase() as any
       });
 
-      const imgData = canvas.toDataURL('image/png');
-      const imgWidth = pdf.internal.pageSize.getWidth();
-      const imgHeight = (canvas.height * imgWidth) / canvas.width;
-      
-      pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
+      if (customization.page.sectionPageBreaks && sections.length > 0) {
+        // Generate PDF with page breaks for sections
+        await generatePDFWithPageBreaks(pdf);
+      } else {
+        // Generate single-page PDF
+        const canvas = await html2canvas(previewRef.current, {
+          scale: 2,
+          useCORS: true,
+          allowTaint: true,
+          backgroundColor: '#ffffff'
+        });
+
+        const imgData = canvas.toDataURL('image/png');
+        const imgWidth = pdf.internal.pageSize.getWidth();
+        const imgHeight = (canvas.height * imgWidth) / canvas.width;
+        
+        pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
+      }
       
       // Add metadata
       pdf.setProperties({
@@ -109,6 +142,55 @@ export const PDFPreview: React.FC<PDFPreviewProps> = ({
       console.error('PDF generation failed:', error);
     } finally {
       setIsGenerating(false);
+    }
+  };
+
+  const generatePDFWithPageBreaks = async (pdf: jsPDF) => {
+    // Implementation for section-based page breaks
+    // This is a simplified version - in production, you'd want more sophisticated layout
+    
+    for (let i = 0; i < sections.length; i++) {
+      if (i > 0) {
+        pdf.addPage();
+      }
+      
+      // Add header to each page
+      if (customization.header.showLogo && customization.header.logoUrl) {
+        // Add logo (simplified)
+        pdf.setFontSize(16);
+        pdf.text('Logo', 20, 20);
+      }
+      
+      if (customization.header.title) {
+        pdf.setFontSize(18);
+        pdf.text(customization.header.title, 20, customization.header.showLogo ? 35 : 20);
+      }
+      
+      // Add section content
+      const section = sections[i];
+      const sectionControls = droppedControls.filter(control => control.sectionId === section.id);
+      
+      pdf.setFontSize(14);
+      pdf.text(section.name, 20, 50);
+      
+      let yPosition = 65;
+      sectionControls.forEach(control => {
+        const value = effectiveFormValues[control.id] || '';
+        pdf.setFontSize(12);
+        pdf.text(`${control.properties.label || control.name}:`, 20, yPosition);
+        pdf.text(String(value), 20, yPosition + 5);
+        yPosition += 15;
+      });
+      
+      // Add footer
+      if (customization.footer.showPageNumbers) {
+        pdf.setFontSize(10);
+        pdf.text(`Page ${i + 1} of ${sections.length}`, 20, pdf.internal.pageSize.getHeight() - 20);
+      }
+      
+      if (customization.footer.customNote) {
+        pdf.text(customization.footer.customNote, 20, pdf.internal.pageSize.getHeight() - 10);
+      }
     }
   };
 
