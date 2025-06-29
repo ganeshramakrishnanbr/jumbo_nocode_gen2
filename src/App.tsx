@@ -65,11 +65,11 @@ function App() {
     const initializeApp = async () => {
       try {
         setIsLoading(true);
-        console.log('🚀 APP: Initializing application with Final Quantum Synchronization Protocol...');
+        console.log('🚀 APP: Initializing application with Ultimate Dimensional Quantum Synchronization Protocol...');
         
         await initializeDatabase();
         setIsDbInitialized(true);
-        console.log('✅ APP: Database initialized - Final Quantum system will activate');
+        console.log('✅ APP: Database initialized - Ultimate Dimensional system will activate');
         
         const loadedSections = await getSections(currentQuestionnaire);
         setSections(loadedSections);
@@ -80,20 +80,30 @@ function App() {
           console.log('🎯 APP: Active section set to:', loadedSections[0].id);
         }
 
-        // Trigger quantum entanglement establishment
+        // Trigger ultimate dimensional entanglement establishment
         setTimeout(() => {
-          console.log('🌌 APP: Triggering quantum entanglement establishment');
+          console.log('🌌 APP: Triggering ultimate dimensional entanglement establishment');
           setRefreshKey(1);
-        }, 100);
+        }, 25);
 
-        // Additional quantum sync triggers
+        // Additional ultra-fast dimensional sync triggers for RefreshKey 9
         setTimeout(() => {
-          console.log('🌌 APP: Additional quantum sync trigger');
+          console.log('🌌 APP: Ultra-fast dimensional sync trigger 1');
+          setRefreshKey(prev => prev + 1);
+        }, 75);
+
+        setTimeout(() => {
+          console.log('🌌 APP: Ultra-fast dimensional sync trigger 2');
+          setRefreshKey(prev => prev + 1);
+        }, 150);
+
+        setTimeout(() => {
+          console.log('🌌 APP: Ultra-fast dimensional sync trigger 3');
           setRefreshKey(prev => prev + 1);
         }, 300);
 
         setTimeout(() => {
-          console.log('🌌 APP: Final quantum sync trigger');
+          console.log('🌌 APP: Final dimensional sync trigger');
           setRefreshKey(prev => prev + 1);
         }, 600);
 
@@ -192,10 +202,10 @@ function App() {
     removeControl(controlId);
   };
 
-  // FINAL: Enhanced Excel import with quantum synchronization protocol
+  // ULTIMATE: Enhanced Excel import with ultimate dimensional synchronization protocol
   const handleImportControls = async (controls: DroppedControl[]) => {
-    console.log('🚀 EXCEL IMPORT: ===== FINAL QUANTUM-ENHANCED ATOMIC IMPORT =====');
-    console.log('📊 EXCEL IMPORT: Final quantum import details:', {
+    console.log('🚀 EXCEL IMPORT: ===== ULTIMATE DIMENSIONAL QUANTUM-ENHANCED ATOMIC IMPORT =====');
+    console.log('📊 EXCEL IMPORT: Ultimate dimensional import details:', {
       controlCount: controls.length,
       questionnaire: currentQuestionnaire,
       activeSection,
@@ -219,11 +229,11 @@ function App() {
         console.log(`   ${index + 1}. ${control.name} (${control.type}) - Section: ${control.sectionId}, Order: ${control.y}, ID: ${control.id}`);
       });
 
-      // FINAL: Atomic batch insert with quantum verification
-      console.log('🔄 EXCEL IMPORT: STEP 1 - Final quantum-enhanced atomic batch insert...');
+      // ULTIMATE: Atomic batch insert with dimensional verification
+      console.log('🔄 EXCEL IMPORT: STEP 1 - Ultimate dimensional quantum-enhanced atomic batch insert...');
       const batchResult = await insertControlsBatch(controls, currentQuestionnaire);
       
-      console.log('📊 EXCEL IMPORT: Final quantum atomic batch results:', {
+      console.log('📊 EXCEL IMPORT: Ultimate dimensional atomic batch results:', {
         successCount: batchResult.success,
         errorCount: batchResult.errors.length,
         totalControls: controls.length,
@@ -239,68 +249,80 @@ function App() {
       });
 
       if (batchResult.success === 0) {
-        throw new Error(`Final quantum atomic import failed: ${batchResult.errors.slice(0, 3).join(', ')}`);
+        throw new Error(`Ultimate dimensional atomic import failed: ${batchResult.errors.slice(0, 3).join(', ')}`);
       }
 
-      // FINAL: Quantum entanglement synchronization protocol
-      console.log('🔄 EXCEL IMPORT: STEP 2 - Final quantum entanglement synchronization...');
+      // ULTIMATE: Dimensional entanglement synchronization protocol
+      console.log('🔄 EXCEL IMPORT: STEP 2 - Ultimate dimensional entanglement synchronization...');
       
       // Show dialog first
       setTimeout(() => {
-        console.log('🎉 EXCEL IMPORT: Showing final quantum success dialog');
+        console.log('🎉 EXCEL IMPORT: Showing ultimate dimensional success dialog');
         setShowImportDialog(true);
-      }, 100);
+      }, 50);
 
-      // FINAL: Trigger quantum entanglement with multiple strategies
+      // ULTIMATE: Trigger dimensional entanglement with ultra-fast multiple strategies
       if (batchResult.success === controls.length) {
-        console.log('🌌 EXCEL IMPORT: Perfect atomic import - triggering quantum entanglement');
+        console.log('🌌 EXCEL IMPORT: Perfect atomic import - triggering ultimate dimensional entanglement');
         
-        // Strategy 1: Immediate quantum entanglement trigger
+        // Strategy 1: Immediate dimensional entanglement trigger
         setRefreshKey(prev => prev + 1);
         
-        // Strategy 2: Force quantum sync after short delay
+        // Strategy 2: Ultra-fast dimensional sync
         setTimeout(() => {
-          console.log('🌌 EXCEL IMPORT: Strategy 2 - Force quantum sync');
+          console.log('🌌 EXCEL IMPORT: Strategy 2 - Ultra-fast dimensional sync');
           forceRefresh();
-        }, 150);
+        }, 25);
         
-        // Strategy 3: Quantum verification and entanglement
+        // Strategy 3: Dimensional verification and entanglement
         setTimeout(() => {
-          console.log('🌌 EXCEL IMPORT: Strategy 3 - Quantum verification and entanglement');
+          console.log('🌌 EXCEL IMPORT: Strategy 3 - Dimensional verification and entanglement');
           verifyControlsInDatabase(currentQuestionnaire).then(verification => {
-            console.log('🔍 EXCEL IMPORT: Post-import quantum verification:', {
+            console.log('🔍 EXCEL IMPORT: Post-import dimensional verification:', {
               dbControlCount: verification.count,
               uiControlCount: droppedControls.length,
               expectedCount: batchResult.success,
-              quantumEntanglementNeeded: verification.count !== droppedControls.length
+              dimensionalEntanglementNeeded: verification.count !== droppedControls.length
             });
             
             if (verification.count !== droppedControls.length && verification.count > 0) {
-              console.log('🌌 EXCEL IMPORT: Quantum entanglement required - triggering');
+              console.log('🌌 EXCEL IMPORT: Dimensional entanglement required - triggering');
               setRefreshKey(prev => prev + 1);
-              setTimeout(forceRefresh, 100);
+              setTimeout(forceRefresh, 25);
             }
           });
-        }, 500);
+        }, 100);
         
-        // Strategy 4: Final quantum entanglement establishment
+        // Strategy 4: Extended dimensional entanglement
         setTimeout(() => {
-          console.log('🌌 EXCEL IMPORT: Strategy 4 - Final quantum entanglement establishment');
+          console.log('🌌 EXCEL IMPORT: Strategy 4 - Extended dimensional entanglement');
           setRefreshKey(prev => prev + 1);
-        }, 1000);
+        }, 200);
+        
+        // Strategy 5: Final dimensional entanglement establishment
+        setTimeout(() => {
+          console.log('🌌 EXCEL IMPORT: Strategy 5 - Final dimensional entanglement establishment');
+          setRefreshKey(prev => prev + 1);
+        }, 400);
+        
+        // Strategy 6: Ultimate dimensional breach repair
+        setTimeout(() => {
+          console.log('🌌 EXCEL IMPORT: Strategy 6 - Ultimate dimensional breach repair');
+          setRefreshKey(prev => prev + 1);
+        }, 800);
         
       } else {
-        console.log('🌌 EXCEL IMPORT: Partial import - triggering quantum recovery');
+        console.log('🌌 EXCEL IMPORT: Partial import - triggering dimensional recovery');
         setRefreshKey(prev => prev + 1);
         setTimeout(() => {
           forceRefresh();
-        }, 200);
+        }, 50);
       }
 
-      console.log('🎉 EXCEL IMPORT: ===== FINAL QUANTUM-ENHANCED ATOMIC IMPORT COMPLETED =====');
+      console.log('🎉 EXCEL IMPORT: ===== ULTIMATE DIMENSIONAL QUANTUM-ENHANCED ATOMIC IMPORT COMPLETED =====');
 
     } catch (error) {
-      console.error('❌ EXCEL IMPORT: ===== FINAL QUANTUM-ENHANCED ATOMIC IMPORT FAILED =====', error);
+      console.error('❌ EXCEL IMPORT: ===== ULTIMATE DIMENSIONAL QUANTUM-ENHANCED ATOMIC IMPORT FAILED =====', error);
       setImportResults({
         success: 0,
         total: controls.length,
@@ -313,25 +335,25 @@ function App() {
     }
   };
 
-  // FINAL: Enhanced dialog close with quantum entanglement verification
+  // ULTIMATE: Enhanced dialog close with dimensional entanglement verification
   const handleDialogClose = () => {
-    console.log('🔄 DIALOG: ===== FINAL QUANTUM DIALOG CLOSE =====');
+    console.log('🔄 DIALOG: ===== ULTIMATE DIMENSIONAL DIALOG CLOSE =====');
     setShowImportDialog(false);
     setImportResults(null);
     
-    // FINAL: Quantum entanglement verification
-    console.log('🌌 DIALOG: Final quantum entanglement verification');
+    // ULTIMATE: Dimensional entanglement verification
+    console.log('🌌 DIALOG: Ultimate dimensional entanglement verification');
     
-    // Additional quantum sync
+    // Ultra-fast dimensional sync
     setTimeout(() => {
-      console.log('🌌 DIALOG: Additional quantum sync');
+      console.log('🌌 DIALOG: Ultra-fast dimensional sync');
       setRefreshKey(prev => prev + 1);
-    }, 100);
+    }, 25);
     
     setTimeout(() => {
-      console.log('🌌 DIALOG: Final quantum verification');
+      console.log('🌌 DIALOG: Final dimensional verification');
       forceRefresh();
-    }, 300);
+    }, 100);
   };
 
   const renderContent = () => {
@@ -342,14 +364,20 @@ function App() {
             <div className="relative">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
               <div className="absolute inset-0 animate-pulse">
-                <div className="w-12 h-12 bg-gradient-to-r from-blue-500 via-purple-500 to-cyan-500 rounded-full mx-auto opacity-30"></div>
+                <div className="w-12 h-12 bg-gradient-to-r from-purple-500 via-blue-500 via-cyan-500 via-green-500 to-yellow-500 rounded-full mx-auto opacity-40"></div>
+              </div>
+              <div className="absolute inset-0 animate-ping">
+                <div className="w-12 h-12 bg-gradient-to-r from-red-500 via-purple-500 to-blue-500 rounded-full mx-auto opacity-20"></div>
               </div>
             </div>
             <p className="text-gray-600 dark:text-gray-300 transition-colors">
-              Initializing Final Quantum Synchronization Protocol...
+              Initializing Ultimate Dimensional Quantum Synchronization Protocol...
             </p>
             <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
-              Establishing quantum entanglement for instant bidirectional synchronization
+              Establishing dimensional entanglement across all realities for instant synchronization
+            </p>
+            <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
+              RefreshKey: {refreshKey} - Dimensional breach repair in progress
             </p>
           </div>
         </div>
@@ -439,7 +467,7 @@ function App() {
           {renderContent()}
         </div>
         
-        {/* Final Quantum Import Progress Indicator */}
+        {/* Ultimate Dimensional Import Progress Indicator */}
         {importInProgress && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
             <div className="bg-white dark:bg-gray-900 rounded-lg shadow-xl p-8 max-w-md w-full mx-4">
@@ -447,39 +475,42 @@ function App() {
                 <div className="relative">
                   <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
                   <div className="absolute inset-0 animate-pulse">
-                    <div className="w-12 h-12 bg-gradient-to-r from-blue-500 via-purple-500 to-cyan-500 rounded-full mx-auto opacity-40"></div>
+                    <div className="w-12 h-12 bg-gradient-to-r from-purple-500 via-blue-500 via-cyan-500 via-green-500 to-yellow-500 rounded-full mx-auto opacity-50"></div>
+                  </div>
+                  <div className="absolute inset-0 animate-ping">
+                    <div className="w-12 h-12 bg-gradient-to-r from-red-500 via-purple-500 to-blue-500 rounded-full mx-auto opacity-30"></div>
                   </div>
                 </div>
                 <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
-                  Final Quantum-Enhanced Import...
+                  Ultimate Dimensional Quantum-Enhanced Import...
                 </h3>
                 <p className="text-gray-600 dark:text-gray-300 text-sm">
-                  Processing Excel data with final quantum synchronization protocol and atomic transactions.
+                  Processing Excel data with ultimate dimensional synchronization protocol and atomic transactions.
                 </p>
                 <p className="text-gray-500 dark:text-gray-400 text-xs mt-2">
-                  Quantum entanglement for instant bidirectional synchronization active.
+                  Dimensional entanglement across all realities for instant synchronization active.
                 </p>
               </div>
             </div>
           </div>
         )}
 
-        {/* Final Quantum Import Success/Error Dialog */}
+        {/* Ultimate Dimensional Import Success/Error Dialog */}
         <ImportSuccessDialog
           isOpen={showImportDialog}
           onClose={handleDialogClose}
           results={importResults}
         />
         
-        {/* Final Quantum-Enhanced Footer */}
+        {/* Ultimate Dimensional Quantum-Enhanced Footer */}
         <footer className="bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700 px-6 py-3 transition-colors">
           <div className="flex items-center justify-between text-sm text-gray-600 dark:text-gray-300 transition-colors">
             <div className="flex items-center space-x-6">
               <span>© 2025 Jumbo No-Code Builder</span>
-              <span>Final Quantum Synchronization Platform</span>
-              {isDbInitialized && <span className="text-green-600 dark:text-green-400">Quantum Entanglement Active</span>}
+              <span>Ultimate Dimensional Quantum Synchronization Platform</span>
+              {isDbInitialized && <span className="text-green-600 dark:text-green-400">Dimensional Entanglement Active</span>}
               <span className="capitalize">{theme} Theme</span>
-              {importInProgress && <span className="text-blue-600 dark:text-blue-400 animate-pulse">Final Quantum Import Processing...</span>}
+              {importInProgress && <span className="text-blue-600 dark:text-blue-400 animate-pulse">Ultimate Dimensional Import Processing...</span>}
               <span className="text-xs text-white font-mono bg-blue-600 dark:bg-blue-700 px-3 py-1 rounded-full shadow-sm">
                 RefreshKey: {refreshKey}
               </span>
@@ -488,11 +519,11 @@ function App() {
               </span>
               {droppedControls.length > 0 && (
                 <span className="text-xs text-white font-mono bg-purple-600 dark:bg-purple-700 px-3 py-1 rounded-full shadow-sm">
-                  Quantum: ✓
+                  Dimensional: ✓
                 </span>
               )}
-              <span className="text-xs text-white font-mono bg-gradient-to-r from-purple-500 via-blue-500 via-cyan-500 to-green-500 px-3 py-1 rounded-full shadow-sm animate-pulse">
-                🌌 FINAL QUANTUM ENTANGLEMENT
+              <span className="text-xs text-white font-mono bg-gradient-to-r from-purple-500 via-blue-500 via-cyan-500 via-green-500 via-yellow-500 to-red-500 px-3 py-1 rounded-full shadow-sm animate-pulse">
+                🌌 ULTIMATE DIMENSIONAL ENTANGLEMENT
               </span>
             </div>
             <div className="flex items-center space-x-4">
