@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
-import { CustomerTier, ControlType, Section } from './types';
+import { CustomerTier, ControlType, Section, DroppedControl } from './types';
 import { Header } from './components/Header';
 import { Dashboard } from './components/Dashboard';
 import { ControlLibrary } from './components/ControlLibrary';
@@ -17,7 +17,8 @@ import {
   getSections, 
   insertSection, 
   updateSection as updateSectionDB, 
-  deleteSection as deleteSectionDB 
+  deleteSection as deleteSectionDB,
+  insertControl
 } from './lib/db';
 
 function App() {
@@ -171,6 +172,20 @@ function App() {
     removeControl(controlId);
   };
 
+  const handleImportControls = async (controls: DroppedControl[]) => {
+    try {
+      // Insert all imported controls into the database
+      for (const control of controls) {
+        await insertControl(control, currentQuestionnaire);
+      }
+      
+      // Refresh the controls list
+      window.location.reload(); // Simple refresh to reload all data
+    } catch (error) {
+      console.error('Failed to import controls:', error);
+    }
+  };
+
   const renderContent = () => {
     if (isLoading || !isDbInitialized) {
       return (
@@ -259,6 +274,7 @@ function App() {
           onTierChange={setCurrentTier}
           activeTab={activeTab}
           onTabChange={setActiveTab}
+          onImportControls={handleImportControls}
         />
         
         <div className="flex-1 flex overflow-hidden">
