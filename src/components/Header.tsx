@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { CustomerTier } from '../types';
 import { TIER_CONFIGS } from '../data/tiers';
-import { Settings, Download, Upload, Save, Eye, Code, BarChart3, FileSpreadsheet } from 'lucide-react';
+import { Settings, Download, Upload, Save, Eye, Code, BarChart3, FileSpreadsheet, Zap } from 'lucide-react';
 import { ThemeToggle } from './ThemeToggle';
 import { ExcelImportModal } from './ExcelImportModal';
+import { DirectImportModal } from './DirectImportModal';
 import { generateExcelTemplate } from '../utils/excelTemplate';
 import { DroppedControl } from '../types';
 
@@ -13,6 +14,7 @@ interface HeaderProps {
   activeTab: 'dashboard' | 'design' | 'preview' | 'json';
   onTabChange: (tab: 'dashboard' | 'design' | 'preview' | 'json') => void;
   onImportControls?: (controls: DroppedControl[]) => void;
+  onDirectImport?: (controls: DroppedControl[]) => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -20,9 +22,11 @@ export const Header: React.FC<HeaderProps> = ({
   onTierChange,
   activeTab,
   onTabChange,
-  onImportControls
+  onImportControls,
+  onDirectImport
 }) => {
   const [showImportModal, setShowImportModal] = useState(false);
+  const [showDirectImportModal, setShowDirectImportModal] = useState(false);
   const tierConfig = TIER_CONFIGS[currentTier];
   
   // Show controls only for design, preview, and JSON tabs
@@ -37,6 +41,13 @@ export const Header: React.FC<HeaderProps> = ({
       onImportControls(controls);
     }
     setShowImportModal(false);
+  };
+
+  const handleDirectImport = (controls: DroppedControl[]) => {
+    if (onDirectImport) {
+      onDirectImport(controls);
+    }
+    setShowDirectImportModal(false);
   };
 
   return (
@@ -125,9 +136,16 @@ export const Header: React.FC<HeaderProps> = ({
                       <FileSpreadsheet className="w-5 h-5" />
                     </button>
                     <button 
+                      onClick={() => setShowDirectImportModal(true)}
+                      className="p-2 text-green-600 dark:text-green-400 hover:text-green-700 dark:hover:text-green-300 hover:bg-green-50 dark:hover:bg-green-900/20 rounded-lg transition-colors"
+                      title="Direct UI Import (Recommended)"
+                    >
+                      <Zap className="w-5 h-5" />
+                    </button>
+                    <button 
                       onClick={() => setShowImportModal(true)}
                       className="p-2 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
-                      title="Import Excel Template"
+                      title="Database Import (Legacy)"
                     >
                       <Upload className="w-5 h-5" />
                     </button>
@@ -167,11 +185,18 @@ export const Header: React.FC<HeaderProps> = ({
         </div>
       </header>
 
-      {/* Excel Import Modal */}
+      {/* Excel Import Modal (Legacy) */}
       <ExcelImportModal
         isOpen={showImportModal}
         onClose={() => setShowImportModal(false)}
         onImport={handleImportControls}
+      />
+
+      {/* Direct Import Modal (New) */}
+      <DirectImportModal
+        isOpen={showDirectImportModal}
+        onClose={() => setShowDirectImportModal(false)}
+        onDirectImport={handleDirectImport}
       />
     </>
   );

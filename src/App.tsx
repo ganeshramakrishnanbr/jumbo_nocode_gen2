@@ -49,6 +49,7 @@ function App() {
     droppedControls,
     selectedControl,
     isLoading: controlsLoading,
+    directImportMode,
     addControl,
     updateControl,
     removeControl,
@@ -58,7 +59,8 @@ function App() {
     clearSelection,
     forceRefresh,
     forceReload,
-    nuclearReset
+    nuclearReset,
+    directImportControls
   } = useDragDrop(currentQuestionnaire, isDbInitialized, refreshKey);
 
   // Initialize database and load sections
@@ -102,6 +104,43 @@ function App() {
     setDraggedControl(null);
   };
 
+  const handleDirectImport = (controls: DroppedControl[]) => {
+    console.log('🚀 DIRECT UI: ===== STARTING DIRECT UI IMPORT =====');
+    console.log('📊 DIRECT UI: Import details:', {
+      controlCount: controls.length,
+      directUIMode: true,
+      timestamp: new Date().toISOString()
+    });
+
+    try {
+      // Use the hook's direct import function
+      const result = directImportControls(controls);
+      
+      // Reset refresh key to 0 to indicate successful direct import
+      setRefreshKey(0);
+      
+      console.log('✅ DIRECT UI: Controls imported directly to UI state');
+      console.log('🎉 DIRECT UI: ===== DIRECT UI IMPORT COMPLETED SUCCESSFULLY =====');
+      
+      // Show success message
+      setImportResults({
+        success: result.success,
+        total: result.total,
+        errors: result.errors
+      });
+      setShowImportDialog(true);
+      
+    } catch (error) {
+      console.error('❌ DIRECT UI: Direct import failed:', error);
+      setImportResults({
+        success: 0,
+        total: controls.length,
+        errors: [error instanceof Error ? error.message : 'Unknown error occurred']
+      });
+      setShowImportDialog(true);
+    }
+  };
+
   const handleMoveControl = (id: string, direction: 'up' | 'down') => {
     moveControl(id, direction);
   };
@@ -112,6 +151,14 @@ function App() {
 
   const handleReorderControl = (dragIndex: number, hoverIndex: number) => {
     reorderControl(dragIndex, hoverIndex);
+  };
+
+  const handleControlSelect = (control: DroppedControl) => {
+    selectControl(control);
+  };
+
+  const handleControlUpdate = (id: string, updates: Partial<DroppedControl>) => {
+    updateControl(id, updates);
   };
 
   const handleCreateSection = async (sectionData: Omit<Section, 'id' | 'controls' | 'validation'>) => {
@@ -157,6 +204,7 @@ function App() {
     try {
       // Move controls from deleted section to default section
       const controlsToMove = droppedControls.filter(control => control.sectionId === id);
+      
       for (const control of controlsToMove) {
         await updateControl(control.id, { sectionId: 'default' });
       }
@@ -190,58 +238,8 @@ function App() {
     removeControl(controlId);
   };
 
-  // NUCLEAR OPTION: Complete application state reset and reload
-  const executeNuclearReset = async () => {
-    console.log('💥 NUCLEAR RESET: ===== INITIATING COMPLETE APPLICATION RESET =====');
-    setNuclearResetInProgress(true);
-    
-    try {
-      // Step 1: Clear all React state
-      console.log('🧹 NUCLEAR RESET: Step 1 - Clearing all React state...');
-      setRefreshKey(0);
-      setSections([]);
-      clearSelection();
-      setIsLoading(true);
-      
-      // Step 2: Force hook reset
-      console.log('🔄 NUCLEAR RESET: Step 2 - Forcing hook reset...');
-      await nuclearReset();
-      
-      // Step 3: Wait for state to clear
-      await new Promise(resolve => setTimeout(resolve, 500));
-      
-      // Step 4: Reinitialize everything from scratch
-      console.log('🔄 NUCLEAR RESET: Step 3 - Reinitializing from database...');
-      
-      // Reload sections
-      const freshSections = await getSections(currentQuestionnaire);
-      setSections(freshSections);
-      console.log('📂 NUCLEAR RESET: Reloaded sections:', freshSections.length);
-      
-      // Set active section
-      if (freshSections.length > 0) {
-        setActiveSection(freshSections[0].id);
-      }
-      
-      // Step 5: Force multiple refresh cycles
-      console.log('🔄 NUCLEAR RESET: Step 4 - Multiple refresh cycles...');
-      for (let i = 0; i < 3; i++) {
-        setRefreshKey(prev => prev + 1);
-        await new Promise(resolve => setTimeout(resolve, 200));
-      }
-      
-      console.log('✅ NUCLEAR RESET: ===== COMPLETE APPLICATION RESET SUCCESSFUL =====');
-      
-    } catch (error) {
-      console.error('❌ NUCLEAR RESET: Failed:', error);
-    } finally {
-      setNuclearResetInProgress(false);
-      setIsLoading(false);
-    }
-  };
-
   const handleImportControls = async (controls: DroppedControl[]) => {
-    console.log('🚀 EXCEL IMPORT: ===== STARTING NUCLEAR IMPORT PROCESS =====');
+    console.log('🚀 EXCEL IMPORT: ===== STARTING DATABASE IMPORT PROCESS =====');
     console.log('📊 EXCEL IMPORT: Import details:', {
       controlCount: controls.length,
       questionnaire: currentQuestionnaire,
@@ -388,39 +386,91 @@ function App() {
     }
   };
 
+  // NUCLEAR OPTION: Complete application state reset and reload
+  const executeNuclearReset = async () => {
+    console.log('💥 NUCLEAR RESET: ===== INITIATING COMPLETE APPLICATION RESET =====');
+    setNuclearResetInProgress(true);
+    
+    try {
+      // Step 1: Clear all React state
+      console.log('🧹 NUCLEAR RESET: Step 1 - Clearing all React state...');
+      setRefreshKey(0);
+      setSections([]);
+      clearSelection();
+      setIsLoading(true);
+      
+      // Step 2: Force hook reset
+      console.log('🔄 NUCLEAR RESET: Step 2 - Forcing hook reset...');
+      await nuclearReset();
+      
+      // Step 3: Wait for state to clear
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      // Step 4: Reinitialize everything from scratch
+      console.log('🔄 NUCLEAR RESET: Step 3 - Reinitializing from database...');
+      
+      // Reload sections
+      const freshSections = await getSections(currentQuestionnaire);
+      setSections(freshSections);
+      console.log('📂 NUCLEAR RESET: Reloaded sections:', freshSections.length);
+      
+      // Set active section
+      if (freshSections.length > 0) {
+        setActiveSection(freshSections[0].id);
+      }
+      
+      // Step 5: Force multiple refresh cycles
+      console.log('🔄 NUCLEAR RESET: Step 4 - Multiple refresh cycles...');
+      for (let i = 0; i < 3; i++) {
+        setRefreshKey(prev => prev + 1);
+        await new Promise(resolve => setTimeout(resolve, 200));
+      }
+      
+      console.log('✅ NUCLEAR RESET: ===== COMPLETE APPLICATION RESET SUCCESSFUL =====');
+      
+    } catch (error) {
+      console.error('❌ NUCLEAR RESET: Failed:', error);
+    } finally {
+      setNuclearResetInProgress(false);
+      setIsLoading(false);
+    }
+  };
+
   const handleDialogClose = () => {
-    console.log('🔄 DIALOG: ===== DIALOG CLOSE WITH NUCLEAR VERIFICATION =====');
+    console.log('🔄 DIALOG: ===== DIALOG CLOSE WITH VERIFICATION =====');
     setShowImportDialog(false);
     setImportResults(null);
     
-    // Nuclear verification after dialog close
-    setTimeout(async () => {
-      console.log('💥 DIALOG: Nuclear verification after dialog close');
-      try {
-        // Final verification with nuclear reset if needed
-        const finalControls = await getControls(currentQuestionnaire);
-        console.log('🔍 DIALOG: Final nuclear verification:', {
-          dbControlCount: finalControls.length,
-          uiControlCount: droppedControls.length,
-          timestamp: new Date().toISOString(),
-          refreshKey: refreshKey,
-          syncDifference: finalControls.length - droppedControls.length
-        });
+    if (!directImportMode) {
+      // Nuclear verification after dialog close for database mode
+      setTimeout(async () => {
+        console.log('💥 DIALOG: Nuclear verification after dialog close');
+        try {
+          // Final verification with nuclear reset if needed
+          const finalControls = await getControls(currentQuestionnaire);
+          console.log('🔍 DIALOG: Final nuclear verification:', {
+            dbControlCount: finalControls.length,
+            uiControlCount: droppedControls.length,
+            timestamp: new Date().toISOString(),
+            refreshKey: refreshKey,
+            syncDifference: finalControls.length - droppedControls.length
+          });
 
-        // If still significantly out of sync, execute nuclear reset
-        if (finalControls.length > droppedControls.length + 2) {
-          console.log('💥 DIALOG: Still significantly out of sync - executing nuclear reset');
-          await executeNuclearReset();
-        } else {
-          // Just a regular refresh
-          setRefreshKey(prev => prev + 1);
+          // If still significantly out of sync, execute nuclear reset
+          if (finalControls.length > droppedControls.length + 2) {
+            console.log('💥 DIALOG: Still significantly out of sync - executing nuclear reset');
+            await executeNuclearReset();
+          } else {
+            // Just a regular refresh
+            setRefreshKey(prev => prev + 1);
+          }
+          
+          console.log('✅ DIALOG: ===== NUCLEAR VERIFICATION COMPLETED =====');
+        } catch (error) {
+          console.error('❌ DIALOG: Nuclear verification failed:', error);
         }
-        
-        console.log('✅ DIALOG: ===== NUCLEAR VERIFICATION COMPLETED =====');
-      } catch (error) {
-        console.error('❌ DIALOG: Nuclear verification failed:', error);
-      }
-    }, 200);
+      }, 200);
+    }
   };
 
   const renderContent = () => {
@@ -468,8 +518,8 @@ function App() {
               <DesignCanvas
                 droppedControls={droppedControls.filter(control => control.sectionId === activeSection)}
                 selectedControl={selectedControl}
-                onControlSelect={selectControl}
-                onControlUpdate={updateControl}
+                onControlSelect={handleControlSelect}
+                onControlUpdate={handleControlUpdate}
                 onControlMove={handleMoveControl}
                 onControlRemove={handleRemoveControl}
                 onControlReorder={handleReorderControl}
@@ -480,7 +530,7 @@ function App() {
             </div>
             <PropertiesPanel
               selectedControl={selectedControl}
-              onUpdateControl={updateControl}
+              onUpdateControl={handleControlUpdate}
               sections={sections}
               droppedControls={droppedControls}
             />
@@ -519,6 +569,7 @@ function App() {
           activeTab={activeTab}
           onTabChange={setActiveTab}
           onImportControls={handleImportControls}
+          onDirectImport={handleDirectImport}
         />
         
         <div className="flex-1 flex overflow-hidden">
@@ -532,7 +583,7 @@ function App() {
               <div className="text-center">
                 <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
                 <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
-                  Nuclear Import in Progress...
+                  Database Import in Progress...
                 </h3>
                 <p className="text-gray-600 dark:text-gray-300 text-sm">
                   Processing Excel data with nuclear-level validation and complete state reset.
@@ -574,9 +625,10 @@ function App() {
           isOpen={showImportDialog}
           onClose={handleDialogClose}
           results={importResults}
+          directImportMode={directImportMode}
         />
         
-        {/* Enhanced Footer with Nuclear Status */}
+        {/* Enhanced Footer with Direct UI Status */}
         <footer className="bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700 px-6 py-3 transition-colors">
           <div className="flex items-center justify-between text-sm text-gray-600 dark:text-gray-300 transition-colors">
             <div className="flex items-center space-x-6">
@@ -584,7 +636,13 @@ function App() {
               <span>Professional Form Builder Platform</span>
               {isDbInitialized && <span className="text-green-600 dark:text-green-400">Database Connected</span>}
               <span className="capitalize">{theme} Theme</span>
-              {importInProgress && <span className="text-blue-600 dark:text-blue-400 animate-pulse">Nuclear Import Processing...</span>}
+              {directImportMode && (
+                <span className="text-green-600 dark:text-green-400 animate-pulse flex items-center">
+                  <span className="w-3 h-3 mr-1">⚡</span>
+                  Direct UI Mode
+                </span>
+              )}
+              {importInProgress && <span className="text-blue-600 dark:text-blue-400 animate-pulse">Database Import Processing...</span>}
               {nuclearResetInProgress && <span className="text-red-600 dark:text-red-400 animate-pulse">Nuclear Reset Active</span>}
               <span className="text-xs text-white font-mono bg-blue-600 dark:bg-blue-700 px-3 py-1 rounded-full shadow-sm">
                 RefreshKey: {refreshKey}
@@ -597,6 +655,11 @@ function App() {
                   Loaded: ✓
                 </span>
               )}
+              {directImportMode && (
+                <span className="text-xs text-white font-mono bg-green-600 dark:bg-green-700 px-3 py-1 rounded-full shadow-sm animate-pulse">
+                  Direct: ⚡
+                </span>
+              )}
               {nuclearResetInProgress && (
                 <span className="text-xs text-white font-mono bg-red-600 dark:bg-red-700 px-3 py-1 rounded-full shadow-sm animate-pulse">
                   Nuclear: 💥
@@ -606,7 +669,7 @@ function App() {
             <div className="flex items-center space-x-4">
               <span>Version 1.0.0</span>
               {activeTab !== 'dashboard' && <span>Sections: {sections.length}</span>}
-              {activeTab !== 'dashboard' && <span>DB Controls: {droppedControls.length}</span>}
+              {activeTab !== 'dashboard' && <span>Mode: {directImportMode ? 'Direct UI' : 'Database'}</span>}
               <span className={`px-2 py-1 rounded text-xs font-medium ${
                 currentTier === 'platinum' ? 'bg-purple-100 dark:bg-purple-900 text-purple-700 dark:text-purple-300' :
                 currentTier === 'gold' ? 'bg-amber-100 dark:bg-amber-900 text-amber-700 dark:text-amber-300' :
