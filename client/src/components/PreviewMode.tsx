@@ -592,7 +592,7 @@ export const PreviewMode: React.FC<PreviewModeProps> = ({
 
       case 'rankingControl':
         const items = control.properties.items?.split(',') || ['Item 1', 'Item 2', 'Item 3'];
-        const rankedItems = Array.isArray(value) ? value : items.map((item, index) => ({ item: item.trim(), rank: index + 1 }));
+        const rankedItems = Array.isArray(value) ? value : items.map((item: string, index: number) => ({ item: item.trim(), rank: index + 1 }));
         
         return (
           <div className="space-y-2">
