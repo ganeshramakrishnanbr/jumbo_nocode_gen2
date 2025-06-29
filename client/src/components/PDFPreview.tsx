@@ -538,13 +538,13 @@ export const PDFPreview: React.FC<PDFPreviewProps> = ({
   };
 
   const renderCustomizationPanel = () => (
-    <div className="w-80 bg-gradient-to-b from-white to-gray-50 dark:from-gray-800 dark:to-gray-900 border-r border-gray-200 dark:border-gray-700 flex flex-col transition-all duration-300 shadow-xl">
-      <div className="p-6 border-b border-gray-200 dark:border-gray-700 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20">
-        <h3 className="text-xl font-bold text-gray-900 dark:text-white flex items-center">
-          <Settings className="w-5 h-5 mr-2 text-blue-600 dark:text-blue-400" />
+    <div className="w-full lg:w-80 bg-gradient-to-b from-white to-gray-50 dark:from-gray-800 dark:to-gray-900 border-b lg:border-b-0 lg:border-r border-gray-200 dark:border-gray-700 flex flex-col transition-all duration-300 shadow-xl">
+      <div className="p-4 sm:p-6 border-b border-gray-200 dark:border-gray-700 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20">
+        <h3 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white flex items-center">
+          <Settings className="w-4 h-4 sm:w-5 sm:h-5 mr-2 text-blue-600 dark:text-blue-400" />
           PDF Studio
         </h3>
-        <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">Create professional documents</p>
+        <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mt-1">Create professional documents</p>
       </div>
       
       <div className="flex-1 overflow-auto">
@@ -767,9 +767,13 @@ export const PDFPreview: React.FC<PDFPreviewProps> = ({
   );
 
   return (
-    <div className={`${isFullscreen ? 'fixed inset-0 z-50' : 'flex-1'} bg-white dark:bg-gray-800 flex transition-all duration-300`}>
-      {/* Left Panel - Customization */}
-      {!isFullscreen && showCustomization && renderCustomizationPanel()}
+    <div className={`${isFullscreen ? 'fixed inset-0 z-50' : 'flex-1'} bg-white dark:bg-gray-800 flex flex-col lg:flex-row transition-all duration-300`}>
+      {/* Left Panel - Customization - Hidden on mobile when not in fullscreen */}
+      {!isFullscreen && showCustomization && (
+        <div className="lg:block">
+          {renderCustomizationPanel()}
+        </div>
+      )}
       
       {/* Main Content */}
       <div className="flex-1 flex flex-col">

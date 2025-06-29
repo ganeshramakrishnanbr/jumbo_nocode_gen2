@@ -70,10 +70,10 @@ export const ControlLibrary: React.FC<ControlLibraryProps> = ({ onDragStart }) =
   });
 
   return (
-    <div className="w-80 bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-700 flex flex-col transition-colors">
+    <div className="w-full lg:w-80 bg-white dark:bg-gray-900 border-b lg:border-b-0 lg:border-r border-gray-200 dark:border-gray-700 flex flex-col transition-colors">
       {/* Header */}
-      <div className="p-4 border-b border-gray-200 dark:border-gray-700">
-        <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-3 transition-colors">Control Library</h2>
+      <div className="p-3 sm:p-4 border-b border-gray-200 dark:border-gray-700">
+        <h2 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white mb-3 transition-colors">Control Library</h2>
         
         {/* Search */}
         <div className="relative mb-3">
@@ -113,14 +113,16 @@ export const ControlLibrary: React.FC<ControlLibraryProps> = ({ onDragStart }) =
       </div>
 
       {/* Controls List */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-2">
-        {filteredControls.map(control => (
-          <DraggableControl
-            key={control.id}
-            control={control}
-            onDragStart={onDragStart}
-          />
-        ))}
+      <div className="flex-1 overflow-y-auto p-3 sm:p-4 max-h-64 lg:max-h-none">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-2 sm:gap-3">
+          {filteredControls.map(control => (
+            <DraggableControl
+              key={control.id}
+              control={control}
+              onDragStart={onDragStart}
+            />
+          ))}
+        </div>
         
         {filteredControls.length === 0 && (
           <div className="text-center py-8 text-gray-500 dark:text-gray-400">
