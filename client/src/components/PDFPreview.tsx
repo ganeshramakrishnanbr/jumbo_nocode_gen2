@@ -200,27 +200,84 @@ export const PDFPreview: React.FC<PDFPreviewProps> = ({
             img.src = customization.header.logoUrl;
           });
           
-          // Add logo to PDF with proper format detection
+          // Add logo to PDF with proper format detection and alignment
           const logoHeight = 20;
           const logoWidth = Math.min((img.width * logoHeight) / img.height, 50); // Limit width
           const format = customization.header.logoUrl.toLowerCase().includes('.png') ? 'PNG' : 'JPEG';
-          pdf.addImage(customization.header.logoUrl, format, 15, currentY, logoWidth, logoHeight);
+          
+          // Position logo based on title alignment
+          let logoX = 15; // Default left alignment
+          switch (customization.header.titleAlignment) {
+            case 'center':
+              logoX = (pageWidth - logoWidth) / 2;
+              break;
+            case 'right':
+              logoX = pageWidth - 15 - logoWidth;
+              break;
+            case 'left':
+            default:
+              logoX = 15;
+              break;
+          }
+          
+          pdf.addImage(customization.header.logoUrl, format, logoX, currentY, logoWidth, logoHeight);
           currentY += logoHeight + 8;
         } catch (error) {
           console.warn('Could not load logo for PDF:', error);
         }
       }
 
-      // Add title
+      // Add title with proper alignment
       pdf.setFontSize(18);
       pdf.setFont('helvetica', 'bold');
-      pdf.text(customization.header.title, pageWidth / 2, currentY, { align: 'center' });
+      
+      let titleX = 15; // Default left alignment
+      let titleAlign: 'left' | 'center' | 'right' = 'left';
+      
+      switch (customization.header.titleAlignment) {
+        case 'center':
+          titleX = pageWidth / 2;
+          titleAlign = 'center';
+          break;
+        case 'right':
+          titleX = pageWidth - 15;
+          titleAlign = 'right';
+          break;
+        case 'left':
+        default:
+          titleX = 15;
+          titleAlign = 'left';
+          break;
+      }
+      
+      pdf.text(customization.header.title, titleX, currentY, { align: titleAlign });
       currentY += 10;
 
       if (customization.header.showDate) {
         pdf.setFontSize(10);
         pdf.setFont('helvetica', 'normal');
-        pdf.text(`Generated on ${new Date().toLocaleDateString()}`, pageWidth / 2, currentY, { align: 'center' });
+        
+        // Use the same alignment as the title
+        let dateX = 15;
+        let dateAlign: 'left' | 'center' | 'right' = 'left';
+        
+        switch (customization.header.titleAlignment) {
+          case 'center':
+            dateX = pageWidth / 2;
+            dateAlign = 'center';
+            break;
+          case 'right':
+            dateX = pageWidth - 15;
+            dateAlign = 'right';
+            break;
+          case 'left':
+          default:
+            dateX = 15;
+            dateAlign = 'left';
+            break;
+        }
+        
+        pdf.text(`Generated on ${new Date().toLocaleDateString()}`, dateX, currentY, { align: dateAlign });
         currentY += 8;
       }
       
