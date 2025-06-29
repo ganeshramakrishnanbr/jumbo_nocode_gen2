@@ -103,6 +103,7 @@ Changelog:
 - June 29, 2025. Enhanced Excel import with dynamic section creation
 - June 29, 2025. Preserved original Bolt documentation in docs/ folder and .bolt file
 - June 29, 2025. Added comprehensive PDF Preview functionality with real-time generation and tier-based templates
+- June 29, 2025. Enhanced PDF Preview with form value display, logo upload, custom footer notes, and section page break settings
 ```
 
 ## User Preferences
