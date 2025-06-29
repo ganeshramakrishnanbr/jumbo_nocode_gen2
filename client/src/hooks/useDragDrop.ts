@@ -65,15 +65,29 @@ export const useDragDrop = (questionnaireId: string = 'default-questionnaire', i
     setDirectImportMode(true);
     setIsLoading(false);
 
-    // Generate unique IDs for imported controls
-    const processedControls = controls.map((control, index) => ({
-      ...control,
-      id: `direct-import-${Date.now()}-${index}-${Math.random().toString(36).substring(2, 8)}`,
-      x: 0,
-      y: index,
-      width: 400,
-      height: control.type === 'textarea' ? 100 : 50
-    }));
+    // Group controls by section and assign proper order within each section
+    const controlsBySection = controls.reduce((acc, control) => {
+      const sectionId = control.sectionId || 'default';
+      if (!acc[sectionId]) acc[sectionId] = [];
+      acc[sectionId].push(control);
+      return acc;
+    }, {} as Record<string, DroppedControl[]>);
+
+    // Generate unique IDs for imported controls and preserve original section IDs
+    const processedControls: DroppedControl[] = [];
+    Object.entries(controlsBySection).forEach(([sectionId, sectionControls]) => {
+      sectionControls.forEach((control, index) => {
+        processedControls.push({
+          ...control,
+          id: `direct-import-${Date.now()}-${processedControls.length}-${Math.random().toString(36).substring(2, 8)}`,
+          x: 0,
+          y: index, // Order within section
+          width: 400,
+          height: control.type === 'textarea' ? 100 : 50,
+          sectionId: sectionId
+        });
+      });
+    });
 
     console.log('📝 DIRECT IMPORT: Processed controls for direct UI import:');
     processedControls.forEach((control, index) => {

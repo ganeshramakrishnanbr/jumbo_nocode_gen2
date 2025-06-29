@@ -113,7 +113,44 @@ function App() {
     });
 
     try {
-      // Use the hook's direct import function
+      // STEP 1: Extract unique section IDs from imported controls
+      const sectionIds = controls.map(control => control.sectionId || 'default');
+      const uniqueSectionIds = Array.from(new Set(sectionIds));
+      console.log('📂 DIRECT UI: Creating sections for:', uniqueSectionIds);
+      
+      // STEP 2: Create section objects dynamically
+      const newSections: Section[] = uniqueSectionIds.map((sectionId, index) => {
+        const sectionName = sectionId === 'default' ? 'General' : 
+          sectionId.split('-').map((word: string) => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+        
+        return {
+          id: sectionId,
+          name: sectionName,
+          color: index === 0 ? '#3B82F6' : `hsl(${(index * 60) % 360}, 70%, 50%)`,
+          icon: index === 0 ? 'Layout' : 'Folder',
+          description: `${sectionName} section`,
+          order: index,
+          required: false,
+          controls: [],
+          validation: {
+            isValid: true,
+            requiredFields: 0,
+            completedFields: 0
+          }
+        };
+      });
+      
+      // STEP 3: Update sections state
+      setSections(newSections);
+      console.log('✅ DIRECT UI: Created sections:', newSections.map(s => s.name));
+      
+      // STEP 4: Set active section to the first imported section
+      if (newSections.length > 0) {
+        setActiveSection(newSections[0].id);
+        console.log('🎯 DIRECT UI: Active section set to:', newSections[0].id);
+      }
+      
+      // STEP 5: Use the hook's direct import function
       const result = directImportControls(controls);
       
       // Reset refresh key to 0 to indicate successful direct import
