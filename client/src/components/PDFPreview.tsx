@@ -49,12 +49,16 @@ export const PDFPreview: React.FC<PDFPreviewProps> = ({
 
   const updateCustomization = (section: keyof PDFCustomization, field: string, value: any) => {
     setCustomization(prev => {
-      const updatedSection = { ...prev[section] };
-      (updatedSection as any)[field] = value;
-      return {
-        ...prev,
-        [section]: updatedSection
-      };
+      if (section === 'header') {
+        return { ...prev, header: { ...prev.header, [field]: value } };
+      } else if (section === 'footer') {
+        return { ...prev, footer: { ...prev.footer, [field]: value } };
+      } else if (section === 'content') {
+        return { ...prev, content: { ...prev.content, [field]: value } };
+      } else if (section === 'page') {
+        return { ...prev, page: { ...prev.page, [field]: value } };
+      }
+      return prev;
     });
   };
 

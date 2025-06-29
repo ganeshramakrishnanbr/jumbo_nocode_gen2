@@ -8,6 +8,7 @@ import { ControlLibrary } from './components/ControlLibrary';
 import { DesignCanvas } from './components/DesignCanvas';
 import { PropertiesPanel } from './components/PropertiesPanel';
 import { PreviewMode } from './components/PreviewMode';
+import { PDFPreview } from './components/PDFPreview';
 import { JSONViewer } from './components/JSONViewer';
 import { SectionManager } from './components/SectionManager';
 import { ImportSuccessDialog } from './components/ImportSuccessDialog';
@@ -25,7 +26,7 @@ import {
 
 function App() {
   const [currentTier, setCurrentTier] = useState<CustomerTier>('platinum');
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'design' | 'preview' | 'json'>('dashboard');
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'design' | 'preview' | 'pdf' | 'json'>('dashboard');
   const [draggedControl, setDraggedControl] = useState<ControlType | null>(null);
   const [currentQuestionnaire, setCurrentQuestionnaire] = useState<string>('default-questionnaire');
   const [sections, setSections] = useState<Section[]>([]);
@@ -580,6 +581,15 @@ function App() {
             droppedControls={droppedControls}
             sections={sections}
             onDeleteControl={handleDeleteControl}
+          />
+        );
+      
+      case 'pdf':
+        return (
+          <PDFPreview
+            droppedControls={droppedControls}
+            sections={sections}
+            currentTier={currentTier}
           />
         );
       

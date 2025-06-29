@@ -11,8 +11,8 @@ import { DroppedControl } from '../types';
 interface HeaderProps {
   currentTier: CustomerTier;
   onTierChange: (tier: CustomerTier) => void;
-  activeTab: 'dashboard' | 'design' | 'preview' | 'json';
-  onTabChange: (tab: 'dashboard' | 'design' | 'preview' | 'json') => void;
+  activeTab: 'dashboard' | 'design' | 'preview' | 'pdf' | 'json';
+  onTabChange: (tab: 'dashboard' | 'design' | 'preview' | 'pdf' | 'json') => void;
   onImportControls?: (controls: DroppedControl[]) => void;
   onDirectImport?: (controls: DroppedControl[]) => void;
 }
@@ -104,6 +104,17 @@ export const Header: React.FC<HeaderProps> = ({
               >
                 <Eye className="w-4 h-4 inline mr-2" />
                 Preview
+              </button>
+              <button
+                onClick={() => onTabChange('pdf')}
+                className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                  activeTab === 'pdf'
+                    ? 'bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm'
+                    : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white'
+                }`}
+              >
+                <FileText className="w-4 h-4 inline mr-2" />
+                PDF Preview
               </button>
               <button
                 onClick={() => onTabChange('json')}
