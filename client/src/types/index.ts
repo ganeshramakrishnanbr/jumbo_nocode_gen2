@@ -150,3 +150,89 @@ export interface ThemeConfig {
     accent: string;
   };
 }
+
+// PDF Preview Types
+export interface PDFTemplate {
+  id: string;
+  name: string;
+  description: string;
+  category: 'executive' | 'professional' | 'academic' | 'survey' | 'application' | 'medical' | 'legal' | 'creative';
+  headerHeight: number;
+  footerHeight: number;
+  margins: {
+    top: number;
+    bottom: number;
+    left: number;
+    right: number;
+  };
+  typography: {
+    title: string;
+    heading: string;
+    body: string;
+    caption: string;
+  };
+  colors: {
+    primary: string;
+    secondary: string;
+    text: string;
+    background: string;
+    border: string;
+  };
+  tierRequired: CustomerTier;
+}
+
+export interface PDFCustomization {
+  template: string;
+  header: {
+    showLogo: boolean;
+    logoPosition: 'left' | 'center' | 'right';
+    title: string;
+    titleAlignment: 'left' | 'center' | 'right';
+    customText: string;
+    showDate: boolean;
+    backgroundColor: string;
+    textColor: string;
+  };
+  footer: {
+    showCompanyInfo: boolean;
+    companyName: string;
+    contactInfo: string;
+    showPageNumbers: boolean;
+    pageNumberFormat: 'simple' | 'total' | 'custom';
+    customText: string;
+    backgroundColor: string;
+    textColor: string;
+  };
+  content: {
+    fontFamily: string;
+    fontSize: number;
+    lineHeight: number;
+    questionSpacing: number;
+    sectionSpacing: number;
+    showRequiredIndicators: boolean;
+    colorScheme: string;
+  };
+  page: {
+    size: 'A4' | 'Letter' | 'Legal' | 'A3';
+    orientation: 'portrait' | 'landscape';
+    margins: {
+      top: number;
+      bottom: number;
+      left: number;
+      right: number;
+    };
+  };
+}
+
+export interface PDFExportSettings {
+  format: 'pdf' | 'high-resolution' | 'pdf-a' | 'flattened';
+  quality: 'standard' | 'high' | 'print';
+  includeResponses: boolean;
+  watermark?: string;
+  metadata: {
+    title: string;
+    author: string;
+    subject: string;
+    keywords: string[];
+  };
+}

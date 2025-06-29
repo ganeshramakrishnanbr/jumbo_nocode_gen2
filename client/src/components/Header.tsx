@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { CustomerTier } from '../types';
 import { TIER_CONFIGS } from '../data/tiers';
-import { Settings, Download, Upload, Save, Eye, Code, BarChart3, FileSpreadsheet, Zap } from 'lucide-react';
+import { Settings, Download, Upload, Save, Eye, Code, BarChart3, FileSpreadsheet, Zap, FileText } from 'lucide-react';
 import { ThemeToggle } from './ThemeToggle';
 import { ExcelImportModal } from './ExcelImportModal';
 import { DirectImportModal } from './DirectImportModal';

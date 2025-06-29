@@ -1,0 +1,287 @@
+Feature Overview: PDF Preview Tab
+New Tab Structure (Updated)
+
+Design Mode - Form building interface
+User UI Preview - (Renamed from "Preview") - Interactive form testing
+PDF Preview - (NEW) - Live PDF preview with customization
+JSON Mode - JSON generation and management
+
+PDF Preview Tab Specifications
+Core Functionality
+Live PDF Preview
+
+Real-time PDF Generation: Automatically generates PDF as user designs form
+Section-Based Organization: PDF reflects the tabbed section structure from User UI Preview
+All Questions Included: Shows every control/question added in the form
+Interactive Preview: Live preview updates as form is modified
+Responsive Preview: PDF preview adjusts to different page sizes and orientations
+
+PDF Content Structure
+PDF Document Structure:
+├── Header (Customizable)
+│   ├── Logo/Branding
+│   ├── Form Title
+│   ├── Custom Header Text
+│   └── Date/Time Stamps
+├── Body Content
+│   ├── Section 1: Personal Information
+│   │   ├── Question 1: Name (Text Box)
+│   │   ├── Question 2: Email (Email Input)
+│   │   └── Question 3: Phone (Phone Number)
+│   ├── Section 2: Preferences
+│   │   ├── Question 4: Newsletter (Checkbox)
+│   │   └── Question 5: Communication Method (Radio)
+│   └── Additional Sections...
+└── Footer (Customizable)
+    ├── Company Information
+    ├── Contact Details
+    ├── Page Numbers
+    └── Custom Footer Text
+PDF Customization Features
+Header Customization
+
+Logo Upload: Add company logo with size and positioning controls
+Form Title: Editable title with font size, color, and alignment options
+Custom Header Text: Additional header content with rich text formatting
+Header Layout: Choose from predefined header layouts or create custom
+Header Styling: Background color, borders, spacing controls
+
+Footer Customization
+
+Company Information: Editable company name, address, contact details
+Page Numbering: Various page number formats and positions
+Custom Footer Text: Additional footer content with formatting options
+Footer Layout: Predefined layouts or custom footer design
+Footer Styling: Background color, borders, spacing controls
+
+Content Styling
+
+Typography: Font family, size, color options for questions and labels
+Section Styling: Section headers with custom colors, fonts, spacing
+Question Formatting: Control how different question types appear in PDF
+Spacing Controls: Margins, padding, line spacing adjustments
+Color Schemes: Predefined color themes or custom color selection
+
+PDF Preview Interface
+Left Panel - PDF Customization Tools
+
+Header Editor: Visual header customization tools
+Footer Editor: Visual footer customization tools
+Styling Options: Typography, colors, spacing controls
+Layout Templates: Pre-designed PDF templates
+Preview Settings: Page size, orientation, margins
+
+Center Panel - Live PDF Preview
+
+PDF Viewer: Real-time PDF preview with zoom controls
+Page Navigation: Navigate through multi-page PDFs
+Section Highlighting: Click sections to highlight in preview
+Responsive Preview: Switch between different page sizes
+Full-Screen Mode: Expand preview for detailed viewing
+
+Right Panel - Properties & Settings
+
+PDF Properties: Document metadata, title, author
+Export Settings: File format options, quality settings
+Template Management: Save/load custom PDF templates
+Tier-Based Options: Access to premium features based on customer tier
+
+Top Toolbar - PDF Preview Mode
+
+📄 Generate PDF: Export final PDF document
+📋 Template Selector: Choose from predefined PDF templates
+🎨 Style Editor: Open advanced styling options
+📱 Device Preview: Preview PDF on different devices/sizes
+💾 Save Template: Save current customization as template
+🔄 Refresh Preview: Manually refresh PDF preview
+📤 Export Options: Multiple export formats and quality settings
+
+Tier-Based PDF Features
+Platinum Tier
+
+Unlimited Customization: Full header/footer customization
+Premium Templates: Access to all professional PDF templates
+Advanced Styling: Custom CSS, advanced typography options
+Branding Options: Unlimited logo placement, custom watermarks
+Export Formats: PDF, PNG, JPEG export options
+
+Gold Tier
+
+Standard Customization: Good header/footer customization options
+Professional Templates: Access to professional PDF templates
+Standard Styling: Preset typography and color options
+Basic Branding: Logo placement, basic watermarks
+Export Formats: PDF export with standard quality
+
+Silver Tier
+
+Limited Customization: Basic header/footer customization
+Standard Templates: Access to standard PDF templates
+Basic Styling: Limited typography and color options
+Minimal Branding: Basic logo placement only
+Export Formats: PDF export only
+
+Bronze Tier
+
+Basic Customization: Minimal header/footer options
+Basic Templates: Access to basic PDF templates only
+No Advanced Styling: Default typography and colors
+No Branding: No logo or watermark options
+Export Formats: Basic PDF export only
+
+PDF Template System
+Pre-built PDF Templates
+
+Executive Template: Premium design with sophisticated styling
+Professional Template: Clean business-oriented design
+Academic Template: Formal academic/research design
+Survey Template: Optimized for survey and feedback forms
+Application Template: Designed for application and registration forms
+Medical Template: Healthcare-compliant design with proper spacing
+Legal Template: Formal legal document design
+Creative Template: Modern, visually appealing design
+
+Template Customization
+
+Color Schemes: Predefined color palettes per template
+Layout Variations: Different arrangements within each template
+Typography Sets: Matching font combinations for each template
+Branding Integration: Easy logo and branding integration
+Section Styling: Template-specific section designs
+
+Integration with Existing Features
+Form Structure Integration
+
+Section-Based PDF: PDF reflects tabbed sections from User UI Preview
+Control Rendering: All 36+ control types properly formatted in PDF
+Required Field Indicators: Visual indicators for required fields
+Conditional Logic: PDF shows only relevant questions based on dependencies
+Validation Display: Show validation rules and requirements
+
+User UI Preview Integration
+
+Synchronized Updates: Changes in User UI Preview reflect in PDF Preview
+Section Mapping: PDF sections match User UI Preview tabs
+Question Order: PDF maintains question order from User UI Preview
+Data Integration: Test data from User UI Preview populates PDF Preview
+
+Design Mode Integration
+
+Real-time Updates: PDF Preview updates as form is modified in Design Mode
+Control Addition: New controls immediately appear in PDF Preview
+Section Changes: Section modifications reflect in PDF structure
+Dependency Updates: Conditional logic changes update PDF display
+
+PDF Preview Workflow
+Workflow 1: Design → PDF Preview
+
+User designs form in Design Mode with sections and controls
+User switches to PDF Preview tab
+System generates real-time PDF preview with all questions
+User customizes header, footer, and styling
+User exports final PDF
+
+Workflow 2: User UI Preview → PDF Preview
+
+User tests form in User UI Preview with sample data
+User switches to PDF Preview tab
+PDF shows filled form with sample responses
+User adjusts PDF formatting based on filled content
+User exports PDF with sample data
+
+Workflow 3: PDF-First Design
+
+User starts in PDF Preview tab
+User selects PDF template and customizes styling
+User switches to Design Mode to add questions
+User returns to PDF Preview to see live updates
+User iterates between modes for optimal PDF design
+
+Technical Implementation
+PDF Generation Engine
+
+Client-side PDF Generation: Using jsPDF or similar library
+Real-time Rendering: Live preview without server round-trips
+High-Quality Output: Vector-based PDF generation for crisp text
+Multi-page Support: Automatic page breaks and continuation
+Memory Optimization: Efficient handling of large forms
+
+Customization Storage
+
+Template Storage: Save custom PDF templates locally
+Styling Persistence: Remember user's styling preferences
+Tier Integration: Access control based on customer tier
+Export History: Track PDF generation and downloads
+
+Performance Optimization
+
+Lazy Loading: Load PDF preview only when tab is active
+Debounced Updates: Optimize real-time preview updates
+Caching: Cache template styles and common elements
+Progressive Loading: Load PDF preview progressively for large forms
+
+Validation and Error Handling
+PDF Generation Validation
+
+Minimum Content: Ensure at least one control exists before PDF generation
+Section Validation: Verify all sections have valid content
+Template Validation: Ensure selected template is compatible
+Styling Validation: Validate custom styling doesn't break layout
+
+Error Handling
+
+Generation Errors: Clear error messages for PDF generation failures
+Template Errors: Helpful messages for template loading issues
+Styling Conflicts: Warnings for conflicting styling options
+Export Errors: Error handling for PDF export failures
+
+User Feedback
+
+Loading Indicators: Show progress during PDF generation
+Success Notifications: Confirm successful PDF generation/export
+Warning Messages: Alert users to potential issues
+Help Documentation: Contextual help for PDF customization
+
+Export and Sharing Options
+Export Formats
+
+PDF Document: Standard PDF with full formatting
+High-Resolution PDF: Enhanced quality for printing
+PDF/A: Archival-quality PDF for long-term storage
+Flattened PDF: PDF with form fields flattened for sharing
+
+Sharing Features
+
+Direct Download: Download PDF to user's device
+Cloud Storage: Save to integrated cloud storage services
+Email Integration: Send PDF via email directly from app
+Print Preview: Optimized print preview and printing
+
+Batch Operations
+
+Multiple Templates: Generate PDFs with different templates
+Batch Export: Export multiple versions simultaneously
+Template Comparison: Compare different template options
+Version Control: Track different PDF versions with form versions
+
+Implementation Considerations
+User Experience
+
+Intuitive Interface: Easy-to-use PDF customization tools
+Real-time Feedback: Immediate visual feedback for all changes
+Mobile Responsive: PDF Preview works on tablets and mobile devices
+Accessibility: Screen reader support and keyboard navigation
+
+Performance
+
+Fast Loading: Quick PDF preview generation
+Smooth Scrolling: Optimized PDF viewer performance
+Memory Management: Efficient handling of large PDFs
+Responsive Updates: Quick updates for styling changes
+
+Integration Testing
+
+Cross-tab Functionality: Ensure seamless integration between all tabs
+Data Consistency: Verify data consistency across tabs
+State Management: Proper state synchronization
+Error Recovery: Graceful handling of errors and edge cases
