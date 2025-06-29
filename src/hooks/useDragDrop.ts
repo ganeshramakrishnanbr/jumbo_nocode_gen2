@@ -13,28 +13,57 @@ export const useDragDrop = (questionnaireId: string = 'default-questionnaire', i
   const [selectedControl, setSelectedControl] = useState<DroppedControl | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Load controls from database when database is initialized or refresh key changes
+  // Enhanced control loading with comprehensive logging
   const loadControlsFromDB = useCallback(async () => {
     if (!isDbInitialized) {
-      console.log('⏸️ Database not initialized, skipping control load');
+      console.log('⏸️ useDragDrop: Database not initialized, skipping control load');
       setIsLoading(true);
       return;
     }
 
     try {
       setIsLoading(true);
-      console.log('🔄 Loading controls from database...', { questionnaireId, refreshKey });
+      console.log('🔄 useDragDrop: Loading controls from database...', { 
+        questionnaireId, 
+        refreshKey,
+        timestamp: new Date().toISOString()
+      });
+      
       const controls = await getControls(questionnaireId);
-      console.log('📊 Loaded controls:', controls.length, 'controls');
-      console.log('🎯 Controls by section:', controls.reduce((acc, c) => {
+      
+      console.log('📊 useDragDrop: Database query results:', {
+        controlCount: controls.length,
+        controls: controls.map(c => ({
+          id: c.id,
+          type: c.type,
+          name: c.name,
+          sectionId: c.sectionId,
+          order: c.y
+        }))
+      });
+      
+      // Log section distribution
+      const sectionDistribution = controls.reduce((acc, c) => {
         acc[c.sectionId || 'unknown'] = (acc[c.sectionId || 'unknown'] || 0) + 1;
         return acc;
-      }, {} as Record<string, number>));
+      }, {} as Record<string, number>);
+      console.log('🎯 useDragDrop: Controls by section:', sectionDistribution);
       
+      // Update state
       setDroppedControls(controls);
-      console.log('✅ Controls state updated successfully');
+      console.log('✅ useDragDrop: Controls state updated successfully');
+      
+      // Verify state update
+      setTimeout(() => {
+        console.log('🔍 useDragDrop: State verification after update:', {
+          stateControlCount: controls.length,
+          refreshKey,
+          timestamp: new Date().toISOString()
+        });
+      }, 50);
+      
     } catch (error) {
-      console.error('❌ Failed to load controls:', error);
+      console.error('❌ useDragDrop: Failed to load controls:', error);
     } finally {
       setIsLoading(false);
     }
@@ -42,18 +71,36 @@ export const useDragDrop = (questionnaireId: string = 'default-questionnaire', i
 
   // Load controls when dependencies change
   useEffect(() => {
-    console.log('🔄 useDragDrop useEffect triggered', { questionnaireId, isDbInitialized, refreshKey });
+    console.log('🔄 useDragDrop: useEffect triggered', { 
+      questionnaireId, 
+      isDbInitialized, 
+      refreshKey,
+      timestamp: new Date().toISOString()
+    });
     loadControlsFromDB();
   }, [loadControlsFromDB]);
 
-  // Function to manually force refresh controls
+  // Enhanced force refresh with verification
   const forceRefresh = useCallback(async () => {
-    console.log('🔄 Force refresh triggered');
-    await loadControlsFromDB();
-  }, [loadControlsFromDB]);
+    console.log('🔄 useDragDrop: Force refresh initiated', {
+      currentControlCount: droppedControls.length,
+      refreshKey,
+      timestamp: new Date().toISOString()
+    });
+    
+    try {
+      await loadControlsFromDB();
+      console.log('✅ useDragDrop: Force refresh completed successfully');
+    } catch (error) {
+      console.error('❌ useDragDrop: Force refresh failed:', error);
+    }
+  }, [loadControlsFromDB, droppedControls.length, refreshKey]);
 
   const addControl = useCallback(async (controlType: ControlType, x: number, y: number, sectionId: string = 'default') => {
-    if (!isDbInitialized) return;
+    if (!isDbInitialized) {
+      console.warn('⚠️ useDragDrop: Cannot add control - database not initialized');
+      return;
+    }
 
     try {
       const sectionControls = droppedControls.filter(c => c.sectionId === sectionId);
@@ -72,21 +119,35 @@ export const useDragDrop = (questionnaireId: string = 'default-questionnaire', i
         sectionId
       };
       
+      console.log('➕ useDragDrop: Adding new control:', {
+        id: newControl.id,
+        type: newControl.type,
+        name: newControl.name,
+        sectionId: newControl.sectionId
+      });
+      
       // Insert into database
       await insertControl(newControl, questionnaireId);
       
       // Update local state
       setDroppedControls(prev => [...prev, newControl]);
       setSelectedControl(newControl);
+      
+      console.log('✅ useDragDrop: Control added successfully');
     } catch (error) {
-      console.error('Failed to add control:', error);
+      console.error('❌ useDragDrop: Failed to add control:', error);
     }
   }, [droppedControls, questionnaireId, isDbInitialized]);
 
   const updateControl = useCallback(async (id: string, updates: Partial<DroppedControl>) => {
-    if (!isDbInitialized) return;
+    if (!isDbInitialized) {
+      console.warn('⚠️ useDragDrop: Cannot update control - database not initialized');
+      return;
+    }
 
     try {
+      console.log('🔄 useDragDrop: Updating control:', { id, updates });
+      
       // Update in database
       await updateControlDB(id, updates);
       
@@ -100,17 +161,31 @@ export const useDragDrop = (questionnaireId: string = 'default-questionnaire', i
       if (selectedControl?.id === id) {
         setSelectedControl(prev => prev ? { ...prev, ...updates } : null);
       }
+      
+      console.log('✅ useDragDrop: Control updated successfully');
     } catch (error) {
-      console.error('Failed to update control:', error);
+      console.error('❌ useDragDrop: Failed to update control:', error);
     }
   }, [selectedControl, questionnaireId, isDbInitialized]);
 
   const removeControl = useCallback(async (id: string) => {
-    if (!isDbInitialized) return;
+    if (!isDbInitialized) {
+      console.warn('⚠️ useDragDrop: Cannot remove control - database not initialized');
+      return;
+    }
 
     try {
       const controlToRemove = droppedControls.find(c => c.id === id);
-      if (!controlToRemove) return;
+      if (!controlToRemove) {
+        console.warn('⚠️ useDragDrop: Control not found for removal:', id);
+        return;
+      }
+      
+      console.log('🗑️ useDragDrop: Removing control:', {
+        id,
+        name: controlToRemove.name,
+        sectionId: controlToRemove.sectionId
+      });
       
       // Delete from database
       await deleteControlDB(id);
@@ -137,13 +212,18 @@ export const useDragDrop = (questionnaireId: string = 'default-questionnaire', i
       if (selectedControl?.id === id) {
         setSelectedControl(null);
       }
+      
+      console.log('✅ useDragDrop: Control removed successfully');
     } catch (error) {
-      console.error('Failed to remove control:', error);
+      console.error('❌ useDragDrop: Failed to remove control:', error);
     }
   }, [droppedControls, selectedControl, questionnaireId, isDbInitialized]);
 
   const moveControl = useCallback(async (id: string, direction: 'up' | 'down') => {
-    if (!isDbInitialized) return;
+    if (!isDbInitialized) {
+      console.warn('⚠️ useDragDrop: Cannot move control - database not initialized');
+      return;
+    }
 
     try {
       const control = droppedControls.find(c => c.id === id);
@@ -156,6 +236,13 @@ export const useDragDrop = (questionnaireId: string = 'default-questionnaire', i
       
       const newIndex = direction === 'up' ? currentIndex - 1 : currentIndex + 1;
       if (newIndex < 0 || newIndex >= sectionControls.length) return;
+      
+      console.log('🔄 useDragDrop: Moving control:', {
+        id,
+        direction,
+        currentIndex,
+        newIndex
+      });
       
       // Swap the y positions
       const targetControl = sectionControls[newIndex];
@@ -170,15 +257,21 @@ export const useDragDrop = (questionnaireId: string = 'default-questionnaire', i
       await updateControlDB(targetControl.id, { y: control.y });
       
       setDroppedControls(updatedControls);
+      console.log('✅ useDragDrop: Control moved successfully');
     } catch (error) {
-      console.error('Failed to move control:', error);
+      console.error('❌ useDragDrop: Failed to move control:', error);
     }
   }, [droppedControls, questionnaireId, isDbInitialized]);
 
   const reorderControl = useCallback(async (dragIndex: number, hoverIndex: number) => {
-    if (!isDbInitialized) return;
+    if (!isDbInitialized) {
+      console.warn('⚠️ useDragDrop: Cannot reorder control - database not initialized');
+      return;
+    }
 
     try {
+      console.log('🔄 useDragDrop: Reordering controls:', { dragIndex, hoverIndex });
+      
       const newControls = [...droppedControls];
       const draggedControl = newControls[dragIndex];
       
@@ -197,18 +290,36 @@ export const useDragDrop = (questionnaireId: string = 'default-questionnaire', i
       await reorderControls(reorderedControls);
       
       setDroppedControls(reorderedControls);
+      console.log('✅ useDragDrop: Controls reordered successfully');
     } catch (error) {
-      console.error('Failed to reorder control:', error);
+      console.error('❌ useDragDrop: Failed to reorder control:', error);
     }
   }, [droppedControls, questionnaireId, isDbInitialized]);
 
   const selectControl = useCallback((control: DroppedControl) => {
+    console.log('🎯 useDragDrop: Control selected:', {
+      id: control.id,
+      name: control.name,
+      type: control.type
+    });
     setSelectedControl(control);
   }, []);
 
   const clearSelection = useCallback(() => {
+    console.log('🎯 useDragDrop: Selection cleared');
     setSelectedControl(null);
   }, []);
+
+  // Log state changes for debugging
+  useEffect(() => {
+    console.log('📊 useDragDrop: State changed:', {
+      controlCount: droppedControls.length,
+      selectedControlId: selectedControl?.id,
+      isLoading,
+      refreshKey,
+      timestamp: new Date().toISOString()
+    });
+  }, [droppedControls.length, selectedControl?.id, isLoading, refreshKey]);
 
   return {
     droppedControls,

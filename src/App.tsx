@@ -31,7 +31,8 @@ function App() {
   const [activeSection, setActiveSection] = useState('default');
   const [isDbInitialized, setIsDbInitialized] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const [refreshKey, setRefreshKey] = useState(0); // Add refresh key for force updates
+  const [refreshKey, setRefreshKey] = useState(0);
+  const [importInProgress, setImportInProgress] = useState(false);
 
   // Initialize theme
   const { theme } = useTheme();
@@ -47,7 +48,7 @@ function App() {
     reorderControl,
     selectControl,
     clearSelection,
-    forceRefresh // Add force refresh function
+    forceRefresh
   } = useDragDrop(currentQuestionnaire, isDbInitialized, refreshKey);
 
   // Initialize database and load sections
@@ -55,21 +56,25 @@ function App() {
     const initializeApp = async () => {
       try {
         setIsLoading(true);
+        console.log('🚀 Initializing application...');
         
         // Initialize database
         await initializeDatabase();
         setIsDbInitialized(true);
+        console.log('✅ Database initialized successfully');
         
         // Load sections
         const loadedSections = await getSections(currentQuestionnaire);
         setSections(loadedSections);
+        console.log('📂 Loaded sections:', loadedSections.length);
         
         // Set active section to first available section
         if (loadedSections.length > 0) {
           setActiveSection(loadedSections[0].id);
+          console.log('🎯 Active section set to:', loadedSections[0].id);
         }
       } catch (error) {
-        console.error('Failed to initialize app:', error);
+        console.error('❌ Failed to initialize app:', error);
       } finally {
         setIsLoading(false);
       }
@@ -176,78 +181,151 @@ function App() {
   };
 
   const handleImportControls = async (controls: DroppedControl[]) => {
+    console.log('🚀 EXCEL IMPORT STARTED');
+    console.log('📊 Import Details:', {
+      controlCount: controls.length,
+      questionnaire: currentQuestionnaire,
+      activeSection,
+      currentControlCount: droppedControls.length,
+      dbInitialized: isDbInitialized
+    });
+
+    if (!isDbInitialized) {
+      console.error('❌ Database not initialized - cannot import');
+      alert('Database not ready. Please wait and try again.');
+      return;
+    }
+
+    setImportInProgress(true);
+    
     try {
-      console.log('🚀 Starting import of', controls.length, 'controls');
-      
-      let insertedCount = 0;
-      
-      // Process each imported control - since we generate unique IDs, just insert them all
-      for (const control of controls) {
-        console.log('📝 Processing control:', control.id, control.name, control.type);
-        
+      console.log('📝 Controls to import:', controls.map(c => ({
+        id: c.id,
+        type: c.type,
+        name: c.name,
+        sectionId: c.sectionId,
+        order: c.y
+      })));
+
+      let successCount = 0;
+      let errorCount = 0;
+      const errors: string[] = [];
+
+      // Process each control individually with detailed logging
+      for (let i = 0; i < controls.length; i++) {
+        const control = controls[i];
+        console.log(`🔄 Processing control ${i + 1}/${controls.length}:`, {
+          id: control.id,
+          type: control.type,
+          name: control.name,
+          sectionId: control.sectionId
+        });
+
         try {
-          // Insert the control directly since we have guaranteed unique IDs
-          console.log('➕ Inserting control:', control.id);
           await insertControl(control, currentQuestionnaire);
-          insertedCount++;
+          successCount++;
+          console.log(`✅ Successfully inserted control ${i + 1}: ${control.name}`);
         } catch (error) {
-          console.error('❌ Failed to insert control:', control.id, error);
-          // Continue with other controls even if one fails
+          errorCount++;
+          const errorMsg = `Failed to insert ${control.name}: ${error}`;
+          errors.push(errorMsg);
+          console.error(`❌ Error inserting control ${i + 1}:`, error);
         }
       }
+
+      console.log('📊 Import Summary:', {
+        total: controls.length,
+        success: successCount,
+        errors: errorCount,
+        errorDetails: errors
+      });
+
+      if (successCount === 0) {
+        throw new Error(`No controls were imported successfully. Errors: ${errors.join(', ')}`);
+      }
+
+      // COMPREHENSIVE REFRESH STRATEGY
+      console.log('🔄 Starting comprehensive refresh strategy...');
       
-      console.log(`✅ Import completed: ${insertedCount} controls inserted`);
-      
-      // CRITICAL: Force complete refresh using multiple strategies
-      console.log('🔄 Triggering comprehensive refresh mechanisms...');
-      
-      // Strategy 1: Increment refresh key to trigger useEffect in useDragDrop
+      // Strategy 1: Immediate refresh key update
+      console.log('📈 Strategy 1: Updating refresh key');
       const newRefreshKey = refreshKey + 1;
-      console.log('📊 Refresh key updated:', refreshKey, '->', newRefreshKey);
       setRefreshKey(newRefreshKey);
-      
-      // Strategy 2: Wait for state update and force refresh
+      console.log(`🔑 Refresh key: ${refreshKey} → ${newRefreshKey}`);
+
+      // Strategy 2: Force refresh after short delay
       setTimeout(async () => {
-        console.log('⏰ Executing delayed force refresh...');
+        console.log('⏰ Strategy 2: Executing force refresh');
         try {
           await forceRefresh();
-          console.log('✅ Force refresh completed successfully');
+          console.log('✅ Force refresh completed');
+          
+          // Verify controls are loaded
+          const currentControls = await getControls(currentQuestionnaire);
+          console.log('🔍 Post-refresh verification:', {
+            dbControlCount: currentControls.length,
+            uiControlCount: droppedControls.length,
+            importedCount: successCount
+          });
+          
         } catch (error) {
           console.error('❌ Force refresh failed:', error);
         }
-      }, 100);
-      
-      // Strategy 3: Direct database reload with longer delay to ensure all operations complete
+      }, 150);
+
+      // Strategy 3: Final verification and correction
       setTimeout(async () => {
-        console.log('🔄 Executing final database verification...');
+        console.log('🔍 Strategy 3: Final verification and sync check');
         try {
-          const freshControls = await getControls(currentQuestionnaire);
-          console.log('📊 Fresh controls loaded:', freshControls.length, 'controls');
-          console.log('🎯 Controls by section:', freshControls.reduce((acc, c) => {
-            acc[c.sectionId || 'unknown'] = (acc[c.sectionId || 'unknown'] || 0) + 1;
-            return acc;
-          }, {} as Record<string, number>));
-          
-          // If the UI still doesn't show the controls, force another refresh
-          if (freshControls.length > droppedControls.length) {
-            console.log('🔄 UI out of sync, forcing final refresh...');
+          const dbControls = await getControls(currentQuestionnaire);
+          console.log('📊 Final verification results:', {
+            dbControlCount: dbControls.length,
+            uiControlCount: droppedControls.length,
+            expectedMinimum: successCount,
+            syncStatus: dbControls.length >= successCount ? 'GOOD' : 'NEEDS_SYNC'
+          });
+
+          // If UI is out of sync, force another refresh
+          if (dbControls.length > droppedControls.length) {
+            console.log('🔄 UI out of sync - forcing final refresh');
             setRefreshKey(prev => prev + 1);
+          } else {
+            console.log('✅ UI and database are in sync');
           }
+
+          // Log section distribution
+          const sectionDistribution = dbControls.reduce((acc, control) => {
+            const section = control.sectionId || 'unknown';
+            acc[section] = (acc[section] || 0) + 1;
+            return acc;
+          }, {} as Record<string, number>);
+          console.log('📂 Controls by section:', sectionDistribution);
+
         } catch (error) {
           console.error('❌ Final verification failed:', error);
         }
-      }, 300);
+      }, 400);
+
+      // Strategy 4: User notification and guidance
+      const message = successCount === controls.length 
+        ? `Successfully imported all ${successCount} controls!`
+        : `Imported ${successCount} of ${controls.length} controls. ${errorCount} failed.`;
       
-      // Show success message with details
-      const message = `Successfully imported ${insertedCount} controls!`;
       console.log(`🎉 ${message}`);
       
-      // Optional: Show user notification
-      alert(`${message} Check the Design tab to see them. If they don't appear immediately, please wait a moment for the refresh to complete.`);
-      
+      // Show detailed user feedback
+      if (errorCount > 0) {
+        alert(`${message}\n\nErrors:\n${errors.slice(0, 3).join('\n')}${errors.length > 3 ? '\n...' : ''}`);
+      } else {
+        alert(`${message}\n\nControls should appear in the Design tab shortly. If they don't appear immediately, please wait a moment for the refresh to complete.`);
+      }
+
     } catch (error) {
-      console.error('❌ Failed to import controls:', error);
-      alert('Failed to import controls. Please try again.');
+      console.error('❌ EXCEL IMPORT FAILED:', error);
+      alert(`Import failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    } finally {
+      setImportInProgress(false);
+      console.log('🏁 EXCEL IMPORT PROCESS COMPLETED');
     }
   };
 
@@ -346,6 +424,14 @@ function App() {
           {renderContent()}
         </div>
         
+        {/* Import Progress Indicator */}
+        {importInProgress && (
+          <div className="fixed bottom-4 right-4 bg-blue-600 text-white px-4 py-2 rounded-lg shadow-lg flex items-center space-x-2">
+            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+            <span>Importing controls...</span>
+          </div>
+        )}
+        
         {/* Footer */}
         <footer className="bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700 px-6 py-3 transition-colors">
           <div className="flex items-center justify-between text-sm text-gray-600 dark:text-gray-300 transition-colors">
@@ -354,6 +440,7 @@ function App() {
               <span>Professional Form Builder Platform</span>
               {isDbInitialized && <span className="text-green-600 dark:text-green-400">Database Connected</span>}
               <span className="capitalize">{theme} Theme</span>
+              {importInProgress && <span className="text-blue-600 dark:text-blue-400">Import in Progress</span>}
             </div>
             <div className="flex items-center space-x-4">
               <span>Version 1.0.0</span>
