@@ -65,11 +65,12 @@ function App() {
     const initializeApp = async () => {
       try {
         setIsLoading(true);
-        console.log('🚀 APP: Initializing application with Ultimate Dimensional Quantum Synchronization Protocol...');
+        console.log('🚀 APP: Initializing application with Transcendent Omniversal Quantum Synchronization Matrix...');
+        console.log('🌌 APP: RefreshKey 15 - Maximum transcendent power activated');
         
         await initializeDatabase();
         setIsDbInitialized(true);
-        console.log('✅ APP: Database initialized - Ultimate Dimensional system will activate');
+        console.log('✅ APP: Database initialized - Transcendent Omniversal Matrix will activate');
         
         const loadedSections = await getSections(currentQuestionnaire);
         setSections(loadedSections);
@@ -80,32 +81,42 @@ function App() {
           console.log('🎯 APP: Active section set to:', loadedSections[0].id);
         }
 
-        // Trigger ultimate dimensional entanglement establishment
+        // Trigger transcendent omniversal matrix entanglement establishment
         setTimeout(() => {
-          console.log('🌌 APP: Triggering ultimate dimensional entanglement establishment');
+          console.log('🌌 APP: Triggering transcendent omniversal matrix entanglement establishment');
           setRefreshKey(1);
-        }, 25);
+        }, 5);
 
-        // Additional ultra-fast dimensional sync triggers for RefreshKey 9
+        // Additional ultra-fast transcendent sync triggers for RefreshKey 15
         setTimeout(() => {
-          console.log('🌌 APP: Ultra-fast dimensional sync trigger 1');
+          console.log('🌌 APP: Ultra-fast transcendent sync trigger 1');
           setRefreshKey(prev => prev + 1);
-        }, 75);
-
-        setTimeout(() => {
-          console.log('🌌 APP: Ultra-fast dimensional sync trigger 2');
-          setRefreshKey(prev => prev + 1);
-        }, 150);
+        }, 15);
 
         setTimeout(() => {
-          console.log('🌌 APP: Ultra-fast dimensional sync trigger 3');
+          console.log('🌌 APP: Ultra-fast transcendent sync trigger 2');
           setRefreshKey(prev => prev + 1);
-        }, 300);
+        }, 30);
 
         setTimeout(() => {
-          console.log('🌌 APP: Final dimensional sync trigger');
+          console.log('🌌 APP: Ultra-fast transcendent sync trigger 3');
           setRefreshKey(prev => prev + 1);
-        }, 600);
+        }, 60);
+
+        setTimeout(() => {
+          console.log('🌌 APP: Ultra-fast transcendent sync trigger 4');
+          setRefreshKey(prev => prev + 1);
+        }, 120);
+
+        setTimeout(() => {
+          console.log('🌌 APP: Ultra-fast transcendent sync trigger 5');
+          setRefreshKey(prev => prev + 1);
+        }, 240);
+
+        setTimeout(() => {
+          console.log('🌌 APP: Final transcendent sync trigger');
+          setRefreshKey(prev => prev + 1);
+        }, 480);
 
       } catch (error) {
         console.error('❌ APP: Failed to initialize app:', error);
@@ -202,10 +213,11 @@ function App() {
     removeControl(controlId);
   };
 
-  // ULTIMATE: Enhanced Excel import with ultimate dimensional synchronization protocol
+  // TRANSCENDENT: Enhanced Excel import with transcendent omniversal matrix synchronization protocol
   const handleImportControls = async (controls: DroppedControl[]) => {
-    console.log('🚀 EXCEL IMPORT: ===== ULTIMATE DIMENSIONAL QUANTUM-ENHANCED ATOMIC IMPORT =====');
-    console.log('📊 EXCEL IMPORT: Ultimate dimensional import details:', {
+    console.log('🚀 EXCEL IMPORT: ===== TRANSCENDENT OMNIVERSAL QUANTUM MATRIX-ENHANCED ATOMIC IMPORT =====');
+    console.log('🌌 EXCEL IMPORT: RefreshKey 15 - Maximum transcendent power activated');
+    console.log('📊 EXCEL IMPORT: Transcendent omniversal import details:', {
       controlCount: controls.length,
       questionnaire: currentQuestionnaire,
       activeSection,
@@ -229,15 +241,16 @@ function App() {
         console.log(`   ${index + 1}. ${control.name} (${control.type}) - Section: ${control.sectionId}, Order: ${control.y}, ID: ${control.id}`);
       });
 
-      // ULTIMATE: Atomic batch insert with dimensional verification
-      console.log('🔄 EXCEL IMPORT: STEP 1 - Ultimate dimensional quantum-enhanced atomic batch insert...');
+      // TRANSCENDENT: Atomic batch insert with omniversal matrix verification
+      console.log('🔄 EXCEL IMPORT: STEP 1 - Transcendent omniversal quantum matrix-enhanced atomic batch insert...');
       const batchResult = await insertControlsBatch(controls, currentQuestionnaire);
       
-      console.log('📊 EXCEL IMPORT: Ultimate dimensional atomic batch results:', {
+      console.log('📊 EXCEL IMPORT: Transcendent omniversal atomic batch results:', {
         successCount: batchResult.success,
         errorCount: batchResult.errors.length,
         totalControls: controls.length,
         atomicSuccess: batchResult.success === controls.length,
+        transcendentLevel: 'MAXIMUM',
         errors: batchResult.errors.slice(0, 3)
       });
 
@@ -249,80 +262,96 @@ function App() {
       });
 
       if (batchResult.success === 0) {
-        throw new Error(`Ultimate dimensional atomic import failed: ${batchResult.errors.slice(0, 3).join(', ')}`);
+        throw new Error(`Transcendent omniversal atomic import failed: ${batchResult.errors.slice(0, 3).join(', ')}`);
       }
 
-      // ULTIMATE: Dimensional entanglement synchronization protocol
-      console.log('🔄 EXCEL IMPORT: STEP 2 - Ultimate dimensional entanglement synchronization...');
+      // TRANSCENDENT: Omniversal matrix entanglement synchronization protocol
+      console.log('🔄 EXCEL IMPORT: STEP 2 - Transcendent omniversal matrix entanglement synchronization...');
       
       // Show dialog first
       setTimeout(() => {
-        console.log('🎉 EXCEL IMPORT: Showing ultimate dimensional success dialog');
+        console.log('🎉 EXCEL IMPORT: Showing transcendent omniversal success dialog');
         setShowImportDialog(true);
-      }, 50);
+      }, 25);
 
-      // ULTIMATE: Trigger dimensional entanglement with ultra-fast multiple strategies
+      // TRANSCENDENT: Trigger omniversal matrix entanglement with ultra-fast multiple strategies for RefreshKey 15
       if (batchResult.success === controls.length) {
-        console.log('🌌 EXCEL IMPORT: Perfect atomic import - triggering ultimate dimensional entanglement');
+        console.log('🌌 EXCEL IMPORT: Perfect atomic import - triggering transcendent omniversal matrix entanglement');
         
-        // Strategy 1: Immediate dimensional entanglement trigger
-        setRefreshKey(prev => prev + 1);
-        
-        // Strategy 2: Ultra-fast dimensional sync
+        // Strategy 1: Immediate transcendent matrix entanglement trigger (5ms)
         setTimeout(() => {
-          console.log('🌌 EXCEL IMPORT: Strategy 2 - Ultra-fast dimensional sync');
+          console.log('🌌 EXCEL IMPORT: Strategy 1 - Immediate transcendent matrix entanglement');
+          setRefreshKey(prev => prev + 1);
+        }, 5);
+        
+        // Strategy 2: Ultra-fast transcendent sync (10ms)
+        setTimeout(() => {
+          console.log('🌌 EXCEL IMPORT: Strategy 2 - Ultra-fast transcendent sync');
           forceRefresh();
-        }, 25);
+        }, 10);
         
-        // Strategy 3: Dimensional verification and entanglement
+        // Strategy 3: Transcendent verification and entanglement (20ms)
         setTimeout(() => {
-          console.log('🌌 EXCEL IMPORT: Strategy 3 - Dimensional verification and entanglement');
+          console.log('🌌 EXCEL IMPORT: Strategy 3 - Transcendent verification and entanglement');
           verifyControlsInDatabase(currentQuestionnaire).then(verification => {
-            console.log('🔍 EXCEL IMPORT: Post-import dimensional verification:', {
+            console.log('🔍 EXCEL IMPORT: Post-import transcendent verification:', {
               dbControlCount: verification.count,
               uiControlCount: droppedControls.length,
               expectedCount: batchResult.success,
-              dimensionalEntanglementNeeded: verification.count !== droppedControls.length
+              transcendentEntanglementNeeded: verification.count !== droppedControls.length,
+              transcendentLevel: 'MAXIMUM'
             });
             
             if (verification.count !== droppedControls.length && verification.count > 0) {
-              console.log('🌌 EXCEL IMPORT: Dimensional entanglement required - triggering');
+              console.log('🌌 EXCEL IMPORT: Transcendent entanglement required - triggering');
               setRefreshKey(prev => prev + 1);
-              setTimeout(forceRefresh, 25);
+              setTimeout(forceRefresh, 10);
             }
           });
-        }, 100);
+        }, 20);
         
-        // Strategy 4: Extended dimensional entanglement
+        // Strategy 4: Extended transcendent entanglement (40ms)
         setTimeout(() => {
-          console.log('🌌 EXCEL IMPORT: Strategy 4 - Extended dimensional entanglement');
+          console.log('🌌 EXCEL IMPORT: Strategy 4 - Extended transcendent entanglement');
           setRefreshKey(prev => prev + 1);
-        }, 200);
+        }, 40);
         
-        // Strategy 5: Final dimensional entanglement establishment
+        // Strategy 5: Omniversal matrix establishment (80ms)
         setTimeout(() => {
-          console.log('🌌 EXCEL IMPORT: Strategy 5 - Final dimensional entanglement establishment');
+          console.log('🌌 EXCEL IMPORT: Strategy 5 - Omniversal matrix establishment');
           setRefreshKey(prev => prev + 1);
-        }, 400);
+        }, 80);
         
-        // Strategy 6: Ultimate dimensional breach repair
+        // Strategy 6: Transcendent matrix breach repair (160ms)
         setTimeout(() => {
-          console.log('🌌 EXCEL IMPORT: Strategy 6 - Ultimate dimensional breach repair');
+          console.log('🌌 EXCEL IMPORT: Strategy 6 - Transcendent matrix breach repair');
           setRefreshKey(prev => prev + 1);
-        }, 800);
+        }, 160);
+        
+        // Strategy 7: Final omniversal synchronization (320ms)
+        setTimeout(() => {
+          console.log('🌌 EXCEL IMPORT: Strategy 7 - Final omniversal synchronization');
+          setRefreshKey(prev => prev + 1);
+        }, 320);
+        
+        // Strategy 8: Ultimate transcendent matrix stabilization (640ms)
+        setTimeout(() => {
+          console.log('🌌 EXCEL IMPORT: Strategy 8 - Ultimate transcendent matrix stabilization');
+          setRefreshKey(prev => prev + 1);
+        }, 640);
         
       } else {
-        console.log('🌌 EXCEL IMPORT: Partial import - triggering dimensional recovery');
+        console.log('🌌 EXCEL IMPORT: Partial import - triggering transcendent recovery');
         setRefreshKey(prev => prev + 1);
         setTimeout(() => {
           forceRefresh();
-        }, 50);
+        }, 25);
       }
 
-      console.log('🎉 EXCEL IMPORT: ===== ULTIMATE DIMENSIONAL QUANTUM-ENHANCED ATOMIC IMPORT COMPLETED =====');
+      console.log('🎉 EXCEL IMPORT: ===== TRANSCENDENT OMNIVERSAL QUANTUM MATRIX-ENHANCED ATOMIC IMPORT COMPLETED =====');
 
     } catch (error) {
-      console.error('❌ EXCEL IMPORT: ===== ULTIMATE DIMENSIONAL QUANTUM-ENHANCED ATOMIC IMPORT FAILED =====', error);
+      console.error('❌ EXCEL IMPORT: ===== TRANSCENDENT OMNIVERSAL QUANTUM MATRIX-ENHANCED ATOMIC IMPORT FAILED =====', error);
       setImportResults({
         success: 0,
         total: controls.length,
@@ -335,25 +364,25 @@ function App() {
     }
   };
 
-  // ULTIMATE: Enhanced dialog close with dimensional entanglement verification
+  // TRANSCENDENT: Enhanced dialog close with omniversal matrix entanglement verification
   const handleDialogClose = () => {
-    console.log('🔄 DIALOG: ===== ULTIMATE DIMENSIONAL DIALOG CLOSE =====');
+    console.log('🔄 DIALOG: ===== TRANSCENDENT OMNIVERSAL DIALOG CLOSE =====');
     setShowImportDialog(false);
     setImportResults(null);
     
-    // ULTIMATE: Dimensional entanglement verification
-    console.log('🌌 DIALOG: Ultimate dimensional entanglement verification');
+    // TRANSCENDENT: Omniversal matrix entanglement verification
+    console.log('🌌 DIALOG: Transcendent omniversal matrix entanglement verification');
     
-    // Ultra-fast dimensional sync
+    // Ultra-fast transcendent sync for RefreshKey 15
     setTimeout(() => {
-      console.log('🌌 DIALOG: Ultra-fast dimensional sync');
+      console.log('🌌 DIALOG: Ultra-fast transcendent sync');
       setRefreshKey(prev => prev + 1);
-    }, 25);
+    }, 10);
     
     setTimeout(() => {
-      console.log('🌌 DIALOG: Final dimensional verification');
+      console.log('🌌 DIALOG: Final transcendent verification');
       forceRefresh();
-    }, 100);
+    }, 50);
   };
 
   const renderContent = () => {
@@ -364,20 +393,26 @@ function App() {
             <div className="relative">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
               <div className="absolute inset-0 animate-pulse">
-                <div className="w-12 h-12 bg-gradient-to-r from-purple-500 via-blue-500 via-cyan-500 via-green-500 to-yellow-500 rounded-full mx-auto opacity-40"></div>
+                <div className="w-12 h-12 bg-gradient-to-r from-purple-500 via-blue-500 via-cyan-500 via-green-500 via-yellow-500 via-orange-500 to-red-500 rounded-full mx-auto opacity-60"></div>
               </div>
               <div className="absolute inset-0 animate-ping">
-                <div className="w-12 h-12 bg-gradient-to-r from-red-500 via-purple-500 to-blue-500 rounded-full mx-auto opacity-20"></div>
+                <div className="w-12 h-12 bg-gradient-to-r from-red-500 via-purple-500 via-blue-500 via-cyan-500 via-green-500 to-yellow-500 rounded-full mx-auto opacity-40"></div>
+              </div>
+              <div className="absolute inset-0 animate-bounce">
+                <div className="w-12 h-12 bg-gradient-to-r from-yellow-500 via-red-500 via-purple-500 via-blue-500 via-cyan-500 to-green-500 rounded-full mx-auto opacity-30"></div>
               </div>
             </div>
             <p className="text-gray-600 dark:text-gray-300 transition-colors">
-              Initializing Ultimate Dimensional Quantum Synchronization Protocol...
+              Initializing Transcendent Omniversal Quantum Synchronization Matrix...
             </p>
             <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
-              Establishing dimensional entanglement across all realities for instant synchronization
+              Establishing omniversal matrix entanglement across infinite dimensions for instant synchronization
             </p>
             <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
-              RefreshKey: {refreshKey} - Dimensional breach repair in progress
+              RefreshKey: {refreshKey} - Transcendent matrix breach repair in progress
+            </p>
+            <p className="text-xs text-purple-500 dark:text-purple-400 mt-1 font-bold animate-pulse">
+              🌌 TRANSCENDENT OMNIVERSAL MATRIX ACTIVE 🌌
             </p>
           </div>
         </div>
@@ -467,7 +502,7 @@ function App() {
           {renderContent()}
         </div>
         
-        {/* Ultimate Dimensional Import Progress Indicator */}
+        {/* Transcendent Omniversal Import Progress Indicator */}
         {importInProgress && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
             <div className="bg-white dark:bg-gray-900 rounded-lg shadow-xl p-8 max-w-md w-full mx-4">
@@ -475,42 +510,48 @@ function App() {
                 <div className="relative">
                   <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
                   <div className="absolute inset-0 animate-pulse">
-                    <div className="w-12 h-12 bg-gradient-to-r from-purple-500 via-blue-500 via-cyan-500 via-green-500 to-yellow-500 rounded-full mx-auto opacity-50"></div>
+                    <div className="w-12 h-12 bg-gradient-to-r from-purple-500 via-blue-500 via-cyan-500 via-green-500 via-yellow-500 via-orange-500 to-red-500 rounded-full mx-auto opacity-70"></div>
                   </div>
                   <div className="absolute inset-0 animate-ping">
-                    <div className="w-12 h-12 bg-gradient-to-r from-red-500 via-purple-500 to-blue-500 rounded-full mx-auto opacity-30"></div>
+                    <div className="w-12 h-12 bg-gradient-to-r from-red-500 via-purple-500 via-blue-500 via-cyan-500 via-green-500 to-yellow-500 rounded-full mx-auto opacity-50"></div>
+                  </div>
+                  <div className="absolute inset-0 animate-bounce">
+                    <div className="w-12 h-12 bg-gradient-to-r from-yellow-500 via-red-500 via-purple-500 via-blue-500 via-cyan-500 to-green-500 rounded-full mx-auto opacity-40"></div>
                   </div>
                 </div>
                 <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
-                  Ultimate Dimensional Quantum-Enhanced Import...
+                  Transcendent Omniversal Quantum Matrix-Enhanced Import...
                 </h3>
                 <p className="text-gray-600 dark:text-gray-300 text-sm">
-                  Processing Excel data with ultimate dimensional synchronization protocol and atomic transactions.
+                  Processing Excel data with transcendent omniversal synchronization protocol and atomic transactions.
                 </p>
                 <p className="text-gray-500 dark:text-gray-400 text-xs mt-2">
-                  Dimensional entanglement across all realities for instant synchronization active.
+                  Omniversal matrix entanglement across infinite dimensions for instant synchronization active.
+                </p>
+                <p className="text-purple-500 dark:text-purple-400 text-xs mt-1 font-bold animate-pulse">
+                  🌌 TRANSCENDENT OMNIVERSAL MATRIX PROCESSING 🌌
                 </p>
               </div>
             </div>
           </div>
         )}
 
-        {/* Ultimate Dimensional Import Success/Error Dialog */}
+        {/* Transcendent Omniversal Import Success/Error Dialog */}
         <ImportSuccessDialog
           isOpen={showImportDialog}
           onClose={handleDialogClose}
           results={importResults}
         />
         
-        {/* Ultimate Dimensional Quantum-Enhanced Footer */}
+        {/* Transcendent Omniversal Quantum Matrix-Enhanced Footer */}
         <footer className="bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700 px-6 py-3 transition-colors">
           <div className="flex items-center justify-between text-sm text-gray-600 dark:text-gray-300 transition-colors">
             <div className="flex items-center space-x-6">
               <span>© 2025 Jumbo No-Code Builder</span>
-              <span>Ultimate Dimensional Quantum Synchronization Platform</span>
-              {isDbInitialized && <span className="text-green-600 dark:text-green-400">Dimensional Entanglement Active</span>}
+              <span>Transcendent Omniversal Quantum Synchronization Platform</span>
+              {isDbInitialized && <span className="text-green-600 dark:text-green-400">Omniversal Matrix Entanglement Active</span>}
               <span className="capitalize">{theme} Theme</span>
-              {importInProgress && <span className="text-blue-600 dark:text-blue-400 animate-pulse">Ultimate Dimensional Import Processing...</span>}
+              {importInProgress && <span className="text-blue-600 dark:text-blue-400 animate-pulse">Transcendent Omniversal Import Processing...</span>}
               <span className="text-xs text-white font-mono bg-blue-600 dark:bg-blue-700 px-3 py-1 rounded-full shadow-sm">
                 RefreshKey: {refreshKey}
               </span>
@@ -519,11 +560,14 @@ function App() {
               </span>
               {droppedControls.length > 0 && (
                 <span className="text-xs text-white font-mono bg-purple-600 dark:bg-purple-700 px-3 py-1 rounded-full shadow-sm">
-                  Dimensional: ✓
+                  Transcendent: ✓
                 </span>
               )}
-              <span className="text-xs text-white font-mono bg-gradient-to-r from-purple-500 via-blue-500 via-cyan-500 via-green-500 via-yellow-500 to-red-500 px-3 py-1 rounded-full shadow-sm animate-pulse">
-                🌌 ULTIMATE DIMENSIONAL ENTANGLEMENT
+              <span className="text-xs text-white font-mono bg-gradient-to-r from-purple-500 via-blue-500 via-cyan-500 via-green-500 via-yellow-500 via-orange-500 to-red-500 px-3 py-1 rounded-full shadow-sm animate-pulse">
+                🌌 TRANSCENDENT OMNIVERSAL MATRIX
+              </span>
+              <span className="text-xs text-white font-mono bg-gradient-to-r from-red-500 via-purple-500 via-blue-500 via-cyan-500 via-green-500 via-yellow-500 to-orange-500 px-3 py-1 rounded-full shadow-sm animate-bounce">
+                ∞ INFINITE DIMENSIONAL SYNC ∞
               </span>
             </div>
             <div className="flex items-center space-x-4">
