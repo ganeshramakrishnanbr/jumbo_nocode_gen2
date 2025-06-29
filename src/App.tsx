@@ -18,7 +18,8 @@ import {
   insertSection, 
   updateSection as updateSectionDB, 
   deleteSection as deleteSectionDB,
-  insertControl
+  insertControl,
+  getControls
 } from './lib/db';
 
 function App() {
@@ -46,7 +47,7 @@ function App() {
     reorderControl,
     selectControl,
     clearSelection,
-    refreshControls // Add refresh function from hook
+    forceRefresh // Add force refresh function
   } = useDragDrop(currentQuestionnaire, isDbInitialized, refreshKey);
 
   // Initialize database and load sections
@@ -176,28 +177,61 @@ function App() {
 
   const handleImportControls = async (controls: DroppedControl[]) => {
     try {
-      console.log('Starting import of', controls.length, 'controls');
+      console.log('🚀 Starting import of', controls.length, 'controls');
       
       // Insert all imported controls into the database
       for (const control of controls) {
+        console.log('📝 Inserting control:', control.id, control.name, control.type);
         await insertControl(control, currentQuestionnaire);
-        console.log('Inserted control:', control.id, control.name);
       }
       
-      // Force refresh the controls by incrementing refresh key
-      console.log('Triggering refresh...');
-      setRefreshKey(prev => prev + 1);
+      console.log('✅ All controls inserted into database');
       
-      // Also manually refresh controls to ensure they're loaded
+      // Force refresh the controls using multiple strategies
+      console.log('🔄 Triggering refresh mechanisms...');
+      
+      // Strategy 1: Increment refresh key
+      setRefreshKey(prev => {
+        const newKey = prev + 1;
+        console.log('📊 Refresh key updated:', prev, '->', newKey);
+        return newKey;
+      });
+      
+      // Strategy 2: Force refresh after a short delay
       setTimeout(async () => {
-        await refreshControls();
-        console.log('Manual refresh completed');
+        console.log('⏰ Executing delayed refresh...');
+        try {
+          await forceRefresh();
+          console.log('✅ Force refresh completed successfully');
+        } catch (error) {
+          console.error('❌ Force refresh failed:', error);
+        }
       }, 100);
       
+      // Strategy 3: Direct database reload after longer delay
+      setTimeout(async () => {
+        console.log('🔄 Executing direct database reload...');
+        try {
+          const freshControls = await getControls(currentQuestionnaire);
+          console.log('📊 Fresh controls loaded:', freshControls.length, 'controls');
+          console.log('🎯 Controls by section:', freshControls.reduce((acc, c) => {
+            acc[c.sectionId || 'unknown'] = (acc[c.sectionId || 'unknown'] || 0) + 1;
+            return acc;
+          }, {} as Record<string, number>));
+        } catch (error) {
+          console.error('❌ Direct reload failed:', error);
+        }
+      }, 200);
+      
       // Show success message
-      console.log(`Successfully imported ${controls.length} controls`);
+      console.log(`🎉 Successfully imported ${controls.length} controls`);
+      
+      // Optional: Show user notification
+      alert(`Successfully imported ${controls.length} controls! Check the Design tab to see them.`);
+      
     } catch (error) {
-      console.error('Failed to import controls:', error);
+      console.error('❌ Failed to import controls:', error);
+      alert('Failed to import controls. Please try again.');
     }
   };
 

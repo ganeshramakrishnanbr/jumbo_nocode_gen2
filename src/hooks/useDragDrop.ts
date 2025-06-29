@@ -14,42 +14,42 @@ export const useDragDrop = (questionnaireId: string = 'default-questionnaire', i
   const [isLoading, setIsLoading] = useState(true);
 
   // Load controls from database when database is initialized or refresh key changes
-  useEffect(() => {
-    const loadControls = async () => {
-      if (!isDbInitialized) {
-        setIsLoading(true);
-        return;
-      }
-
-      try {
-        setIsLoading(true);
-        console.log('Loading controls from database...', { questionnaireId, refreshKey });
-        const controls = await getControls(questionnaireId);
-        console.log('Loaded controls:', controls.length, controls);
-        setDroppedControls(controls);
-      } catch (error) {
-        console.error('Failed to load controls:', error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    loadControls();
-  }, [questionnaireId, isDbInitialized, refreshKey]); // Add refreshKey as dependency
-
-  // Function to manually refresh controls
-  const refreshControls = useCallback(async () => {
-    if (!isDbInitialized) return;
+  const loadControlsFromDB = useCallback(async () => {
+    if (!isDbInitialized) {
+      console.log('⏸️ Database not initialized, skipping control load');
+      setIsLoading(true);
+      return;
+    }
 
     try {
-      console.log('Manually refreshing controls...');
+      setIsLoading(true);
+      console.log('🔄 Loading controls from database...', { questionnaireId, refreshKey });
       const controls = await getControls(questionnaireId);
-      console.log('Manual refresh loaded:', controls.length, 'controls');
+      console.log('📊 Loaded controls:', controls.length, 'controls');
+      console.log('🎯 Controls by section:', controls.reduce((acc, c) => {
+        acc[c.sectionId || 'unknown'] = (acc[c.sectionId || 'unknown'] || 0) + 1;
+        return acc;
+      }, {} as Record<string, number>));
+      
       setDroppedControls(controls);
+      console.log('✅ Controls state updated successfully');
     } catch (error) {
-      console.error('Failed to refresh controls:', error);
+      console.error('❌ Failed to load controls:', error);
+    } finally {
+      setIsLoading(false);
     }
-  }, [questionnaireId, isDbInitialized]);
+  }, [questionnaireId, isDbInitialized, refreshKey]);
+
+  // Load controls when dependencies change
+  useEffect(() => {
+    loadControlsFromDB();
+  }, [loadControlsFromDB]);
+
+  // Function to manually force refresh controls
+  const forceRefresh = useCallback(async () => {
+    console.log('🔄 Force refresh triggered');
+    await loadControlsFromDB();
+  }, [loadControlsFromDB]);
 
   const addControl = useCallback(async (controlType: ControlType, x: number, y: number, sectionId: string = 'default') => {
     if (!isDbInitialized) return;
@@ -220,6 +220,6 @@ export const useDragDrop = (questionnaireId: string = 'default-questionnaire', i
     reorderControl,
     selectControl,
     clearSelection,
-    refreshControls
+    forceRefresh
   };
 };
