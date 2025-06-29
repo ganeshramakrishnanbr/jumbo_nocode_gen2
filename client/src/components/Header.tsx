@@ -53,25 +53,25 @@ export const Header: React.FC<HeaderProps> = ({
   return (
     <>
       <header className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 shadow-sm transition-colors">
-        <div className="px-6 py-4">
-          <div className="flex items-center justify-between">
+        <div className="px-4 sm:px-6 py-3 sm:py-4">
+          <div className="flex flex-col space-y-4 lg:flex-row lg:items-center lg:justify-between lg:space-y-0">
             {/* Logo and Title */}
-            <div className="flex items-center space-x-4">
-              <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
-                <Settings className="w-6 h-6 text-white" />
+            <div className="flex items-center space-x-3 sm:space-x-4">
+              <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
+                <Settings className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
               </div>
               <div>
-                <h1 className="text-2xl font-bold text-gray-900 dark:text-white transition-colors">
+                <h1 className="text-lg sm:text-2xl font-bold text-gray-900 dark:text-white transition-colors">
                   Jumbo No-Code Builder
                 </h1>
-                <p className="text-sm text-gray-500 dark:text-gray-400 transition-colors">
+                <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 transition-colors hidden sm:block">
                   Professional Form Builder Platform
                 </p>
               </div>
             </div>
 
-            {/* Center Tabs */}
-            <div className="flex bg-gray-100 dark:bg-gray-800 rounded-lg p-1 transition-colors">
+            {/* Center Tabs - Responsive */}
+            <div className="flex bg-gray-100 dark:bg-gray-800 rounded-lg p-1 transition-colors overflow-x-auto scrollbar-hide">
               <button
                 onClick={() => onTabChange('dashboard')}
                 className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${

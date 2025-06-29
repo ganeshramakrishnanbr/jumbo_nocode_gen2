@@ -544,9 +544,17 @@ function App() {
 
       case 'design':
         return (
-          <div className="flex flex-1">
-            <ControlLibrary onDragStart={handleDragStart} />
-            <div className="flex-1 flex flex-col">
+          <div className="flex flex-1 flex-col lg:flex-row">
+            {/* Mobile/Tablet: Stacked layout, Desktop: Side-by-side */}
+            <div className="lg:hidden">
+              <ControlLibrary onDragStart={handleDragStart} />
+            </div>
+            
+            <div className="hidden lg:block">
+              <ControlLibrary onDragStart={handleDragStart} />
+            </div>
+            
+            <div className="flex-1 flex flex-col min-w-0">
               <SectionManager
                 sections={sections}
                 activeSection={activeSection}
@@ -568,12 +576,16 @@ function App() {
                 activeSection={activeSection}
               />
             </div>
-            <PropertiesPanel
-              selectedControl={selectedControl}
-              onUpdateControl={handleControlUpdate}
-              sections={sections}
-              droppedControls={droppedControls}
-            />
+            
+            {/* Properties Panel - Hidden on mobile, collapsible on tablet */}
+            <div className="hidden md:block">
+              <PropertiesPanel
+                selectedControl={selectedControl}
+                onUpdateControl={handleControlUpdate}
+                sections={sections}
+                droppedControls={droppedControls}
+              />
+            </div>
           </div>
         );
       
