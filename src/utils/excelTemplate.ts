@@ -29,8 +29,9 @@ export const generateExcelTemplate = () => {
     ['1. This template contains all available form controls from the Jumbo No-Code Builder'],
     ['2. Use the "Design" sheet to define your form controls'],
     ['3. Fill in the required columns for each control you want to add'],
-    ['4. Save the file and import it back into the application'],
-    ['5. You can modify controls after import in the Design tab'],
+    ['4. IMPORTANT: Leave the ID column EMPTY - IDs will be auto-generated during import'],
+    ['5. Save the file and import it back into the application'],
+    ['6. You can modify controls after import in the Design tab'],
     [''],
     ['AVAILABLE CONTROL CATEGORIES:'],
     ...CONTROL_CATEGORIES.map(category => [category]),
@@ -45,7 +46,7 @@ export const generateExcelTemplate = () => {
     ]),
     [''],
     ['COLUMN DESCRIPTIONS:'],
-    ['id: Unique identifier (leave empty for auto-generation)'],
+    ['id: LEAVE EMPTY - Unique identifier will be auto-generated'],
     ['type: Control type from the available controls list'],
     ['category: Control category'],
     ['name: Display name for the control'],
@@ -66,9 +67,10 @@ export const generateExcelTemplate = () => {
     ['- Use description field to explain why field is required'],
     [''],
     ['IMPORTANT NOTES:'],
-    ['- Leave ID column empty to auto-generate unique IDs'],
-    ['- Duplicate IDs will be automatically resolved during import'],
-    ['- Controls will be added to existing sections or create new ones']
+    ['- ALWAYS leave ID column empty for auto-generation'],
+    ['- Duplicate IDs will cause import errors'],
+    ['- Controls will be added to existing sections or create new ones'],
+    ['- Check console logs during import for detailed debugging information']
   ];
 
   const instructionsSheet = XLSX.utils.aoa_to_sheet(instructionsData);
@@ -119,7 +121,7 @@ export const generateExcelTemplate = () => {
   const sampleData: ExcelControlData[] = [
     // Personal Information Section
     {
-      id: '', // Leave empty for auto-generation
+      id: '', // ALWAYS EMPTY for auto-generation
       type: 'textInput',
       category: 'Core Input',
       name: 'Full Name',
@@ -132,7 +134,7 @@ export const generateExcelTemplate = () => {
       maxLength: 100
     },
     {
-      id: '', // Leave empty for auto-generation
+      id: '', // ALWAYS EMPTY for auto-generation
       type: 'emailInput',
       category: 'Core Input',
       name: 'Email Address',
@@ -144,7 +146,7 @@ export const generateExcelTemplate = () => {
       order: 2
     },
     {
-      id: '', // Leave empty for auto-generation
+      id: '', // ALWAYS EMPTY for auto-generation
       type: 'phoneInput',
       category: 'Core Input',
       name: 'Phone Number',
@@ -156,7 +158,7 @@ export const generateExcelTemplate = () => {
       order: 3
     },
     {
-      id: '', // Leave empty for auto-generation
+      id: '', // ALWAYS EMPTY for auto-generation
       type: 'datePicker',
       category: 'Date & Time',
       name: 'Date of Birth',
@@ -168,7 +170,7 @@ export const generateExcelTemplate = () => {
       order: 4
     },
     {
-      id: '', // Leave empty for auto-generation
+      id: '', // ALWAYS EMPTY for auto-generation
       type: 'radioGroup',
       category: 'Selection',
       name: 'Gender',
@@ -183,7 +185,7 @@ export const generateExcelTemplate = () => {
 
     // Address Information Section
     {
-      id: '', // Leave empty for auto-generation
+      id: '', // ALWAYS EMPTY for auto-generation
       type: 'completeAddress',
       category: 'Address',
       name: 'Home Address',
@@ -198,7 +200,7 @@ export const generateExcelTemplate = () => {
 
     // Professional Information Section
     {
-      id: '', // Leave empty for auto-generation
+      id: '', // ALWAYS EMPTY for auto-generation
       type: 'textInput',
       category: 'Core Input',
       name: 'Company Name',
@@ -211,7 +213,7 @@ export const generateExcelTemplate = () => {
       maxLength: 150
     },
     {
-      id: '', // Leave empty for auto-generation
+      id: '', // ALWAYS EMPTY for auto-generation
       type: 'textInput',
       category: 'Core Input',
       name: 'Job Title',
@@ -224,7 +226,7 @@ export const generateExcelTemplate = () => {
       maxLength: 100
     },
     {
-      id: '', // Leave empty for auto-generation
+      id: '', // ALWAYS EMPTY for auto-generation
       type: 'dropdown',
       category: 'Selection',
       name: 'Experience Level',
@@ -236,7 +238,7 @@ export const generateExcelTemplate = () => {
       order: 3
     },
     {
-      id: '', // Leave empty for auto-generation
+      id: '', // ALWAYS EMPTY for auto-generation
       type: 'checkboxGroup',
       category: 'Selection',
       name: 'Technical Skills',
@@ -249,7 +251,7 @@ export const generateExcelTemplate = () => {
       order: 4
     },
     {
-      id: '', // Leave empty for auto-generation
+      id: '', // ALWAYS EMPTY for auto-generation
       type: 'numberInput',
       category: 'Core Input',
       name: 'Expected Salary',
@@ -265,7 +267,7 @@ export const generateExcelTemplate = () => {
 
     // Preferences Section
     {
-      id: '', // Leave empty for auto-generation
+      id: '', // ALWAYS EMPTY for auto-generation
       type: 'toggleSwitch',
       category: 'Selection',
       name: 'Remote Work',
@@ -279,7 +281,7 @@ export const generateExcelTemplate = () => {
       order: 1
     },
     {
-      id: '', // Leave empty for auto-generation
+      id: '', // ALWAYS EMPTY for auto-generation
       type: 'slider',
       category: 'Selection',
       name: 'Travel Willingness',
@@ -294,7 +296,7 @@ export const generateExcelTemplate = () => {
       order: 2
     },
     {
-      id: '', // Leave empty for auto-generation
+      id: '', // ALWAYS EMPTY for auto-generation
       type: 'ratingScale',
       category: 'Selection',
       name: 'Interest Level',
@@ -307,7 +309,7 @@ export const generateExcelTemplate = () => {
       order: 3
     },
     {
-      id: '', // Leave empty for auto-generation
+      id: '', // ALWAYS EMPTY for auto-generation
       type: 'dateRangePicker',
       category: 'Date & Time',
       name: 'Availability',
@@ -321,7 +323,7 @@ export const generateExcelTemplate = () => {
 
     // Additional Information Section
     {
-      id: '', // Leave empty for auto-generation
+      id: '', // ALWAYS EMPTY for auto-generation
       type: 'fileUpload',
       category: 'File & Media',
       name: 'Resume Upload',
@@ -335,7 +337,7 @@ export const generateExcelTemplate = () => {
       order: 1
     },
     {
-      id: '', // Leave empty for auto-generation
+      id: '', // ALWAYS EMPTY for auto-generation
       type: 'urlInput',
       category: 'Core Input',
       name: 'Portfolio URL',
@@ -347,7 +349,7 @@ export const generateExcelTemplate = () => {
       order: 2
     },
     {
-      id: '', // Leave empty for auto-generation
+      id: '', // ALWAYS EMPTY for auto-generation
       type: 'textarea',
       category: 'Core Input',
       name: 'Cover Letter',
@@ -361,7 +363,7 @@ export const generateExcelTemplate = () => {
       order: 3
     },
     {
-      id: '', // Leave empty for auto-generation
+      id: '', // ALWAYS EMPTY for auto-generation
       type: 'termsConditions',
       category: 'Validation & Security',
       name: 'Terms Agreement',
@@ -415,12 +417,26 @@ export const generateExcelTemplate = () => {
 
 export const parseExcelFile = (file: File): Promise<ExcelControlData[]> => {
   return new Promise((resolve, reject) => {
+    console.log('🔄 EXCEL PARSE: ===== STARTING EXCEL FILE PARSING =====');
+    console.log('📊 EXCEL PARSE: File details:', {
+      name: file.name,
+      size: file.size,
+      type: file.type,
+      lastModified: new Date(file.lastModified).toISOString()
+    });
+
     const reader = new FileReader();
     
     reader.onload = (e) => {
       try {
+        console.log('📖 EXCEL PARSE: File read successfully, parsing workbook...');
         const data = new Uint8Array(e.target?.result as ArrayBuffer);
         const workbook = XLSX.read(data, { type: 'array' });
+        
+        console.log('📊 EXCEL PARSE: Workbook details:', {
+          sheetNames: workbook.SheetNames,
+          sheetCount: workbook.SheetNames.length
+        });
         
         // Look for Design sheet
         const designSheetName = workbook.SheetNames.find(name => 
@@ -428,24 +444,43 @@ export const parseExcelFile = (file: File): Promise<ExcelControlData[]> => {
         );
         
         if (!designSheetName) {
-          reject(new Error('Design sheet not found in the Excel file'));
+          const error = 'Design sheet not found in the Excel file';
+          console.error('❌ EXCEL PARSE:', error);
+          reject(new Error(error));
           return;
         }
+        
+        console.log('✅ EXCEL PARSE: Found Design sheet:', designSheetName);
         
         const worksheet = workbook.Sheets[designSheetName];
         const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
         
+        console.log('📊 EXCEL PARSE: Raw sheet data:', {
+          totalRows: jsonData.length,
+          firstRowSample: jsonData[0]
+        });
+        
         if (jsonData.length < 2) {
-          reject(new Error('No data found in Design sheet'));
+          const error = 'No data found in Design sheet';
+          console.error('❌ EXCEL PARSE:', error);
+          reject(new Error(error));
           return;
         }
         
         const headers = jsonData[0] as string[];
         const rows = jsonData.slice(1) as any[][];
         
+        console.log('📊 EXCEL PARSE: Data structure:', {
+          headers: headers,
+          dataRows: rows.length,
+          nonEmptyRows: rows.filter(row => row.some(cell => cell !== undefined && cell !== '')).length
+        });
+        
         const controls: ExcelControlData[] = rows
           .filter(row => row.some(cell => cell !== undefined && cell !== ''))
           .map((row, index) => {
+            console.log(`🔄 EXCEL PARSE: Processing row ${index + 1}:`, row);
+            
             const control: any = {};
             
             headers.forEach((header, colIndex) => {
@@ -461,27 +496,48 @@ export const parseExcelFile = (file: File): Promise<ExcelControlData[]> => {
               }
             });
             
-            // Always generate a new unique ID to avoid conflicts
+            // Generate guaranteed unique ID with comprehensive uniqueness strategy
             const timestamp = Date.now();
             const randomSuffix = Math.random().toString(36).substring(2, 8);
-            control.id = `imported-${control.type || 'control'}-${timestamp}-${randomSuffix}-${index}`;
+            const indexSuffix = index.toString().padStart(3, '0');
+            const typePrefix = control.type || 'control';
+            control.id = `imported-${typePrefix}-${timestamp}-${randomSuffix}-${indexSuffix}`;
             
             // Set defaults
             control.sectionId = control.sectionId || 'default';
             control.order = control.order || index;
             control.required = control.required || false;
             
+            console.log(`✅ EXCEL PARSE: Processed control ${index + 1}:`, {
+              id: control.id,
+              type: control.type,
+              name: control.name,
+              sectionId: control.sectionId,
+              required: control.required
+            });
+            
             return control;
           });
         
+        console.log('✅ EXCEL PARSE: ===== PARSING COMPLETED SUCCESSFULLY =====');
+        console.log('📊 EXCEL PARSE: Final results:', {
+          totalControls: controls.length,
+          controlTypes: [...new Set(controls.map(c => c.type))],
+          sections: [...new Set(controls.map(c => c.sectionId))],
+          requiredControls: controls.filter(c => c.required).length
+        });
+        
         resolve(controls);
       } catch (error) {
+        console.error('❌ EXCEL PARSE: Parsing failed:', error);
         reject(new Error(`Failed to parse Excel file: ${error}`));
       }
     };
     
     reader.onerror = () => {
-      reject(new Error('Failed to read file'));
+      const error = 'Failed to read file';
+      console.error('❌ EXCEL PARSE:', error);
+      reject(new Error(error));
     };
     
     reader.readAsArrayBuffer(file);
@@ -489,55 +545,72 @@ export const parseExcelFile = (file: File): Promise<ExcelControlData[]> => {
 };
 
 export const convertExcelDataToControls = (excelData: ExcelControlData[]): DroppedControl[] => {
-  return excelData.map(data => {
+  console.log('🔄 EXCEL CONVERT: ===== STARTING DATA CONVERSION =====');
+  console.log('📊 EXCEL CONVERT: Input data:', {
+    controlCount: excelData.length,
+    sampleControl: excelData[0] ? {
+      id: excelData[0].id,
+      type: excelData[0].type,
+      name: excelData[0].name
+    } : 'No controls'
+  });
+
+  const convertedControls = excelData.map((data, index) => {
+    console.log(`🔄 EXCEL CONVERT: Converting control ${index + 1}: ${data.name}`);
+    
     // Build properties object from Excel data
     const properties: Record<string, any> = {
       label: data.label || data.name,
       required: data.required || false
     };
     
-    // Add type-specific properties
-    if (data.placeholder) properties.placeholder = data.placeholder;
-    if (data.description) properties.description = data.description;
-    if (data.options) properties.options = data.options;
-    if (data.minLength) properties.minLength = data.minLength;
-    if (data.maxLength) properties.maxLength = data.maxLength;
-    if (data.min !== undefined) properties.min = data.min;
-    if (data.max !== undefined) properties.max = data.max;
-    if (data.step) properties.step = data.step;
-    if (data.rows) properties.rows = data.rows;
-    if (data.accept) properties.accept = data.accept;
-    if (data.multiple !== undefined) properties.multiple = data.multiple;
-    if (data.maxSize) properties.maxSize = data.maxSize;
-    if (data.format) properties.format = data.format;
-    if (data.layout) properties.layout = data.layout;
-    if (data.scaleType) properties.scaleType = data.scaleType;
-    if (data.maxValue) properties.maxValue = data.maxValue;
-    if (data.defaultValue !== undefined) properties.defaultValue = data.defaultValue;
-    if (data.onLabel) properties.onLabel = data.onLabel;
-    if (data.offLabel) properties.offLabel = data.offLabel;
-    if (data.canvasWidth) properties.canvasWidth = data.canvasWidth;
-    if (data.canvasHeight) properties.canvasHeight = data.canvasHeight;
-    if (data.defaultColor) properties.defaultColor = data.defaultColor;
-    if (data.text) properties.text = data.text;
-    if (data.level) properties.level = data.level;
-    if (data.alignment) properties.alignment = data.alignment;
-    if (data.fontSize) properties.fontSize = data.fontSize;
-    if (data.color) properties.color = data.color;
-    if (data.style) properties.style = data.style;
-    if (data.thickness) properties.thickness = data.thickness;
-    if (data.spacing) properties.spacing = data.spacing;
+    // Add type-specific properties with comprehensive logging
+    const propertyMappings = [
+      'placeholder', 'description', 'options', 'minLength', 'maxLength', 
+      'min', 'max', 'step', 'rows', 'accept', 'multiple', 'maxSize', 
+      'format', 'layout', 'scaleType', 'maxValue', 'defaultValue', 
+      'onLabel', 'offLabel', 'canvasWidth', 'canvasHeight', 'defaultColor', 
+      'text', 'level', 'alignment', 'fontSize', 'color', 'style', 
+      'thickness', 'spacing'
+    ];
+
+    propertyMappings.forEach(prop => {
+      if (data[prop] !== undefined && data[prop] !== '') {
+        properties[prop] = data[prop];
+      }
+    });
     
-    return {
+    const convertedControl: DroppedControl = {
       id: data.id, // Use the guaranteed unique ID from parsing
       type: data.type,
       name: data.name,
       x: 0,
-      y: data.order || 0,
+      y: data.order || index,
       width: 400,
       height: data.type === 'textarea' ? 100 : 50,
       properties,
       sectionId: data.sectionId || 'default'
     };
+
+    console.log(`✅ EXCEL CONVERT: Converted control ${index + 1}:`, {
+      id: convertedControl.id,
+      type: convertedControl.type,
+      name: convertedControl.name,
+      sectionId: convertedControl.sectionId,
+      propertyCount: Object.keys(properties).length
+    });
+    
+    return convertedControl;
   });
+
+  console.log('✅ EXCEL CONVERT: ===== CONVERSION COMPLETED =====');
+  console.log('📊 EXCEL CONVERT: Final results:', {
+    convertedCount: convertedControls.length,
+    sectionDistribution: convertedControls.reduce((acc, control) => {
+      acc[control.sectionId || 'unknown'] = (acc[control.sectionId || 'unknown'] || 0) + 1;
+      return acc;
+    }, {} as Record<string, number>)
+  });
+
+  return convertedControls;
 };

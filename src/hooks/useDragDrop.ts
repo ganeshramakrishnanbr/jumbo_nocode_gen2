@@ -23,7 +23,8 @@ export const useDragDrop = (questionnaireId: string = 'default-questionnaire', i
 
     try {
       setIsLoading(true);
-      console.log('🔄 useDragDrop: Loading controls from database...', { 
+      console.log('🔄 useDragDrop: ===== LOADING CONTROLS FROM DATABASE =====');
+      console.log('📊 useDragDrop: Load parameters:', { 
         questionnaireId, 
         refreshKey,
         timestamp: new Date().toISOString()
@@ -34,14 +35,18 @@ export const useDragDrop = (questionnaireId: string = 'default-questionnaire', i
       console.log('📊 useDragDrop: Database query results:', {
         controlCount: controls.length,
         refreshKey,
-        controls: controls.map(c => ({
-          id: c.id,
-          type: c.type,
-          name: c.name,
-          sectionId: c.sectionId,
-          order: c.y
-        }))
+        timestamp: new Date().toISOString()
       });
+
+      // Detailed control logging
+      if (controls.length > 0) {
+        console.log('📝 useDragDrop: Loaded controls details:');
+        controls.forEach((control, index) => {
+          console.log(`   ${index + 1}. ${control.name} (${control.type}) - Section: ${control.sectionId}, Order: ${control.y}, ID: ${control.id}`);
+        });
+      } else {
+        console.log('📝 useDragDrop: No controls found in database');
+      }
       
       // Log section distribution for debugging
       const sectionDistribution = controls.reduce((acc, c) => {
@@ -51,6 +56,7 @@ export const useDragDrop = (questionnaireId: string = 'default-questionnaire', i
       console.log('🎯 useDragDrop: Controls by section:', sectionDistribution);
       
       // Update state with error boundary
+      console.log('🔄 useDragDrop: Updating React state...');
       setDroppedControls(controls);
       console.log('✅ useDragDrop: Controls state updated successfully');
       
@@ -69,12 +75,14 @@ export const useDragDrop = (questionnaireId: string = 'default-questionnaire', i
       setDroppedControls([]);
     } finally {
       setIsLoading(false);
+      console.log('🏁 useDragDrop: Load controls process completed');
     }
   }, [questionnaireId, isDbInitialized, refreshKey]);
 
   // Load controls when dependencies change with enhanced error handling
   useEffect(() => {
-    console.log('🔄 useDragDrop: useEffect triggered', { 
+    console.log('🔄 useDragDrop: ===== useEffect TRIGGERED =====');
+    console.log('📊 useDragDrop: useEffect parameters:', { 
       questionnaireId, 
       isDbInitialized, 
       refreshKey,
@@ -95,31 +103,41 @@ export const useDragDrop = (questionnaireId: string = 'default-questionnaire', i
 
   // Enhanced force refresh with comprehensive verification
   const forceRefresh = useCallback(async () => {
-    console.log('🔄 useDragDrop: Force refresh initiated', {
+    console.log('🔄 useDragDrop: ===== FORCE REFRESH INITIATED =====');
+    console.log('📊 useDragDrop: Force refresh parameters:', {
       currentControlCount: droppedControls.length,
       refreshKey,
+      questionnaireId,
       timestamp: new Date().toISOString()
     });
     
     try {
       // Force reload from database
+      console.log('🔄 useDragDrop: Executing force reload from database...');
       await loadControlsFromDB();
       
-      // Additional verification step
+      // Additional verification step with enhanced logging
       setTimeout(async () => {
         try {
+          console.log('🔍 useDragDrop: Force refresh verification step...');
           const verificationControls = await getControls(questionnaireId);
-          console.log('🔍 useDragDrop: Force refresh verification:', {
+          const currentStateCount = droppedControls.length;
+          
+          console.log('📊 useDragDrop: Force refresh verification results:', {
             dbControlCount: verificationControls.length,
-            stateControlCount: droppedControls.length,
+            stateControlCount: currentStateCount,
             refreshKey,
+            syncStatus: verificationControls.length === currentStateCount ? 'SYNCED' : 'OUT_OF_SYNC',
             timestamp: new Date().toISOString()
           });
           
           // If state is still out of sync, update it directly
-          if (verificationControls.length !== droppedControls.length) {
-            console.log('🔄 useDragDrop: State out of sync, updating directly');
+          if (verificationControls.length !== currentStateCount) {
+            console.log('🔄 useDragDrop: State out of sync - updating directly');
             setDroppedControls(verificationControls);
+            console.log('✅ useDragDrop: Direct state update completed');
+          } else {
+            console.log('✅ useDragDrop: State is in sync');
           }
         } catch (error) {
           console.error('❌ useDragDrop: Force refresh verification failed:', error);
@@ -348,14 +366,25 @@ export const useDragDrop = (questionnaireId: string = 'default-questionnaire', i
 
   // Enhanced state change logging for debugging
   useEffect(() => {
-    console.log('📊 useDragDrop: State changed:', {
+    console.log('📊 useDragDrop: ===== STATE CHANGED =====');
+    console.log('📊 useDragDrop: Current state:', {
       controlCount: droppedControls.length,
       selectedControlId: selectedControl?.id,
+      selectedControlName: selectedControl?.name,
       isLoading,
       refreshKey,
       timestamp: new Date().toISOString()
     });
-  }, [droppedControls.length, selectedControl?.id, isLoading, refreshKey]);
+
+    // Log control distribution by section
+    if (droppedControls.length > 0) {
+      const distribution = droppedControls.reduce((acc, control) => {
+        acc[control.sectionId || 'unknown'] = (acc[control.sectionId || 'unknown'] || 0) + 1;
+        return acc;
+      }, {} as Record<string, number>);
+      console.log('📂 useDragDrop: Current controls by section:', distribution);
+    }
+  }, [droppedControls.length, selectedControl?.id, selectedControl?.name, isLoading, refreshKey]);
 
   return {
     droppedControls,

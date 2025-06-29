@@ -188,7 +188,7 @@ function App() {
   };
 
   const handleImportControls = async (controls: DroppedControl[]) => {
-    console.log('🚀 EXCEL IMPORT: Starting comprehensive import process');
+    console.log('🚀 EXCEL IMPORT: ===== STARTING COMPREHENSIVE IMPORT PROCESS =====');
     console.log('📊 EXCEL IMPORT: Import details:', {
       controlCount: controls.length,
       questionnaire: currentQuestionnaire,
@@ -207,33 +207,37 @@ function App() {
     setImportInProgress(true);
     
     try {
-      console.log('📝 EXCEL IMPORT: Controls to import:', controls.map(c => ({
-        id: c.id,
-        type: c.type,
-        name: c.name,
-        sectionId: c.sectionId,
-        order: c.y,
-        hasUniqueId: c.id.includes('imported-')
-      })));
+      console.log('📝 EXCEL IMPORT: Raw Excel data received:');
+      controls.forEach((control, index) => {
+        console.log(`   ${index + 1}. ${control.name} (${control.type}) - Section: ${control.sectionId}, Order: ${control.y}`);
+      });
 
+      // STEP 1: COMPREHENSIVE DATA VALIDATION
+      console.log('🔍 EXCEL IMPORT: STEP 1 - Comprehensive data validation...');
       let successCount = 0;
       let errorCount = 0;
       const errors: string[] = [];
 
-      // Validate Excel data structure
-      console.log('🔍 EXCEL IMPORT: Validating data structure...');
       for (const control of controls) {
+        console.log(`🔍 EXCEL IMPORT: Validating control: ${control.name}`);
+        
         if (!control.type || !control.name) {
-          errors.push(`Invalid control data: missing type or name for control ${control.id}`);
+          const error = `Invalid control data: missing type or name for control ${control.id}`;
+          errors.push(error);
           errorCount++;
+          console.error(`❌ EXCEL IMPORT: ${error}`);
           continue;
         }
         
-        if (!control.id || !control.id.includes('imported-')) {
-          errors.push(`Invalid control ID: ${control.id} - should be auto-generated`);
+        if (!control.id) {
+          const error = `Invalid control ID: missing ID for control ${control.name}`;
+          errors.push(error);
           errorCount++;
+          console.error(`❌ EXCEL IMPORT: ${error}`);
           continue;
         }
+
+        console.log(`✅ EXCEL IMPORT: Control ${control.name} passed validation`);
       }
 
       if (errorCount > 0) {
@@ -241,28 +245,33 @@ function App() {
         throw new Error(`Data validation failed: ${errors.join(', ')}`);
       }
 
-      console.log('✅ EXCEL IMPORT: Data validation passed');
+      console.log('✅ EXCEL IMPORT: All controls passed validation');
 
-      // Process each control individually with comprehensive error handling
+      // STEP 2: INDIVIDUAL CONTROL PROCESSING WITH ERROR ISOLATION
+      console.log('🔄 EXCEL IMPORT: STEP 2 - Processing individual controls...');
+      
       for (let i = 0; i < controls.length; i++) {
         const control = controls[i];
-        console.log(`🔄 EXCEL IMPORT: Processing control ${i + 1}/${controls.length}:`, {
-          id: control.id,
-          type: control.type,
-          name: control.name,
-          sectionId: control.sectionId,
-          properties: Object.keys(control.properties || {})
-        });
+        console.log(`🔄 EXCEL IMPORT: Processing control ${i + 1}/${controls.length}:`);
+        console.log(`   - ID: ${control.id}`);
+        console.log(`   - Type: ${control.type}`);
+        console.log(`   - Name: ${control.name}`);
+        console.log(`   - Section: ${control.sectionId}`);
+        console.log(`   - Properties: ${JSON.stringify(control.properties, null, 2)}`);
 
         try {
-          // Ensure unique ID with additional timestamp
-          const uniqueId = `${control.id}-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`;
+          // Generate guaranteed unique ID with multiple layers of uniqueness
+          const timestamp = Date.now();
+          const randomSuffix = Math.random().toString(36).substring(2, 8);
+          const indexSuffix = i.toString().padStart(3, '0');
+          const uniqueId = `imported-${control.type}-${timestamp}-${randomSuffix}-${indexSuffix}`;
+          
           const controlToInsert = {
             ...control,
             id: uniqueId
           };
 
-          console.log(`📝 EXCEL IMPORT: Inserting control with ID: ${uniqueId}`);
+          console.log(`📝 EXCEL IMPORT: Inserting control with guaranteed unique ID: ${uniqueId}`);
           await insertControl(controlToInsert, currentQuestionnaire);
           successCount++;
           console.log(`✅ EXCEL IMPORT: Successfully inserted control ${i + 1}: ${control.name}`);
@@ -274,11 +283,11 @@ function App() {
         }
       }
 
-      console.log('📊 EXCEL IMPORT: Import summary:', {
+      console.log('📊 EXCEL IMPORT: STEP 2 COMPLETE - Import summary:', {
         total: controls.length,
         success: successCount,
         errors: errorCount,
-        errorDetails: errors.slice(0, 5) // Log first 5 errors
+        errorDetails: errors.slice(0, 5)
       });
 
       if (successCount === 0) {
@@ -292,18 +301,18 @@ function App() {
         errors: errors
       });
 
-      // COMPREHENSIVE STATE REFRESH STRATEGY
-      console.log('🔄 EXCEL IMPORT: Starting comprehensive refresh strategy...');
+      // STEP 3: COMPREHENSIVE STATE REFRESH STRATEGY
+      console.log('🔄 EXCEL IMPORT: STEP 3 - Executing comprehensive refresh strategy...');
       
-      // Strategy 1: Immediate refresh key update
-      console.log('📈 EXCEL IMPORT: Strategy 1 - Updating refresh key');
+      // Strategy 1: Immediate refresh key update (0ms)
+      console.log('📈 EXCEL IMPORT: Strategy 1 - Immediate refresh key update');
       const newRefreshKey = refreshKey + 1;
       setRefreshKey(newRefreshKey);
-      console.log(`🔑 EXCEL IMPORT: Refresh key: ${refreshKey} → ${newRefreshKey}`);
+      console.log(`🔑 EXCEL IMPORT: Refresh key updated: ${refreshKey} → ${newRefreshKey}`);
 
-      // Strategy 2: Force refresh after short delay
+      // Strategy 2: Force refresh with verification (200ms)
       setTimeout(async () => {
-        console.log('⏰ EXCEL IMPORT: Strategy 2 - Executing force refresh');
+        console.log('⏰ EXCEL IMPORT: Strategy 2 - Force refresh with verification');
         try {
           await forceRefresh();
           console.log('✅ EXCEL IMPORT: Force refresh completed');
@@ -314,7 +323,8 @@ function App() {
             dbControlCount: currentControls.length,
             uiControlCount: droppedControls.length,
             importedCount: successCount,
-            refreshKey: newRefreshKey
+            refreshKey: newRefreshKey,
+            expectedMinimum: successCount
           });
           
         } catch (error) {
@@ -322,49 +332,52 @@ function App() {
         }
       }, 200);
 
-      // Strategy 3: Final verification and sync check
+      // Strategy 3: Final verification and sync check (500ms)
       setTimeout(async () => {
         console.log('🔍 EXCEL IMPORT: Strategy 3 - Final verification and sync check');
         try {
           const dbControls = await getControls(currentQuestionnaire);
+          const currentUIControls = droppedControls.length;
+          
           console.log('📊 EXCEL IMPORT: Final verification results:', {
             dbControlCount: dbControls.length,
-            uiControlCount: droppedControls.length,
+            uiControlCount: currentUIControls,
             expectedMinimum: successCount,
-            syncStatus: dbControls.length >= successCount ? 'GOOD' : 'NEEDS_SYNC'
+            syncStatus: dbControls.length >= successCount ? 'GOOD' : 'NEEDS_SYNC',
+            refreshKey: newRefreshKey
           });
 
           // If UI is out of sync, force another refresh
-          if (dbControls.length > droppedControls.length) {
-            console.log('🔄 EXCEL IMPORT: UI out of sync - forcing final refresh');
+          if (dbControls.length > currentUIControls) {
+            console.log('🔄 EXCEL IMPORT: UI out of sync - forcing additional refresh');
             setRefreshKey(prev => prev + 1);
           } else {
             console.log('✅ EXCEL IMPORT: UI and database are in sync');
           }
 
-          // Log section distribution
+          // Log section distribution for debugging
           const sectionDistribution = dbControls.reduce((acc, control) => {
             const section = control.sectionId || 'unknown';
             acc[section] = (acc[section] || 0) + 1;
             return acc;
           }, {} as Record<string, number>);
-          console.log('📂 EXCEL IMPORT: Controls by section:', sectionDistribution);
+          console.log('📂 EXCEL IMPORT: Final controls by section:', sectionDistribution);
 
         } catch (error) {
           console.error('❌ EXCEL IMPORT: Final verification failed:', error);
         }
       }, 500);
 
-      // Strategy 4: Show success dialog
+      // Strategy 4: Show success dialog (100ms)
       setTimeout(() => {
-        console.log('🎉 EXCEL IMPORT: Showing success dialog');
+        console.log('🎉 EXCEL IMPORT: Strategy 4 - Showing success dialog');
         setShowImportDialog(true);
       }, 100);
 
-      console.log('🎉 EXCEL IMPORT: Import process completed successfully');
+      console.log('🎉 EXCEL IMPORT: ===== IMPORT PROCESS COMPLETED SUCCESSFULLY =====');
 
     } catch (error) {
-      console.error('❌ EXCEL IMPORT: Import process failed:', error);
+      console.error('❌ EXCEL IMPORT: ===== IMPORT PROCESS FAILED =====', error);
       setImportResults({
         success: 0,
         total: controls.length,
@@ -373,24 +386,42 @@ function App() {
       setShowImportDialog(true);
     } finally {
       setImportInProgress(false);
-      console.log('🏁 EXCEL IMPORT: Process completed, import progress cleared');
+      console.log('🏁 EXCEL IMPORT: Import progress cleared');
     }
   };
 
   const handleDialogClose = () => {
-    console.log('🔄 DIALOG: Closing import dialog and triggering screen refresh');
+    console.log('🔄 DIALOG: ===== DIALOG CLOSE AND SCREEN REFRESH =====');
     setShowImportDialog(false);
     setImportResults(null);
     
-    // Trigger final refresh when dialog closes
+    // Strategy 5: Dialog-triggered refresh (100ms)
     setTimeout(() => {
-      console.log('🔄 DIALOG: Executing post-dialog refresh');
-      setRefreshKey(prev => prev + 1);
+      console.log('🔄 DIALOG: Strategy 5 - Post-dialog refresh');
+      setRefreshKey(prev => {
+        const newKey = prev + 1;
+        console.log(`🔑 DIALOG: Refresh key updated: ${prev} → ${newKey}`);
+        return newKey;
+      });
       
-      // Force a complete page refresh if needed
-      setTimeout(() => {
-        console.log('🔄 DIALOG: Final verification after dialog close');
-        forceRefresh();
+      // Strategy 6: Final verification after dialog close (300ms)
+      setTimeout(async () => {
+        console.log('🔄 DIALOG: Strategy 6 - Final verification after dialog close');
+        try {
+          await forceRefresh();
+          
+          // Final state verification
+          const finalControls = await getControls(currentQuestionnaire);
+          console.log('🔍 DIALOG: Final state verification:', {
+            dbControlCount: finalControls.length,
+            uiControlCount: droppedControls.length,
+            timestamp: new Date().toISOString()
+          });
+          
+          console.log('✅ DIALOG: ===== SCREEN REFRESH COMPLETED =====');
+        } catch (error) {
+          console.error('❌ DIALOG: Final verification failed:', error);
+        }
       }, 300);
     }, 100);
   };
@@ -500,7 +531,10 @@ function App() {
                   Importing Controls...
                 </h3>
                 <p className="text-gray-600 dark:text-gray-300 text-sm">
-                  Please wait while we process your Excel file and import the controls.
+                  Processing Excel data and importing controls with comprehensive validation.
+                </p>
+                <p className="text-gray-500 dark:text-gray-400 text-xs mt-2">
+                  Check console for detailed progress logs.
                 </p>
               </div>
             </div>
@@ -523,6 +557,7 @@ function App() {
               {isDbInitialized && <span className="text-green-600 dark:text-green-400">Database Connected</span>}
               <span className="capitalize">{theme} Theme</span>
               {importInProgress && <span className="text-blue-600 dark:text-blue-400 animate-pulse">Import Processing...</span>}
+              <span className="text-xs text-gray-500 dark:text-gray-400">RefreshKey: {refreshKey}</span>
             </div>
             <div className="flex items-center space-x-4">
               <span>Version 1.0.0</span>
