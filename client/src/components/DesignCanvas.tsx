@@ -51,9 +51,9 @@ export const DesignCanvas: React.FC<DesignCanvasProps> = ({
   const sortedControls = [...droppedControls].sort((a, b) => a.y - b.y);
 
   return (
-    <div className="flex-1 bg-gray-50 dark:bg-gray-800 relative overflow-auto transition-colors">
+    <div className="flex-1 bg-gray-50 dark:bg-gray-800 relative flex flex-col overflow-hidden transition-colors">
       {/* Canvas Header */}
-      <div className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 px-6 py-3 flex items-center justify-between sticky top-0 z-10 transition-colors">
+      <div className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 px-6 py-3 flex items-center justify-between flex-shrink-0 transition-colors">
         <div className="flex items-center space-x-4">
           <h3 className="font-medium text-gray-900 dark:text-white transition-colors">Design Canvas</h3>
           <div className="flex items-center space-x-2 text-sm text-gray-500 dark:text-gray-400 transition-colors">
@@ -71,16 +71,14 @@ export const DesignCanvas: React.FC<DesignCanvasProps> = ({
         </div>
       </div>
 
-      {/* Canvas Area */}
+      {/* Canvas Area - Scrollable */}
       <div
-        ref={(node) => {
-          canvasRef.current = node;
-          drop(node);
-        }}
-        className={`relative min-h-full p-6 transition-colors ${
+        ref={drop}
+        className={`flex-1 overflow-y-auto overflow-x-hidden p-6 transition-colors design-canvas-scroll ${
           isOver ? 'bg-blue-50 dark:bg-blue-900/20' : ''
         }`}
         onClick={handleCanvasClick}
+        style={{ maxHeight: 'calc(100vh - 200px)' }}
       >
         {/* Drop Zone Hint */}
         {droppedControls.length === 0 && (
@@ -102,8 +100,8 @@ export const DesignCanvas: React.FC<DesignCanvasProps> = ({
 
         {/* Form Container */}
         {droppedControls.length > 0 && (
-          <div className="max-w-4xl mx-auto bg-white dark:bg-gray-900 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-8 transition-colors">
-            <div className="space-y-6">
+          <div className="max-w-4xl mx-auto bg-white dark:bg-gray-900 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-8 transition-colors min-h-screen">
+            <div className="space-y-6 pb-20">
               {sortedControls.map((control, index) => (
                 <DraggableControlComponent
                   key={control.id}
