@@ -1299,19 +1299,23 @@ export const PreviewMode: React.FC<PreviewModeProps> = ({
       </div>
 
       {/* Form Content - Scrollable area with theme and tab alignment */}
-      <div className="flex-1 flex flex-col h-full">
+      <div className="flex-1 flex flex-col h-full overflow-hidden">
         <div className="flex-1 overflow-y-auto">
-          <div className="p-8">
-            {/* Dynamic Layout based on tab alignment */}
-            <div className={currentTheme.containerClass}>
+          <div className="p-4 md:p-8 min-h-full">
+            {/* Dynamic Layout based on tab alignment - Ensure proper containment */}
+            <div className="w-full max-w-none">
               {/* Section Tabs - Top alignment */}
               {tabAlignment === 'top' && sections.length > 1 && (
-                <div className={currentTheme.sectionTabsClass}>
+                <div className="flex flex-wrap gap-1 mb-8 bg-gray-100 dark:bg-gray-800 p-1 rounded-lg overflow-x-auto">
                   {sections.map((section, index) => (
                     <button
                       key={section.id}
                       onClick={() => setActiveSection(index)}
-                      className={activeSection === index ? currentTheme.activeTabClass : currentTheme.inactiveTabClass}
+                      className={`px-4 py-2 rounded-md whitespace-nowrap flex-shrink-0 transition-colors ${
+                        activeSection === index 
+                          ? 'bg-white dark:bg-gray-700 text-blue-600 dark:text-blue-400 font-medium shadow-sm' 
+                          : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
+                      }`}
                     >
                       {section.name}
                     </button>
@@ -1319,25 +1323,25 @@ export const PreviewMode: React.FC<PreviewModeProps> = ({
                 </div>
               )}
 
-              {/* Main content area with sidebar for left/right tabs */}
-              <div className={`${tabAlignment !== 'top' ? 'flex gap-8' : ''} ${tabAlignment === 'right' ? 'flex-row-reverse' : 'flex-row'}`}>
+              {/* Main content area with proper overflow handling */}
+              <div className={`${tabAlignment !== 'top' ? 'flex gap-4 lg:gap-8' : ''} ${tabAlignment === 'right' ? 'flex-row-reverse' : 'flex-row'}`}>
                 {/* Section Tabs Sidebar - Left/Right alignment */}
                 {tabAlignment !== 'top' && sections.length > 1 && (
-                  <div className="flex-shrink-0 w-64 space-y-2">
+                  <div className="flex-shrink-0 w-48 lg:w-64 space-y-2">
                     <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Sections</h3>
                     {sections.map((section, index) => (
                       <button
                         key={section.id}
                         onClick={() => setActiveSection(index)}
-                        className={`w-full text-left p-4 rounded-lg transition-all ${
+                        className={`w-full text-left p-3 lg:p-4 rounded-lg transition-all ${
                           activeSection === index
                             ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg'
                             : 'bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-600'
                         }`}
                       >
-                        <div className="font-medium">{section.name}</div>
+                        <div className="font-medium text-sm lg:text-base">{section.name}</div>
                         {section.description && (
-                          <div className={`text-sm mt-1 ${activeSection === index ? 'text-blue-100' : 'text-gray-500 dark:text-gray-400'}`}>
+                          <div className={`text-xs lg:text-sm mt-1 ${activeSection === index ? 'text-blue-100' : 'text-gray-500 dark:text-gray-400'}`}>
                             {section.description}
                           </div>
                         )}
@@ -1346,56 +1350,58 @@ export const PreviewMode: React.FC<PreviewModeProps> = ({
                   </div>
                 )}
 
-                {/* Form Content */}
-                <div className={tabAlignment !== 'top' ? 'flex-1' : ''}>
-                  {/* Form Title */}
-                  {currentSection && (
-                    <>
-                      <div className="mb-8">
-                        <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">{currentSection.name}</h1>
-                        {currentSection.description && (
-                          <p className="text-gray-600 dark:text-gray-300">{currentSection.description}</p>
-                        )}
-                      </div>
-                      
-                      {/* Form Fields with theme styling */}
-                      {sectionControls.length === 0 ? (
-                        <div className="text-center py-16">
-                          <Circle className="w-16 h-16 text-gray-400 dark:text-gray-500 mx-auto mb-4" />
-                          <h3 className="text-xl font-medium text-gray-600 dark:text-gray-300 mb-2">No controls in this section</h3>
-                          <p className="text-gray-500 dark:text-gray-400">Add form controls to see the preview</p>
+                {/* Form Content - Properly contained */}
+                <div className={`${tabAlignment !== 'top' ? 'flex-1 min-w-0' : 'w-full'} max-w-4xl mx-auto`}>
+                  <div className="bg-white dark:bg-gray-900 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 p-6 lg:p-8">
+                    {/* Form Title */}
+                    {currentSection && (
+                      <>
+                        <div className="mb-6 lg:mb-8">
+                          <h1 className="text-2xl lg:text-3xl font-bold text-gray-900 dark:text-white mb-2">{currentSection.name}</h1>
+                          {currentSection.description && (
+                            <p className="text-gray-600 dark:text-gray-300">{currentSection.description}</p>
+                          )}
                         </div>
-                      ) : (
-                        <div className={currentTheme.fieldSpacing}>
-                          {sectionControls
-                            .sort((a, b) => a.y - b.y || a.x - b.x)
-                            .map(control => (
-                              <div key={control.id} className="relative group">
-                                {/* Themed field container */}
-                                <div className="space-y-2">
-                                  {control.properties.label && (
-                                    <label className={currentTheme.labelClass}>
-                                      {control.properties.required && (
-                                        <span className="text-red-500 mr-1">*</span>
-                                      )}
-                                      {control.properties.label}
-                                      {control.properties.dependencies && control.properties.dependencies.length > 0 && (
-                                        <span className="ml-2 text-xs text-blue-600 dark:text-blue-400 bg-blue-100 dark:bg-blue-900 px-1 py-0.5 rounded">
-                                          Conditional
-                                        </span>
-                                      )}
-                                    </label>
-                                  )}
-                                  <div className="themed-input">
-                                    {renderThemedControl(control, currentTheme)}
+                        
+                        {/* Form Fields with theme styling */}
+                        {sectionControls.length === 0 ? (
+                          <div className="text-center py-16">
+                            <Circle className="w-16 h-16 text-gray-400 dark:text-gray-500 mx-auto mb-4" />
+                            <h3 className="text-xl font-medium text-gray-600 dark:text-gray-300 mb-2">No controls in this section</h3>
+                            <p className="text-gray-500 dark:text-gray-400">Add form controls to see the preview</p>
+                          </div>
+                        ) : (
+                          <div className="space-y-6">
+                            {sectionControls
+                              .sort((a, b) => a.y - b.y || a.x - b.x)
+                              .map(control => (
+                                <div key={control.id} className="relative group">
+                                  {/* Themed field container */}
+                                  <div className="space-y-2">
+                                    {control.properties.label && (
+                                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                        {control.properties.required && (
+                                          <span className="text-red-500 mr-1">*</span>
+                                        )}
+                                        {control.properties.label}
+                                        {control.properties.dependencies && control.properties.dependencies.length > 0 && (
+                                          <span className="ml-2 text-xs text-blue-600 dark:text-blue-400 bg-blue-100 dark:bg-blue-900 px-1 py-0.5 rounded">
+                                            Conditional
+                                          </span>
+                                        )}
+                                      </label>
+                                    )}
+                                    <div className="w-full">
+                                      {renderThemedControl(control, currentTheme)}
+                                    </div>
                                   </div>
                                 </div>
-                              </div>
-                            ))}
-                        </div>
-                      )}
-                    </>
-                  )}
+                              ))}
+                          </div>
+                        )}
+                      </>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
