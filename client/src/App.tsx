@@ -571,14 +571,14 @@ function App() {
 
       case 'design':
         return (
-          <div className="flex flex-1 flex-col lg:flex-row h-full">
-            {/* Control Library - Responsive sizing */}
-            <div className="w-full lg:w-64 xl:w-72 flex-shrink-0">
+          <div className="flex flex-1 h-full overflow-hidden">
+            {/* Control Library - Left Panel */}
+            <div className="w-80 flex-shrink-0 border-r border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900">
               <ControlLibrary onDragStart={handleDragStart} />
             </div>
             
-            {/* Main Design Area */}
-            <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
+            {/* Main Design Area - Center Panel */}
+            <div className="flex-1 flex flex-col min-w-0 bg-gray-50 dark:bg-gray-800">
               <SectionManager
                 sections={sections}
                 activeSection={activeSection}
@@ -587,17 +587,29 @@ function App() {
                 onUpdateSection={handleUpdateSection}
                 onDeleteSection={handleDeleteSection}
               />
-              <DesignCanvas
-                droppedControls={droppedControls.filter(control => control.sectionId === activeSection)}
+              <div className="flex-1 overflow-hidden">
+                <DesignCanvas
+                  droppedControls={droppedControls.filter(control => control.sectionId === activeSection)}
+                  selectedControl={selectedControl}
+                  onControlSelect={handleControlSelect}
+                  onControlUpdate={handleControlUpdate}
+                  onControlMove={handleMoveControl}
+                  onControlRemove={handleRemoveControl}
+                  onControlReorder={handleReorderControl}
+                  onDrop={handleDrop}
+                  draggedControl={draggedControl}
+                  activeSection={activeSection}
+                />
+              </div>
+            </div>
+
+            {/* Properties Panel - Right Panel */}
+            <div className="w-80 flex-shrink-0 border-l border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900">
+              <PropertiesPanel
                 selectedControl={selectedControl}
-                onControlSelect={handleControlSelect}
-                onControlUpdate={handleControlUpdate}
-                onControlMove={handleMoveControl}
-                onControlRemove={handleRemoveControl}
-                onControlReorder={handleReorderControl}
-                onDrop={handleDrop}
-                draggedControl={draggedControl}
-                activeSection={activeSection}
+                onUpdateControl={handleControlUpdate}
+                sections={sections}
+                droppedControls={droppedControls}
               />
             </div>
             
