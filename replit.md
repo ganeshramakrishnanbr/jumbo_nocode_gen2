@@ -32,15 +32,16 @@ The application follows a full-stack monolithic architecture with clear separati
 - **Static file serving** with Vite integration in development
 
 ### Key Features
-1. **Multi-tier customer experience** with feature limitations based on subscription level
-2. **Form builder interface** with drag-and-drop controls from a component library
-3. **Section-based form organization** with visual management
-4. **Real-time preview mode** for form testing
-5. **PDF Preview functionality** with real-time generation, tier-based templates, logo upload, custom footer notes, page break settings, and filled value display
-6. **JSON export/import** for form definitions with expandable sections
-7. **Excel template system** for bulk form creation
-8. **Dashboard with analytics** showing form usage statistics
-9. **Responsive design** supporting web, tablet, and mobile devices with mobile-first approach, collapsible panels, and touch-friendly controls
+1. **Dashboard Designer** - New comprehensive dashboard builder with customizable templates, themes, and live preview functionality
+2. **Multi-tier customer experience** with feature limitations based on subscription level
+3. **Form builder interface** with drag-and-drop controls from a component library
+4. **Section-based form organization** with visual management
+5. **Real-time preview mode** for form testing
+6. **PDF Preview functionality** with real-time generation, tier-based templates, logo upload, custom footer notes, page break settings, and filled value display
+7. **JSON export/import** for form definitions with expandable sections and dashboard configurations
+8. **Excel template system** for bulk form creation
+9. **Dashboard with analytics** showing form usage statistics
+10. **Responsive design** supporting web, tablet, and mobile devices with mobile-first approach, collapsible panels, and touch-friendly controls
 
 ## Data Flow
 
@@ -106,6 +107,7 @@ Changelog:
 - June 29, 2025. Added comprehensive PDF Preview functionality with real-time generation and tier-based templates
 - June 29, 2025. Enhanced PDF Preview with form value display, logo upload, custom footer notes, and section page break settings
 - June 29, 2025. Implemented comprehensive responsive design for web, tablet, and mobile devices with mobile-first approach
+- June 30, 2025. Added Dashboard Designer module with template selection, theme customization, live preview, and separate JSON export configuration
 ```
 
 ## User Preferences

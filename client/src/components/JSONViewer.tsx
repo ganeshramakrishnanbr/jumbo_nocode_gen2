@@ -371,16 +371,19 @@ export const JSONViewer: React.FC<JSONViewerProps> = ({
   const experienceJsonString = JSON.stringify(generateUserExperienceJSON(), null, 2);
   const dashboardJsonString = JSON.stringify(generateDashboardJSON(), null, 2);
 
-  const copyToClipboard = (jsonType: 'designer' | 'experience') => {
-    const jsonString = jsonType === 'designer' ? designerJsonString : experienceJsonString;
+  const copyToClipboard = (jsonType: 'designer' | 'experience' | 'dashboard') => {
+    const jsonString = jsonType === 'designer' ? designerJsonString : 
+                      jsonType === 'experience' ? experienceJsonString : dashboardJsonString;
     navigator.clipboard.writeText(jsonString);
   };
 
-  const downloadJSON = (jsonType: 'designer' | 'experience') => {
-    const jsonString = jsonType === 'designer' ? designerJsonString : experienceJsonString;
+  const downloadJSON = (jsonType: 'designer' | 'experience' | 'dashboard') => {
+    const jsonString = jsonType === 'designer' ? designerJsonString : 
+                      jsonType === 'experience' ? experienceJsonString : dashboardJsonString;
     const filename = jsonType === 'designer' ? 
       `form-definition-${Date.now()}.json` : 
-      `user-experience-${Date.now()}.json`;
+      jsonType === 'experience' ? `user-experience-${Date.now()}.json` :
+      `dashboard-config-${Date.now()}.json`;
     
     const blob = new Blob([jsonString], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
@@ -509,6 +512,57 @@ export const JSONViewer: React.FC<JSONViewerProps> = ({
             </div>
           )}
         </div>
+
+        {/* Dashboard Designer JSON Section */}
+        <div className="border border-gray-200 dark:border-gray-700 rounded-lg transition-colors">
+          <div className="border-b border-gray-200 dark:border-gray-700 p-4 transition-colors">
+            <button
+              onClick={() => setDashboardExpanded(!dashboardExpanded)}
+              className="w-full flex items-center justify-between text-left hover:bg-gray-50 dark:hover:bg-gray-700 p-2 -m-2 rounded-lg transition-colors"
+            >
+              <div className="flex items-center space-x-3">
+                <Palette className="w-5 h-5 text-green-600 dark:text-green-400" />
+                <div>
+                  <h3 className="text-base font-semibold text-gray-900 dark:text-white">Dashboard Designer JSON</h3>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">Dashboard templates, themes, and layout configuration</p>
+                </div>
+              </div>
+              <div className="flex items-center space-x-2">
+                {dashboardExpanded && (
+                  <>
+                    <button
+                      onClick={(e) => { e.stopPropagation(); copyToClipboard('dashboard'); }}
+                      className="flex items-center px-2 py-1 text-xs bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 rounded transition-colors"
+                    >
+                      <Copy className="w-3 h-3 mr-1" />
+                      Copy
+                    </button>
+                    <button
+                      onClick={(e) => { e.stopPropagation(); downloadJSON('dashboard'); }}
+                      className="flex items-center px-2 py-1 text-xs bg-green-600 dark:bg-green-700 hover:bg-green-700 dark:hover:bg-green-600 text-white rounded transition-colors"
+                    >
+                      <Download className="w-3 h-3 mr-1" />
+                      Download
+                    </button>
+                  </>
+                )}
+                {dashboardExpanded ? (
+                  <ChevronDown className="w-4 h-4 text-gray-400" />
+                ) : (
+                  <ChevronRight className="w-4 h-4 text-gray-400" />
+                )}
+              </div>
+            </button>
+          </div>
+          
+          {dashboardExpanded && (
+            <div className="p-4">
+              <pre className="bg-gray-50 dark:bg-gray-900 rounded-lg p-4 text-sm font-mono overflow-auto border border-gray-200 dark:border-gray-700 transition-colors max-h-96">
+                <code className="text-gray-800 dark:text-gray-200 transition-colors">{dashboardJsonString}</code>
+              </pre>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Footer Stats */}
@@ -520,6 +574,7 @@ export const JSONViewer: React.FC<JSONViewerProps> = ({
             <span>Tier: {currentTier.charAt(0).toUpperCase() + currentTier.slice(1)}</span>
             <span>Theme: {selectedTheme.charAt(0).toUpperCase() + selectedTheme.slice(1)}</span>
             <span>Progress: {formProgress.overall}%</span>
+            {dashboardConfig && <span>Dashboard: {dashboardConfig.template.charAt(0).toUpperCase() + dashboardConfig.template.slice(1)}</span>}
           </div>
           <span>Generated: {new Date().toLocaleTimeString()}</span>
         </div>
