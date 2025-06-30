@@ -1499,17 +1499,42 @@ export const PreviewMode: React.FC<PreviewModeProps> = ({
           <div className="p-4 md:p-8 min-h-full">
             {/* Dynamic Layout using selected tab theme */}
             <div className="w-full max-w-none">
-              {/* Render tabs using the selected tab layout theme */}
-              {sections.length > 1 && selectedTabLayout !== 'leftSidebar' && (
-                TAB_LAYOUT_THEMES[selectedTabLayout].renderTabs(sections, activeSection, setActiveSection)
-              )}
+              {/* Demo sections for tab themes if no real sections exist */}
+              {(() => {
+                const demoSections = [
+                  { id: '1', name: 'Overview', description: 'Basic information' },
+                  { id: '2', name: 'Analytics', description: 'Data analysis' },
+                  { id: '3', name: 'Reports', description: 'Generated reports' },
+                  { id: '4', name: 'Settings', description: 'Configuration' }
+                ];
+                
+                const displaySections = sections.length > 0 ? sections : demoSections;
+                
+                // Render tabs using the selected tab layout theme
+                if (displaySections.length > 1 && selectedTabLayout !== 'leftSidebar') {
+                  return TAB_LAYOUT_THEMES[selectedTabLayout].renderTabs(displaySections as any, activeSection, setActiveSection);
+                }
+                return null;
+              })()}
 
               {/* Main content area with proper overflow handling */}
               <div className={selectedTabLayout === 'leftSidebar' ? 'flex gap-4 lg:gap-8' : ''}>
                 {/* Left Sidebar for leftSidebar theme */}
-                {selectedTabLayout === 'leftSidebar' && sections.length > 1 && (
-                  TAB_LAYOUT_THEMES[selectedTabLayout].renderTabs(sections, activeSection, setActiveSection)
-                )}
+                {(() => {
+                  const demoSections = [
+                    { id: '1', name: 'Overview', description: 'Basic information' },
+                    { id: '2', name: 'Analytics', description: 'Data analysis' },
+                    { id: '3', name: 'Reports', description: 'Generated reports' },
+                    { id: '4', name: 'Settings', description: 'Configuration' }
+                  ];
+                  
+                  const displaySections = sections.length > 0 ? sections : demoSections;
+                  
+                  if (selectedTabLayout === 'leftSidebar' && displaySections.length > 1) {
+                    return TAB_LAYOUT_THEMES[selectedTabLayout].renderTabs(displaySections as any, activeSection, setActiveSection);
+                  }
+                  return null;
+                })()}
 
                 {/* Form Content - Properly contained */}
                 <div className={`${selectedTabLayout === 'leftSidebar' ? 'flex-1 min-w-0' : 'w-full'} max-w-4xl mx-auto`}>
