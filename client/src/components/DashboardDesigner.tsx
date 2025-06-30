@@ -168,56 +168,76 @@ export const DashboardDesigner: React.FC<DashboardDesignerProps> = ({ onConfigCh
   };
 
   const handleThemeSelect = (themeId: string) => {
+    console.log('🎨 Theme selected:', themeId);
+    setConfigStatus('updating');
     setSelectedTheme(themeId);
     const selectedThemeData = themes.find(t => t.id === themeId);
+    
     // Update the configuration
+    const newConfig = {
+      template: selectedTemplate,
+      theme: themeId,
+      customColors: {
+        primary: selectedThemeData?.primaryColor || '#3B82F6',
+        secondary: '#8B5CF6',
+        accent: '#10B981'
+      },
+      appearance: appearance,
+      layout: {
+        sidebar: selectedTemplate === 'sidebar',
+        header: true,
+        footer: false
+      },
+      branding: {
+        title: 'Analytics Dashboard',
+        subtitle: 'Monitor your business performance'
+      }
+    };
+    
+    console.log('🎨 Theme config updated:', newConfig);
+    
     if (onConfigChange && selectedThemeData) {
-      onConfigChange({
-        template: selectedTemplate,
-        theme: themeId,
-        customColors: {
-          primary: selectedThemeData.primaryColor,
-          secondary: '#8B5CF6',
-          accent: '#10B981'
-        },
-        appearance: appearance,
-        layout: {
-          sidebar: selectedTemplate === 'sidebar',
-          header: true,
-          footer: false
-        },
-        branding: {
-          title: 'Analytics Dashboard',
-          subtitle: 'Monitor your business performance'
-        }
-      });
+      onConfigChange(newConfig);
     }
+    
+    setTimeout(() => setConfigStatus('saved'), 500);
+    setTimeout(() => setConfigStatus('idle'), 2000);
   };
 
   const handleAppearanceChange = (newAppearance: 'light' | 'dark') => {
+    console.log('🎨 Appearance changed to:', newAppearance);
+    setConfigStatus('updating');
     setAppearance(newAppearance);
+    
     // Update the configuration
+    const newConfig = {
+      template: selectedTemplate,
+      theme: selectedTheme,
+      customColors: {
+        primary: themes.find(t => t.id === selectedTheme)?.primaryColor || '#3B82F6',
+        secondary: '#8B5CF6',
+        accent: '#10B981'
+      },
+      appearance: newAppearance,
+      layout: {
+        sidebar: selectedTemplate === 'sidebar',
+        header: true,
+        footer: false
+      },
+      branding: {
+        title: 'Analytics Dashboard',
+        subtitle: 'Monitor your business performance'
+      }
+    };
+    
+    console.log('💡 Appearance config updated:', newConfig);
+    
     if (onConfigChange) {
-      onConfigChange({
-        template: selectedTemplate,
-        theme: selectedTheme,
-        customColors: {
-          primary: themes.find(t => t.id === selectedTheme)?.primaryColor || '#3B82F6',
-          secondary: '#8B5CF6',
-          accent: '#10B981'
-        },
-        appearance: newAppearance,
-        layout: {
-          sidebar: selectedTemplate === 'sidebar',
-          header: true,
-          footer: false
-        },
-        branding: {
-          title: 'Analytics Dashboard',
-          subtitle: 'Monitor your business performance'
-        }
-      });
+      onConfigChange(newConfig);
     }
+    
+    setTimeout(() => setConfigStatus('saved'), 500);
+    setTimeout(() => setConfigStatus('idle'), 2000);
   };
 
   const getPreviewClassName = () => {
@@ -500,6 +520,20 @@ export const DashboardDesigner: React.FC<DashboardDesignerProps> = ({ onConfigCh
           <p className="text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
             Create beautiful dashboards with customizable templates and themes
           </p>
+          {configStatus !== 'idle' && (
+            <div className="mt-4">
+              <div className={`inline-flex items-center px-4 py-2 rounded-full text-sm font-medium ${
+                configStatus === 'updating' 
+                  ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400'
+                  : 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400'
+              }`}>
+                {configStatus === 'updating' && (
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600 mr-2"></div>
+                )}
+                {configStatus === 'updating' ? 'Updating configuration...' : 'Configuration saved!'}
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Navigation Tabs */}
@@ -621,14 +655,24 @@ export const DashboardDesigner: React.FC<DashboardDesignerProps> = ({ onConfigCh
           </div>
         )}
 
-        {/* Preview Button */}
+        {/* Preview Button and Current Selection */}
         <div className="text-center mt-12">
-          <button
-            onClick={() => setShowPreview(true)}
-            className="px-8 py-4 bg-blue-500 text-white rounded-lg text-lg font-medium hover:bg-blue-600 transition-colors shadow-lg hover:shadow-xl transform hover:scale-105"
-          >
-            Preview Dashboard
-          </button>
+          <div className="mb-6 p-4 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 inline-block">
+            <h4 className="text-sm font-medium text-gray-900 dark:text-white mb-2">Current Selection</h4>
+            <div className="flex items-center gap-4 text-sm text-gray-600 dark:text-gray-400">
+              <span>Template: <strong className="text-gray-900 dark:text-white">{templates.find(t => t.id === selectedTemplate)?.name}</strong></span>
+              <span>Theme: <strong className="text-gray-900 dark:text-white">{themes.find(t => t.id === selectedTheme)?.name}</strong></span>
+              <span>Mode: <strong className="text-gray-900 dark:text-white">{appearance === 'light' ? 'Light' : 'Dark'}</strong></span>
+            </div>
+          </div>
+          <div>
+            <button
+              onClick={() => setShowPreview(true)}
+              className="px-8 py-4 bg-blue-500 text-white rounded-lg text-lg font-medium hover:bg-blue-600 transition-colors shadow-lg hover:shadow-xl transform hover:scale-105"
+            >
+              Preview Dashboard
+            </button>
+          </div>
         </div>
       </div>
     </div>
