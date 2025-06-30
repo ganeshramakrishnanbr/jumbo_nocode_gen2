@@ -1599,19 +1599,41 @@ export const PreviewMode: React.FC<PreviewModeProps> = ({
                   </div>
                 );
                 
-                // Layout based on alignment and theme
-                if (selectedTabLayout === 'leftSidebar' || tabAlignment === 'left') {
-                  console.log('Rendering LEFT tabs with theme:', selectedTabLayout, 'alignment:', tabAlignment);
+                // Vertical Tab Renderer for Left Alignment
+                const renderVerticalTabs = (sections: Section[], activeSection: number, setActiveSection: (index: number) => void) => {
+                  const icons = [Home, User, Settings, Bell, Palette, BarChart3, Sparkles, HelpCircle];
                   return (
-                    <div className="flex gap-4 lg:gap-8" key={`left-${selectedTabLayout}`}>
+                    <div className="space-y-2">
+                      {sections.map((section, index) => {
+                        const IconComponent = icons[index % icons.length];
+                        return (
+                          <button
+                            key={section.id}
+                            onClick={() => setActiveSection(index)}
+                            className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-left transition-all duration-300 ${
+                              activeSection === index
+                                ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 border-2 border-blue-200 dark:border-blue-700 shadow-md'
+                                : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-gray-200 border-2 border-transparent'
+                            }`}
+                          >
+                            <IconComponent className="w-5 h-5 flex-shrink-0" />
+                            <span className="text-sm font-medium">{section.name}</span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  );
+                };
+
+                // Layout based on alignment and theme
+                if (tabAlignment === 'left') {
+                  console.log('Rendering LEFT aligned tabs with theme:', selectedTabLayout, 'alignment:', tabAlignment);
+                  return (
+                    <div className="flex gap-6 lg:gap-8" key={`left-${selectedTabLayout}-${forceRender}`}>
                       <div className="flex-shrink-0 w-64">
-                        {selectedTabLayout === 'leftSidebar' ? (
-                          TAB_LAYOUT_THEMES.leftSidebar.renderTabs(displaySections as any, currentActiveTab, setCurrentActiveTab)
-                        ) : (
-                          <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg p-4">
-                            {TAB_LAYOUT_THEMES[selectedTabLayout].renderTabs(displaySections as any, currentActiveTab, setCurrentActiveTab)}
-                          </div>
-                        )}
+                        <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+                          {renderVerticalTabs(displaySections as any, currentActiveTab, setCurrentActiveTab)}
+                        </div>
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="w-full max-w-4xl">
@@ -1621,12 +1643,12 @@ export const PreviewMode: React.FC<PreviewModeProps> = ({
                     </div>
                   );
                 } else if (tabAlignment === 'right') {
-                  console.log('Rendering RIGHT tabs with theme:', selectedTabLayout, 'alignment:', tabAlignment);
+                  console.log('Rendering RIGHT aligned tabs with theme:', selectedTabLayout, 'alignment:', tabAlignment);
                   return (
-                    <div className="flex flex-row-reverse gap-4 lg:gap-8" key={`right-${selectedTabLayout}`}>
+                    <div className="flex flex-row-reverse gap-6 lg:gap-8" key={`right-${selectedTabLayout}-${forceRender}`}>
                       <div className="flex-shrink-0 w-64">
                         <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg p-4">
-                          {TAB_LAYOUT_THEMES[selectedTabLayout].renderTabs(displaySections as any, currentActiveTab, setCurrentActiveTab)}
+                          {renderVerticalTabs(displaySections as any, currentActiveTab, setCurrentActiveTab)}
                         </div>
                       </div>
                       <div className="flex-1 min-w-0">
