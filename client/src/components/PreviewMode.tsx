@@ -1432,6 +1432,7 @@ export const PreviewMode: React.FC<PreviewModeProps> = ({
                   onClick={() => {
                     console.log('🎨 Tab theme button clicked:', key);
                     setSelectedTabLayout(key as keyof typeof TAB_LAYOUT_THEMES);
+                    setForceRender(prev => prev + 1); // Force immediate re-render
                     console.log('🎨 Tab theme should be set to:', key);
                   }}
                   className={`w-full p-3 rounded-lg text-left transition-all ${
@@ -1636,11 +1637,17 @@ export const PreviewMode: React.FC<PreviewModeProps> = ({
                     </div>
                   );
                 } else {
-                  console.log('Rendering top tabs with theme:', selectedTabLayout, 'sections:', displaySections.length);
+                  console.log('🎨 Rendering top tabs with theme:', selectedTabLayout, 'sections:', displaySections.length);
+                  console.log('🎨 Available theme names:', Object.keys(TAB_LAYOUT_THEMES));
+                  console.log('🎨 Current theme object:', TAB_LAYOUT_THEMES[selectedTabLayout]);
+                  
+                  const currentTheme = TAB_LAYOUT_THEMES[selectedTabLayout];
+                  const tabsComponent = currentTheme.renderTabs(displaySections as any, currentActiveTab, setCurrentActiveTab);
+                  
                   return (
-                    <div className="w-full" key={selectedTabLayout}>
+                    <div className="w-full" key={`${selectedTabLayout}-${forceRender}`}>
                       <div className="mb-6">
-                        {TAB_LAYOUT_THEMES[selectedTabLayout].renderTabs(displaySections as any, currentActiveTab, setCurrentActiveTab)}
+                        {tabsComponent}
                       </div>
                       <div className="w-full max-w-4xl mx-auto">
                         <FormContent />
