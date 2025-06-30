@@ -1431,9 +1431,16 @@ export const PreviewMode: React.FC<PreviewModeProps> = ({
                   key={key}
                   onClick={() => {
                     console.log('🎨 Tab theme button clicked:', key);
+                    console.log('🎨 Before state change - current theme:', selectedTabLayout);
                     setSelectedTabLayout(key as keyof typeof TAB_LAYOUT_THEMES);
                     setForceRender(prev => prev + 1); // Force immediate re-render
                     console.log('🎨 Tab theme should be set to:', key);
+                    
+                    // Force a re-render with a slight delay to ensure state update
+                    setTimeout(() => {
+                      console.log('🎨 After timeout - current theme should be:', key);
+                      setForceRender(prev => prev + 1);
+                    }, 10);
                   }}
                   className={`w-full p-3 rounded-lg text-left transition-all ${
                     selectedTabLayout === key
@@ -1453,6 +1460,40 @@ export const PreviewMode: React.FC<PreviewModeProps> = ({
           <div className="flex items-center space-x-2 text-sm text-gray-600 dark:text-gray-400 mt-3">
             <Layout className="w-4 h-4" />
             <span>Current: {TAB_LAYOUT_THEMES[selectedTabLayout].name}</span>
+          </div>
+          
+          {/* Quick Theme Test Buttons */}
+          <div className="flex gap-2 mt-3">
+            <button 
+              onClick={() => {
+                console.log('🧪 FORCE: iconText theme');
+                setSelectedTabLayout('iconText');
+                setForceRender(prev => prev + 1);
+              }}
+              className="px-2 py-1 bg-blue-500 text-white text-xs rounded"
+            >
+              Force Icon
+            </button>
+            <button 
+              onClick={() => {
+                console.log('🧪 FORCE: cardSelection theme');
+                setSelectedTabLayout('cardSelection');
+                setForceRender(prev => prev + 1);
+              }}
+              className="px-2 py-1 bg-green-500 text-white text-xs rounded"
+            >
+              Force Card
+            </button>
+            <button 
+              onClick={() => {
+                console.log('🧪 FORCE: underlineStyle theme');
+                setSelectedTabLayout('underlineStyle');
+                setForceRender(prev => prev + 1);
+              }}
+              className="px-2 py-1 bg-purple-500 text-white text-xs rounded"
+            >
+              Force Underline
+            </button>
           </div>
           
 
