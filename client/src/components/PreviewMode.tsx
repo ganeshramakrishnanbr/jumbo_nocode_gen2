@@ -1612,6 +1612,7 @@ export const PreviewMode: React.FC<PreviewModeProps> = ({
                     </div>
                   );
                 } else {
+                  console.log('Rendering top tabs with theme:', selectedTabLayout, 'sections:', displaySections.length);
                   return (
                     <div className="w-full" key={selectedTabLayout}>
                       <div className="mb-6">
