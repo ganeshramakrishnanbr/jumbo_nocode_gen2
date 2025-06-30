@@ -52,7 +52,7 @@ export const Header: React.FC<HeaderProps> = ({
   };
 
   const tabs = [
-    { key: 'dashboardDesigner', label: 'Dashboard Designer', icon: Layout },
+    { key: 'dashboardDesigner', label: 'Jumbo Studio', icon: Layout },
     { key: 'dashboard', label: 'Dashboard', icon: BarChart3 },
     { key: 'design', label: 'Design', icon: Settings },
     { key: 'preview', label: 'Preview', icon: Eye },

@@ -49,6 +49,8 @@ export const DashboardDesigner: React.FC<DashboardDesignerProps> = ({ onConfigCh
   const [appearance, setAppearance] = useState<'light' | 'dark'>('light');
   const [previewMode, setPreviewMode] = useState<'desktop' | 'tablet' | 'mobile'>('desktop');
   const [showPreview, setShowPreview] = useState(false);
+  const [designMode, setDesignMode] = useState(false);
+  const [configStatus, setConfigStatus] = useState<'idle' | 'updating' | 'saved'>('idle');
 
   const templates: DashboardTemplate[] = [
     {
@@ -130,11 +132,92 @@ export const DashboardDesigner: React.FC<DashboardDesignerProps> = ({ onConfigCh
   ];
 
   const handleTemplateSelect = (templateId: string) => {
+    console.log('🎨 Template selected:', templateId);
+    setConfigStatus('updating');
     setSelectedTemplate(templateId);
+    
+    // Update the configuration
+    const newConfig = {
+      template: templateId,
+      theme: selectedTheme,
+      customColors: {
+        primary: themes.find(t => t.id === selectedTheme)?.primaryColor || '#3B82F6',
+        secondary: '#8B5CF6',
+        accent: '#10B981'
+      },
+      appearance: appearance,
+      layout: {
+        sidebar: templateId === 'sidebar',
+        header: true,
+        footer: false
+      },
+      branding: {
+        title: 'Analytics Dashboard',
+        subtitle: 'Monitor your business performance'
+      }
+    };
+    
+    console.log('📝 Dashboard config updated:', newConfig);
+    
+    if (onConfigChange) {
+      onConfigChange(newConfig);
+    }
+    
+    setTimeout(() => setConfigStatus('saved'), 500);
+    setTimeout(() => setConfigStatus('idle'), 2000);
   };
 
   const handleThemeSelect = (themeId: string) => {
     setSelectedTheme(themeId);
+    const selectedThemeData = themes.find(t => t.id === themeId);
+    // Update the configuration
+    if (onConfigChange && selectedThemeData) {
+      onConfigChange({
+        template: selectedTemplate,
+        theme: themeId,
+        customColors: {
+          primary: selectedThemeData.primaryColor,
+          secondary: '#8B5CF6',
+          accent: '#10B981'
+        },
+        appearance: appearance,
+        layout: {
+          sidebar: selectedTemplate === 'sidebar',
+          header: true,
+          footer: false
+        },
+        branding: {
+          title: 'Analytics Dashboard',
+          subtitle: 'Monitor your business performance'
+        }
+      });
+    }
+  };
+
+  const handleAppearanceChange = (newAppearance: 'light' | 'dark') => {
+    setAppearance(newAppearance);
+    // Update the configuration
+    if (onConfigChange) {
+      onConfigChange({
+        template: selectedTemplate,
+        theme: selectedTheme,
+        customColors: {
+          primary: themes.find(t => t.id === selectedTheme)?.primaryColor || '#3B82F6',
+          secondary: '#8B5CF6',
+          accent: '#10B981'
+        },
+        appearance: newAppearance,
+        layout: {
+          sidebar: selectedTemplate === 'sidebar',
+          header: true,
+          footer: false
+        },
+        branding: {
+          title: 'Analytics Dashboard',
+          subtitle: 'Monitor your business performance'
+        }
+      });
+    }
   };
 
   const getPreviewClassName = () => {
@@ -412,7 +495,7 @@ export const DashboardDesigner: React.FC<DashboardDesignerProps> = ({ onConfigCh
         {/* Header */}
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-            Dashboard Builder
+            Jumbo Studio
           </h1>
           <p className="text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
             Create beautiful dashboards with customizable templates and themes
@@ -456,7 +539,7 @@ export const DashboardDesigner: React.FC<DashboardDesignerProps> = ({ onConfigCh
                   onClick={() => handleTemplateSelect(template.id)}
                   className={`cursor-pointer group transition-all duration-200 ${
                     selectedTemplate === template.id
-                      ? 'ring-2 ring-blue-500 bg-blue-50 dark:bg-blue-900/20'
+                      ? 'ring-2 ring-blue-500 bg-blue-50 dark:bg-blue-900/20 scale-105'
                       : 'hover:shadow-lg hover:scale-105'
                   }`}
                 >
@@ -487,7 +570,7 @@ export const DashboardDesigner: React.FC<DashboardDesignerProps> = ({ onConfigCh
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Appearance</h3>
                 <div className="flex gap-4">
                   <button
-                    onClick={() => setAppearance('light')}
+                    onClick={() => handleAppearanceChange('light')}
                     className={`flex items-center gap-2 px-4 py-3 rounded-lg border transition-colors ${
                       appearance === 'light'
                         ? 'bg-blue-500 text-white border-blue-500'
@@ -498,7 +581,7 @@ export const DashboardDesigner: React.FC<DashboardDesignerProps> = ({ onConfigCh
                     Light
                   </button>
                   <button
-                    onClick={() => setAppearance('dark')}
+                    onClick={() => handleAppearanceChange('dark')}
                     className={`flex items-center gap-2 px-4 py-3 rounded-lg border transition-colors ${
                       appearance === 'dark'
                         ? 'bg-gray-700 text-white border-gray-700'
@@ -519,10 +602,10 @@ export const DashboardDesigner: React.FC<DashboardDesignerProps> = ({ onConfigCh
                     <button
                       key={theme.id}
                       onClick={() => handleThemeSelect(theme.id)}
-                      className={`flex flex-col items-center gap-2 p-3 rounded-lg border transition-colors ${
+                      className={`flex flex-col items-center gap-2 p-3 rounded-lg border transition-all duration-200 ${
                         selectedTheme === theme.id
-                          ? 'border-gray-400 bg-gray-50 dark:bg-gray-700'
-                          : 'border-gray-200 hover:border-gray-300'
+                          ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20 ring-2 ring-blue-200 scale-105'
+                          : 'border-gray-200 hover:border-gray-300 hover:scale-105'
                       }`}
                     >
                       <div
