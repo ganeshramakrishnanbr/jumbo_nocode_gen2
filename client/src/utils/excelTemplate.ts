@@ -23,30 +23,13 @@ export const generateExcelTemplate = () => {
 
   // Instructions Sheet
   const instructionsData = [
-    ['Jumbo No-Code Builder - Control Library Template'],
+    ['JUMBO FORM BUILDER - EXCEL TEMPLATE INSTRUCTIONS'],
     [''],
-    ['INSTRUCTIONS:'],
-    ['1. This template contains all available form controls from the Jumbo No-Code Builder'],
-    ['2. Use the "Design" sheet to define your form controls'],
-    ['3. Fill in the required columns for each control you want to add'],
-    ['4. IMPORTANT: Leave the ID column EMPTY - IDs will be auto-generated during import'],
-    ['5. Save the file and import it back into the application'],
-    ['6. You can modify controls after import in the Design tab'],
-    [''],
-    ['AVAILABLE CONTROL CATEGORIES:'],
-    ...CONTROL_CATEGORIES.map(category => [category]),
-    [''],
-    ['AVAILABLE CONTROLS:'],
-    ['Category', 'Control Type', 'Control Name', 'Description'],
-    ...CONTROLS.map(control => [
-      control.category,
-      control.type,
-      control.name,
-      control.description
-    ]),
+    ['This template allows you to create form controls in bulk using Excel.'],
+    ['Follow the format in the "Design" sheet to create your form controls.'],
     [''],
     ['COLUMN DESCRIPTIONS:'],
-    ['id: LEAVE EMPTY - Unique identifier will be auto-generated'],
+    ['id: Leave EMPTY - IDs are auto-generated during import'],
     ['type: Control type from the available controls list'],
     ['category: Control category'],
     ['name: Display name for the control'],
@@ -115,13 +98,18 @@ export const generateExcelTemplate = () => {
     'color',
     'style',
     'thickness',
-    'spacing'
+    'spacing',
+    'rowLabels',
+    'columnOptions',
+    'questions',
+    'answers',
+    'items'
   ];
 
   const sampleData: ExcelControlData[] = [
     // Core Input Section - All basic input types
     {
-      id: '', // ALWAYS EMPTY for auto-generation
+      id: '',
       type: 'textInput',
       category: 'Core Input',
       name: 'Full Name',
@@ -134,7 +122,7 @@ export const generateExcelTemplate = () => {
       maxLength: 100
     },
     {
-      id: '', // ALWAYS EMPTY for auto-generation
+      id: '',
       type: 'textarea',
       category: 'Core Input',
       name: 'Description',
@@ -148,7 +136,7 @@ export const generateExcelTemplate = () => {
       maxLength: 500
     },
     {
-      id: '', // ALWAYS EMPTY for auto-generation
+      id: '',
       type: 'numberInput',
       category: 'Core Input',
       name: 'Age',
@@ -162,7 +150,7 @@ export const generateExcelTemplate = () => {
       step: 1
     },
     {
-      id: '', // ALWAYS EMPTY for auto-generation
+      id: '',
       type: 'emailInput',
       category: 'Core Input',
       name: 'Email Address',
@@ -174,7 +162,7 @@ export const generateExcelTemplate = () => {
       order: 4
     },
     {
-      id: '', // ALWAYS EMPTY for auto-generation
+      id: '',
       type: 'phoneInput',
       category: 'Core Input',
       name: 'Phone Number',
@@ -185,48 +173,10 @@ export const generateExcelTemplate = () => {
       sectionId: 'core-inputs',
       order: 5
     },
-    {
-      id: '', // ALWAYS EMPTY for auto-generation
-      type: 'urlInput',
-      category: 'Core Input',
-      name: 'Website',
-      label: 'Personal Website',
-      placeholder: 'https://yourwebsite.com',
-      required: false,
-      description: 'URL input with validation',
-      sectionId: 'core-inputs',
-      order: 6
-    },
-    {
-      id: '', // ALWAYS EMPTY for auto-generation
-      type: 'passwordInput',
-      category: 'Core Input',
-      name: 'Password',
-      label: 'Create Password',
-      placeholder: 'Enter secure password...',
-      required: true,
-      description: 'Password with strength validation',
-      sectionId: 'core-inputs',
-      order: 7,
-      minLength: 8
-    },
-    {
-      id: '', // ALWAYS EMPTY for auto-generation
-      type: 'richTextEditor',
-      category: 'Core Input',
-      name: 'Bio',
-      label: 'Professional Bio',
-      placeholder: 'Enter formatted biography...',
-      required: false,
-      description: 'Rich text editor with formatting options',
-      sectionId: 'core-inputs',
-      order: 8,
-      maxLength: 1000
-    },
 
-    // Date & Time Section - All date/time controls
+    // Date & Time Section
     {
-      id: '', // ALWAYS EMPTY for auto-generation
+      id: '',
       type: 'datePicker',
       category: 'Date & Time',
       name: 'Date of Birth',
@@ -238,7 +188,7 @@ export const generateExcelTemplate = () => {
       order: 1
     },
     {
-      id: '', // ALWAYS EMPTY for auto-generation
+      id: '',
       type: 'timePicker',
       category: 'Date & Time',
       name: 'Preferred Meeting Time',
@@ -250,23 +200,10 @@ export const generateExcelTemplate = () => {
       order: 2,
       step: 15
     },
-    {
-      id: '', // ALWAYS EMPTY for auto-generation
-      type: 'dateRangePicker',
-      category: 'Date & Time',
-      name: 'Availability',
-      label: 'Available Date Range',
-      required: false,
-      format: 'YYYY-MM-DD',
-      description: 'Start and end date selection',
-      sectionId: 'date-time',
-      order: 3,
-      maxRange: 365
-    },
 
-    // Selection Section - All selection controls
+    // Selection Section
     {
-      id: '', // ALWAYS EMPTY for auto-generation
+      id: '',
       type: 'dropdown',
       category: 'Selection',
       name: 'Country',
@@ -278,20 +215,7 @@ export const generateExcelTemplate = () => {
       order: 1
     },
     {
-      id: '', // ALWAYS EMPTY for auto-generation
-      type: 'multiSelectDropdown',
-      category: 'Selection',
-      name: 'Skills',
-      label: 'Technical Skills',
-      required: false,
-      options: 'JavaScript,Python,React,Node.js,SQL,Docker,AWS,Machine Learning',
-      description: 'Multiple selection dropdown',
-      sectionId: 'selection-controls',
-      order: 2,
-      maxSelections: 5
-    },
-    {
-      id: '', // ALWAYS EMPTY for auto-generation
+      id: '',
       type: 'radioGroup',
       category: 'Selection',
       name: 'Experience Level',
@@ -300,11 +224,11 @@ export const generateExcelTemplate = () => {
       options: 'Beginner,Intermediate,Advanced,Expert',
       description: 'Single selection radio buttons',
       sectionId: 'selection-controls',
-      order: 3,
+      order: 2,
       layout: 'vertical'
     },
     {
-      id: '', // ALWAYS EMPTY for auto-generation
+      id: '',
       type: 'checkboxGroup',
       category: 'Selection',
       name: 'Interests',
@@ -313,24 +237,12 @@ export const generateExcelTemplate = () => {
       options: 'Technology,Sports,Music,Travel,Reading,Cooking,Photography,Art',
       description: 'Multiple selection checkboxes',
       sectionId: 'selection-controls',
-      order: 4,
+      order: 3,
       layout: 'vertical',
       maxSelections: 3
     },
     {
-      id: '', // ALWAYS EMPTY for auto-generation
-      type: 'buttonGroup',
-      category: 'Selection',
-      name: 'Preferred Contact',
-      label: 'Preferred Contact Method',
-      required: true,
-      options: 'Email,Phone,SMS,Video Call',
-      description: 'Styled buttons for selection',
-      sectionId: 'selection-controls',
-      order: 5
-    },
-    {
-      id: '', // ALWAYS EMPTY for auto-generation
+      id: '',
       type: 'ratingScale',
       category: 'Selection',
       name: 'Satisfaction Rating',
@@ -338,65 +250,14 @@ export const generateExcelTemplate = () => {
       required: false,
       description: 'Star rating scale',
       sectionId: 'selection-controls',
-      order: 6,
+      order: 4,
       scaleType: 'stars',
       maxValue: 5
     },
-    {
-      id: '', // ALWAYS EMPTY for auto-generation
-      type: 'slider',
-      category: 'Selection',
-      name: 'Budget Range',
-      label: 'Budget Range ($)',
-      required: false,
-      description: 'Range slider for numeric input',
-      sectionId: 'selection-controls',
-      order: 7,
-      min: 0,
-      max: 10000,
-      step: 100,
-      defaultValue: 5000
-    },
-    {
-      id: '', // ALWAYS EMPTY for auto-generation
-      type: 'toggleSwitch',
-      category: 'Selection',
-      name: 'Newsletter',
-      label: 'Newsletter Subscription',
-      required: false,
-      description: 'Binary choice control',
-      sectionId: 'selection-controls',
-      order: 8,
-      onLabel: 'Subscribe',
-      offLabel: 'Unsubscribe'
-    },
-    {
-      id: '', // ALWAYS EMPTY for auto-generation
-      type: 'imageSelection',
-      category: 'Selection',
-      name: 'Avatar',
-      label: 'Choose Profile Avatar',
-      required: false,
-      description: 'Choose from image options',
-      sectionId: 'selection-controls',
-      order: 9
-    },
-    {
-      id: '', // ALWAYS EMPTY for auto-generation
-      type: 'tagInput',
-      category: 'Selection',
-      name: 'Keywords',
-      label: 'Keywords/Tags',
-      required: false,
-      description: 'Add/remove tags dynamically',
-      sectionId: 'selection-controls',
-      order: 10,
-      maxTags: 10
-    },
 
-    // Grid & Matrix Section - THE MISSING CONTROLS THE USER REQUESTED
+    // Grid & Matrix Section - THE KEY MISSING CONTROLS
     {
-      id: '', // ALWAYS EMPTY for auto-generation
+      id: '',
       type: 'singleSelectiveGrid',
       category: 'Grid & Matrix',
       name: 'Service Quality Rating',
@@ -409,7 +270,7 @@ export const generateExcelTemplate = () => {
       columnOptions: 'Excellent,Good,Average,Poor,Very Poor'
     },
     {
-      id: '', // ALWAYS EMPTY for auto-generation
+      id: '',
       type: 'multiSelectiveGrid',
       category: 'Grid & Matrix',
       name: 'Feature Usage',
@@ -422,7 +283,7 @@ export const generateExcelTemplate = () => {
       columnOptions: 'Daily,Weekly,Monthly,Rarely,Never'
     },
     {
-      id: '', // ALWAYS EMPTY for auto-generation
+      id: '',
       type: 'matrixQuestions',
       category: 'Grid & Matrix',
       name: 'Agreement Survey',
@@ -435,7 +296,7 @@ export const generateExcelTemplate = () => {
       answers: 'Strongly Agree,Agree,Neutral,Disagree,Strongly Disagree'
     },
     {
-      id: '', // ALWAYS EMPTY for auto-generation
+      id: '',
       type: 'rankingControl',
       category: 'Grid & Matrix',
       name: 'Priority Ranking',
@@ -447,9 +308,9 @@ export const generateExcelTemplate = () => {
       items: 'Performance,Security,User Interface,Customer Support,Price,Documentation'
     },
 
-    // File & Media Section - All file and media controls
+    // File & Media Section
     {
-      id: '', // ALWAYS EMPTY for auto-generation
+      id: '',
       type: 'fileUpload',
       category: 'File & Media',
       name: 'Resume Upload',
@@ -462,7 +323,7 @@ export const generateExcelTemplate = () => {
       maxSize: 10
     },
     {
-      id: '', // ALWAYS EMPTY for auto-generation
+      id: '',
       type: 'imageUpload',
       category: 'File & Media',
       name: 'Profile Photo',
@@ -475,7 +336,7 @@ export const generateExcelTemplate = () => {
       maxSize: 5
     },
     {
-      id: '', // ALWAYS EMPTY for auto-generation
+      id: '',
       type: 'signaturePad',
       category: 'File & Media',
       name: 'Digital Signature',
@@ -487,151 +348,10 @@ export const generateExcelTemplate = () => {
       canvasWidth: 400,
       canvasHeight: 200
     },
-    {
-      id: '', // ALWAYS EMPTY for auto-generation
-      type: 'colorPicker',
-      category: 'File & Media',
-      name: 'Brand Color',
-      label: 'Select your brand color',
-      required: false,
-      description: 'Visual color selection',
-      sectionId: 'file-media',
-      order: 4,
-      defaultColor: '#3B82F6',
-      format: 'hex'
-    },
 
-    // Advanced Input Section - All advanced input controls
+    // Layout & Display Section
     {
-      id: '', // ALWAYS EMPTY for auto-generation
-      type: 'patternInput',
-      category: 'Advanced Input',
-      name: 'Product Code',
-      label: 'Product Code',
-      placeholder: 'ABC-123-XYZ',
-      required: true,
-      description: 'Input with pattern validation',
-      sectionId: 'advanced-input',
-      order: 1
-    },
-    {
-      id: '', // ALWAYS EMPTY for auto-generation
-      type: 'calculatedField',
-      category: 'Advanced Input',
-      name: 'Total Cost',
-      label: 'Total Cost Calculation',
-      required: false,
-      description: 'Auto-calculated field based on other inputs',
-      sectionId: 'advanced-input',
-      order: 2
-    },
-    {
-      id: '', // ALWAYS EMPTY for auto-generation
-      type: 'conditionalLogic',
-      category: 'Advanced Input',
-      name: 'Additional Info',
-      label: 'Additional Information',
-      required: false,
-      description: 'Field that shows/hides based on conditions',
-      sectionId: 'advanced-input',
-      order: 3
-    },
-    {
-      id: '', // ALWAYS EMPTY for auto-generation
-      type: 'jsonInput',
-      category: 'Advanced Input',
-      name: 'API Configuration',
-      label: 'JSON Configuration',
-      placeholder: '{"key": "value"}',
-      required: false,
-      description: 'JSON input with syntax validation',
-      sectionId: 'advanced-input',
-      order: 4
-    },
-    {
-      id: '', // ALWAYS EMPTY for auto-generation
-      type: 'codeEditor',
-      category: 'Advanced Input',
-      name: 'Custom Script',
-      label: 'JavaScript Code',
-      required: false,
-      description: 'Code editor with syntax highlighting',
-      sectionId: 'advanced-input',
-      order: 5
-    },
-    {
-      id: '', // ALWAYS EMPTY for auto-generation
-      type: 'searchableSelect',
-      category: 'Advanced Input',
-      name: 'City Search',
-      label: 'Search and select city',
-      required: false,
-      description: 'Searchable dropdown with large dataset',
-      sectionId: 'advanced-input',
-      order: 6
-    },
-
-    // Address Section - All address-related controls
-    {
-      id: '', // ALWAYS EMPTY for auto-generation
-      type: 'addressLookup',
-      category: 'Address',
-      name: 'Home Address',
-      label: 'Home Address',
-      required: true,
-      description: 'Address lookup with autocomplete',
-      sectionId: 'address',
-      order: 1
-    },
-    {
-      id: '', // ALWAYS EMPTY for auto-generation
-      type: 'geolocation',
-      category: 'Address',
-      name: 'Current Location',
-      label: 'Current Location',
-      required: false,
-      description: 'Capture GPS coordinates',
-      sectionId: 'address',
-      order: 2
-    },
-    {
-      id: '', // ALWAYS EMPTY for auto-generation
-      type: 'mapSelector',
-      category: 'Address',
-      name: 'Meeting Location',
-      label: 'Select meeting location on map',
-      required: false,
-      description: 'Interactive map for location selection',
-      sectionId: 'address',
-      order: 3
-    },
-    {
-      id: '', // ALWAYS EMPTY for auto-generation
-      type: 'countrySelect',
-      category: 'Address',
-      name: 'Shipping Country',
-      label: 'Shipping Country',
-      required: true,
-      description: 'Country selection with flags',
-      sectionId: 'address',
-      order: 4
-    },
-    {
-      id: '', // ALWAYS EMPTY for auto-generation
-      type: 'postalCode',
-      category: 'Address',
-      name: 'ZIP Code',
-      label: 'ZIP/Postal Code',
-      placeholder: '12345',
-      required: true,
-      description: 'Postal code with format validation',
-      sectionId: 'address',
-      order: 5
-    },
-
-    // Layout & Display Section - All layout controls
-    {
-      id: '', // ALWAYS EMPTY for auto-generation
+      id: '',
       type: 'heading',
       category: 'Layout & Display',
       name: 'Section Title',
@@ -647,7 +367,7 @@ export const generateExcelTemplate = () => {
       color: '#1F2937'
     },
     {
-      id: '', // ALWAYS EMPTY for auto-generation
+      id: '',
       type: 'sectionDivider',
       category: 'Layout & Display',
       name: 'Section Break',
@@ -661,55 +381,35 @@ export const generateExcelTemplate = () => {
       color: '#e5e7eb',
       spacing: 'medium'
     },
+
+    // Address Section
     {
-      id: '', // ALWAYS EMPTY for auto-generation
-      type: 'progressBar',
-      category: 'Layout & Display',
-      name: 'Form Progress',
-      label: 'Completion Progress',
-      required: false,
-      description: 'Form completion indicator',
-      sectionId: 'layout-display',
-      order: 3
+      id: '',
+      type: 'addressLookup',
+      category: 'Address',
+      name: 'Home Address',
+      label: 'Home Address',
+      required: true,
+      description: 'Address lookup with autocomplete',
+      sectionId: 'address',
+      order: 1
     },
     {
-      id: '', // ALWAYS EMPTY for auto-generation
-      type: 'accordionPanel',
-      category: 'Layout & Display',
-      name: 'Collapsible Section',
-      label: 'Additional Details',
-      required: false,
-      description: 'Collapsible content panel',
-      sectionId: 'layout-display',
-      order: 4
-    },
-    {
-      id: '', // ALWAYS EMPTY for auto-generation
-      type: 'tabContainer',
-      category: 'Layout & Display',
-      name: 'Tabbed Content',
-      label: 'Information Tabs',
-      required: false,
-      description: 'Tabbed content organization',
-      sectionId: 'layout-display',
-      order: 5
-    },
-    {
-      id: '', // ALWAYS EMPTY for auto-generation
-      type: 'infoBox',
-      category: 'Layout & Display',
-      name: 'Help Information',
-      label: 'Important Notice',
-      required: false,
-      description: 'Information display box',
-      sectionId: 'layout-display',
-      order: 6,
-      text: 'Please ensure all information is accurate before submitting.'
+      id: '',
+      type: 'postalCode',
+      category: 'Address',
+      name: 'ZIP Code',
+      label: 'ZIP/Postal Code',
+      placeholder: '12345',
+      required: true,
+      description: 'Postal code with format validation',
+      sectionId: 'address',
+      order: 2
     },
 
-    // Validation & Security Section - All validation controls
+    // Validation & Security Section
     {
-      id: '', // ALWAYS EMPTY for auto-generation
+      id: '',
       type: 'captcha',
       category: 'Validation & Security',
       name: 'Security Verification',
@@ -720,30 +420,7 @@ export const generateExcelTemplate = () => {
       order: 1
     },
     {
-      id: '', // ALWAYS EMPTY for auto-generation
-      type: 'twoFactorAuth',
-      category: 'Validation & Security',
-      name: '2FA Code',
-      label: 'Two-Factor Authentication Code',
-      placeholder: '000000',
-      required: true,
-      description: 'Two-factor authentication input',
-      sectionId: 'validation-security',
-      order: 2
-    },
-    {
-      id: '', // ALWAYS EMPTY for auto-generation
-      type: 'biometricAuth',
-      category: 'Validation & Security',
-      name: 'Biometric Verification',
-      label: 'Fingerprint/Face ID',
-      required: false,
-      description: 'Biometric authentication',
-      sectionId: 'validation-security',
-      order: 3
-    },
-    {
-      id: '', // ALWAYS EMPTY for auto-generation
+      id: '',
       type: 'consentCheckbox',
       category: 'Validation & Security',
       name: 'Privacy Consent',
@@ -751,236 +428,7 @@ export const generateExcelTemplate = () => {
       required: true,
       description: 'Required consent checkbox',
       sectionId: 'validation-security',
-      order: 4
-    },
-    {
-      id: '', // ALWAYS EMPTY for auto-generation
-      type: 'ageVerification',
-      category: 'Validation & Security',
-      name: 'Age Confirmation',
-      label: 'I confirm I am 18 years or older',
-      required: true,
-      description: 'Age verification checkbox',
-      sectionId: 'validation-security',
-      order: 5
-    },
-    {
-      id: '', // ALWAYS EMPTY for auto-generation
-      type: 'dataRetention',
-      category: 'Validation & Security',
-      name: 'Data Retention',
-      label: 'Data retention preferences',
-      required: false,
-      description: 'Data retention settings',
-      sectionId: 'validation-security',
-      order: 6
-    }
-  ];
-      id: '', // ALWAYS EMPTY for auto-generation
-      type: 'radioGroup',
-      category: 'Selection',
-      name: 'Gender',
-      label: 'Gender',
-      required: false,
-      options: 'Male,Female,Non-binary,Prefer not to say',
-      layout: 'horizontal',
-      description: 'Optional demographic information',
-      sectionId: 'personal-info',
-      order: 5
-    },
-
-    // Address Information Section
-    {
-      id: '', // ALWAYS EMPTY for auto-generation
-      type: 'completeAddress',
-      category: 'Address',
-      name: 'Home Address',
-      label: 'Home Address',
-      required: true,
-      includeAddressLine2: true,
-      defaultCountry: 'US',
-      description: 'Complete mailing address required for shipping',
-      sectionId: 'address-info',
-      order: 1
-    },
-
-    // Professional Information Section
-    {
-      id: '', // ALWAYS EMPTY for auto-generation
-      type: 'textInput',
-      category: 'Core Input',
-      name: 'Company Name',
-      label: 'Company/Organization',
-      placeholder: 'Enter your company name',
-      required: false,
-      description: 'Current employer or organization',
-      sectionId: 'professional-info',
-      order: 1,
-      maxLength: 150
-    },
-    {
-      id: '', // ALWAYS EMPTY for auto-generation
-      type: 'textInput',
-      category: 'Core Input',
-      name: 'Job Title',
-      label: 'Job Title',
-      placeholder: 'e.g., Software Engineer, Manager',
-      required: false,
-      description: 'Your current position or role',
-      sectionId: 'professional-info',
-      order: 2,
-      maxLength: 100
-    },
-    {
-      id: '', // ALWAYS EMPTY for auto-generation
-      type: 'dropdown',
-      category: 'Selection',
-      name: 'Experience Level',
-      label: 'Years of Experience',
-      required: true,
-      options: 'Less than 1 year,1-2 years,3-5 years,6-10 years,11-15 years,More than 15 years',
-      description: 'Total years of professional experience',
-      sectionId: 'professional-info',
-      order: 3
-    },
-    {
-      id: '', // ALWAYS EMPTY for auto-generation
-      type: 'checkboxGroup',
-      category: 'Selection',
-      name: 'Technical Skills',
-      label: 'Technical Skills',
-      required: false,
-      options: 'JavaScript,Python,Java,C++,React,Angular,Vue.js,Node.js,SQL,MongoDB,AWS,Docker',
-      layout: 'vertical',
-      description: 'Select all technologies you are proficient in',
-      sectionId: 'professional-info',
-      order: 4
-    },
-    {
-      id: '', // ALWAYS EMPTY for auto-generation
-      type: 'numberInput',
-      category: 'Core Input',
-      name: 'Expected Salary',
-      label: 'Expected Annual Salary (USD)',
-      required: false,
-      min: 30000,
-      max: 500000,
-      step: 1000,
-      description: 'Optional salary expectation',
-      sectionId: 'professional-info',
-      order: 5
-    },
-
-    // Preferences Section
-    {
-      id: '', // ALWAYS EMPTY for auto-generation
-      type: 'toggleSwitch',
-      category: 'Selection',
-      name: 'Remote Work',
-      label: 'Open to Remote Work',
-      required: false,
-      onLabel: 'Yes',
-      offLabel: 'No',
-      defaultValue: false,
-      description: 'Willing to work remotely',
-      sectionId: 'preferences',
-      order: 1
-    },
-    {
-      id: '', // ALWAYS EMPTY for auto-generation
-      type: 'slider',
-      category: 'Selection',
-      name: 'Travel Willingness',
-      label: 'Willingness to Travel (%)',
-      required: false,
-      min: 0,
-      max: 100,
-      step: 5,
-      defaultValue: 25,
-      description: 'Percentage of time willing to travel for work',
-      sectionId: 'preferences',
       order: 2
-    },
-    {
-      id: '', // ALWAYS EMPTY for auto-generation
-      type: 'ratingScale',
-      category: 'Selection',
-      name: 'Interest Level',
-      label: 'Interest in this Position',
-      required: true,
-      scaleType: 'stars',
-      maxValue: 5,
-      description: 'Rate your interest level (required)',
-      sectionId: 'preferences',
-      order: 3
-    },
-    {
-      id: '', // ALWAYS EMPTY for auto-generation
-      type: 'dateRangePicker',
-      category: 'Date & Time',
-      name: 'Availability',
-      label: 'Available Start Date Range',
-      required: false,
-      format: 'YYYY-MM-DD',
-      description: 'When you could potentially start',
-      sectionId: 'preferences',
-      order: 4
-    },
-
-    // Additional Information Section
-    {
-      id: '', // ALWAYS EMPTY for auto-generation
-      type: 'fileUpload',
-      category: 'File & Media',
-      name: 'Resume Upload',
-      label: 'Upload Resume',
-      required: true,
-      accept: '.pdf,.doc,.docx',
-      multiple: false,
-      maxSize: 10,
-      description: 'Required: Upload your current resume (PDF or Word)',
-      sectionId: 'additional-info',
-      order: 1
-    },
-    {
-      id: '', // ALWAYS EMPTY for auto-generation
-      type: 'urlInput',
-      category: 'Core Input',
-      name: 'Portfolio URL',
-      label: 'Portfolio/LinkedIn URL',
-      placeholder: 'https://www.linkedin.com/in/yourname',
-      required: false,
-      description: 'Link to your professional portfolio or LinkedIn profile',
-      sectionId: 'additional-info',
-      order: 2
-    },
-    {
-      id: '', // ALWAYS EMPTY for auto-generation
-      type: 'textarea',
-      category: 'Core Input',
-      name: 'Cover Letter',
-      label: 'Cover Letter / Additional Information',
-      placeholder: 'Tell us why you are interested in this position...',
-      required: false,
-      rows: 6,
-      maxLength: 1000,
-      description: 'Optional cover letter or additional information',
-      sectionId: 'additional-info',
-      order: 3
-    },
-    {
-      id: '', // ALWAYS EMPTY for auto-generation
-      type: 'termsConditions',
-      category: 'Validation & Security',
-      name: 'Terms Agreement',
-      label: 'Terms and Conditions',
-      required: true,
-      text: 'I agree to the terms and conditions and privacy policy',
-      linkText: 'View Terms',
-      linkUrl: '/terms',
-      description: 'Required: Must agree to terms to proceed',
-      sectionId: 'additional-info',
-      order: 4
     }
   ];
 
@@ -1008,6 +456,11 @@ export const generateExcelTemplate = () => {
       case 'options': return { wch: 50 };
       case 'description': return { wch: 40 };
       case 'sectionId': return { wch: 18 };
+      case 'rowLabels': return { wch: 50 };
+      case 'columnOptions': return { wch: 50 };
+      case 'questions': return { wch: 50 };
+      case 'answers': return { wch: 50 };
+      case 'items': return { wch: 50 };
       default: return { wch: 12 };
     }
   });
@@ -1128,8 +581,8 @@ export const parseExcelFile = (file: File): Promise<ExcelControlData[]> => {
         console.log('✅ EXCEL PARSE: ===== PARSING COMPLETED SUCCESSFULLY =====');
         console.log('📊 EXCEL PARSE: Final results:', {
           totalControls: controls.length,
-          controlTypes: [...new Set(controls.map(c => c.type))],
-          sections: [...new Set(controls.map(c => c.sectionId))],
+          controlTypes: Array.from(new Set(controls.map(c => c.type))),
+          sections: Array.from(new Set(controls.map(c => c.sectionId))),
           requiredControls: controls.filter(c => c.required).length
         });
         
@@ -1177,7 +630,8 @@ export const convertExcelDataToControls = (excelData: ExcelControlData[]): Dropp
       'format', 'layout', 'scaleType', 'maxValue', 'defaultValue', 
       'onLabel', 'offLabel', 'canvasWidth', 'canvasHeight', 'defaultColor', 
       'text', 'level', 'alignment', 'fontSize', 'color', 'style', 
-      'thickness', 'spacing'
+      'thickness', 'spacing', 'rowLabels', 'columnOptions', 'questions', 
+      'answers', 'items'
     ];
 
     propertyMappings.forEach(prop => {
