@@ -1,0 +1,216 @@
+chunk-PJEEZAML.js?v=4af276a5:21551 Download the React DevTools for a better development experience: https://reactjs.org/link/react-devtools
+useDragDrop.ts:434 📊 useDragDrop: Current state: {controlCount: 0, selectedControlId: undefined, isLoading: true, refreshKey: 0, directImportMode: false, …}
+App.tsx:94 🚀 APP: Initializing application...
+db.ts:45 Initializing localStorage-based database
+db.ts:20 Mock DB execute: INSERT OR IGNORE INTO questionnaires (id, name, description, purpose, category, status, tier) 
+          VALUES (?, ?, ?, ?, ?, ?, ?)
+useDragDrop.ts:434 📊 useDragDrop: Current state: {controlCount: 0, selectedControlId: undefined, isLoading: true, refreshKey: 0, directImportMode: false, …}
+App.tsx:94 🚀 APP: Initializing application...
+db.ts:20 Mock DB execute: INSERT OR IGNORE INTO sections (id, questionnaire_id, name, description, color, icon, section_order, required) 
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+App.tsx:99 ✅ APP: Database initialized successfully
+db.ts:20 Mock DB execute: SELECT * FROM sections WHERE questionnaire_id = ? ORDER BY section_order
+db.ts:51 Database initialized successfully
+App.tsx:104 📂 APP: Loaded sections: 0
+App.tsx:99 ✅ APP: Database initialized successfully
+db.ts:20 Mock DB execute: SELECT * FROM sections WHERE questionnaire_id = ? ORDER BY section_order
+App.tsx:104 📂 APP: Loaded sections: 0
+useDragDrop.ts:27 🔄 useDragDrop: Loading controls from database
+db.ts:20 Mock DB execute: SELECT * FROM controls WHERE questionnaire_id = ? ORDER BY y, x
+useDragDrop.ts:31 📊 useDragDrop: Database query results: {controlCount: 0, refreshKey: 0, timestamp: '2025-06-30T03:36:57.265Z'}
+useDragDrop.ts:38 ✅ useDragDrop: Controls loaded successfully
+useDragDrop.ts:434 📊 useDragDrop: Current state: {controlCount: 0, selectedControlId: undefined, isLoading: false, refreshKey: 0, directImportMode: false, …}
+DirectImportModal.tsx:59 🚀 DIRECT IMPORT: Starting direct UI import process...
+excelTemplate.ts:479 🔄 EXCEL PARSE: ===== STARTING EXCEL FILE PARSING =====
+excelTemplate.ts:480 📊 EXCEL PARSE: File details: {name: 'Jumbo_Form_Controls_Template_2025-06-30.xlsx', size: 58282, type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', lastModified: '2025-06-30T01:53:57.620Z'}
+excelTemplate.ts:491 📖 EXCEL PARSE: File read successfully, parsing workbook...
+excelTemplate.ts:495 📊 EXCEL PARSE: Workbook details: {sheetNames: Array(2), sheetCount: 2}
+excelTemplate.ts:512 ✅ EXCEL PARSE: Found Design sheet: Design
+excelTemplate.ts:517 📊 EXCEL PARSE: Raw sheet data: {totalRows: 25, firstRowSample: Array(43)}
+excelTemplate.ts:532 📊 EXCEL PARSE: Data structure: {headers: Array(43), dataRows: 24, nonEmptyRows: 24}
+excelTemplate.ts:541 🔄 EXCEL PARSE: Processing row 1: (43) ['', 'textInput', 'Core Input', 'Full Name', 'Full Name', 'Enter your complete legal name', 'TRUE', '', 'Required for identification purposes', 'core-inputs', 1, '', 100, '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+excelTemplate.ts:570 ✅ EXCEL PARSE: Processed control 1: {id: 'imported-textInput-1751254627607-w59q9b-000', type: 'textInput', name: 'Full Name', sectionId: 'core-inputs', required: true}
+excelTemplate.ts:541 🔄 EXCEL PARSE: Processing row 2: (43) ['', 'textarea', 'Core Input', 'Description', 'Tell us about yourself', 'Provide a detailed description...', 'FALSE', '', 'Multi-line text input example', 'core-inputs', 2, '', 500, '', '', '', 4, '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+excelTemplate.ts:570 ✅ EXCEL PARSE: Processed control 2: {id: 'imported-textarea-1751254627608-5oadov-001', type: 'textarea', name: 'Description', sectionId: 'core-inputs', required: false}
+excelTemplate.ts:541 🔄 EXCEL PARSE: Processing row 3: (43) ['', 'numberInput', 'Core Input', 'Age', 'Age', '', 'TRUE', '', 'Numeric input with validation', 'core-inputs', 3, '', '', 18, 100, 1, '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+excelTemplate.ts:570 ✅ EXCEL PARSE: Processed control 3: {id: 'imported-numberInput-1751254627608-tf1enf-002', type: 'numberInput', name: 'Age', sectionId: 'core-inputs', required: true}
+excelTemplate.ts:541 🔄 EXCEL PARSE: Processing row 4: (43) ['', 'emailInput', 'Core Input', 'Email Address', 'Email Address', 'your.email@example.com', 'TRUE', '', 'Primary contact email - required for account creation', 'core-inputs', 4, '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+excelTemplate.ts:570 ✅ EXCEL PARSE: Processed control 4: {id: 'imported-emailInput-1751254627608-k65apz-003', type: 'emailInput', name: 'Email Address', sectionId: 'core-inputs', required: true}
+excelTemplate.ts:541 🔄 EXCEL PARSE: Processing row 5: (43) ['', 'phoneInput', 'Core Input', 'Phone Number', 'Phone Number', '(555) 123-4567', 'FALSE', '', 'Optional backup contact method', 'core-inputs', 5, '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+excelTemplate.ts:570 ✅ EXCEL PARSE: Processed control 5: {id: 'imported-phoneInput-1751254627609-6q2ucb-004', type: 'phoneInput', name: 'Phone Number', sectionId: 'core-inputs', required: false}
+excelTemplate.ts:541 🔄 EXCEL PARSE: Processing row 6: (43) ['', 'datePicker', 'Date & Time', 'Date of Birth', 'Date of Birth', '', 'TRUE', '', 'Required for age verification', 'date-time', 1, '', '', '', '', '', '', '', '', '', 'YYYY-MM-DD', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+excelTemplate.ts:570 ✅ EXCEL PARSE: Processed control 6: {id: 'imported-datePicker-1751254627609-vvdjsy-005', type: 'datePicker', name: 'Date of Birth', sectionId: 'date-time', required: true}
+excelTemplate.ts:541 🔄 EXCEL PARSE: Processing row 7: (43) ['', 'timePicker', 'Date & Time', 'Preferred Meeting Time', 'Best Meeting Time', '', 'FALSE', '', 'Time selection input', 'date-time', 2, '', '', '', '', 15, '', '', '', '', '24h', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+excelTemplate.ts:570 ✅ EXCEL PARSE: Processed control 7: {id: 'imported-timePicker-1751254627609-9bcdoy-006', type: 'timePicker', name: 'Preferred Meeting Time', sectionId: 'date-time', required: false}
+excelTemplate.ts:541 🔄 EXCEL PARSE: Processing row 8: (43) ['', 'dropdown', 'Selection', 'Country', 'Country of Residence', '', 'TRUE', 'United States,Canada,United Kingdom,Australia,Germany,France,Japan,Other', 'Single selection dropdown', 'selection-controls', 1, '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+excelTemplate.ts:570 ✅ EXCEL PARSE: Processed control 8: {id: 'imported-dropdown-1751254627610-8k8kok-007', type: 'dropdown', name: 'Country', sectionId: 'selection-controls', required: true}
+excelTemplate.ts:541 🔄 EXCEL PARSE: Processing row 9: (43) ['', 'radioGroup', 'Selection', 'Experience Level', 'Experience Level', '', 'TRUE', 'Beginner,Intermediate,Advanced,Expert', 'Single selection radio buttons', 'selection-controls', 2, '', '', '', '', '', '', '', '', '', '', 'vertical', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+excelTemplate.ts:570 ✅ EXCEL PARSE: Processed control 9: {id: 'imported-radioGroup-1751254627610-tgzn0k-008', type: 'radioGroup', name: 'Experience Level', sectionId: 'selection-controls', required: true}
+excelTemplate.ts:541 🔄 EXCEL PARSE: Processing row 10: (43) ['', 'checkboxGroup', 'Selection', 'Interests', 'Areas of Interest', '', 'FALSE', 'Technology,Sports,Music,Travel,Reading,Cooking,Photography,Art', 'Multiple selection checkboxes', 'selection-controls', 3, '', '', '', '', '', '', '', '', '', '', 'vertical', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+excelTemplate.ts:570 ✅ EXCEL PARSE: Processed control 10: {id: 'imported-checkboxGroup-1751254627611-c8iy2p-009', type: 'checkboxGroup', name: 'Interests', sectionId: 'selection-controls', required: false}
+excelTemplate.ts:541 🔄 EXCEL PARSE: Processing row 11: (43) ['', 'ratingScale', 'Selection', 'Satisfaction Rating', 'Rate your experience', '', 'FALSE', '', 'Star rating scale', 'selection-controls', 4, '', '', '', '', '', '', '', '', '', '', '', 'stars', 5, '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+excelTemplate.ts:570 ✅ EXCEL PARSE: Processed control 11: {id: 'imported-ratingScale-1751254627611-v72zih-010', type: 'ratingScale', name: 'Satisfaction Rating', sectionId: 'selection-controls', required: false}
+excelTemplate.ts:541 🔄 EXCEL PARSE: Processing row 12: (43) ['', 'singleSelectiveGrid', 'Grid & Matrix', 'Service Quality Rating', 'Rate our services (Single Selection per Row)', '', 'TRUE', '', 'Grid with radio button groups - single selection per row', 'grid-matrix', 1, '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', 'Customer Service,Product Quality,Delivery Speed,Website Experience,Overall Satisfaction', 'Excellent,Good,Average,Poor,Very Poor', '', '', '']
+excelTemplate.ts:570 ✅ EXCEL PARSE: Processed control 12: {id: 'imported-singleSelectiveGrid-1751254627611-dc93rj-011', type: 'singleSelectiveGrid', name: 'Service Quality Rating', sectionId: 'grid-matrix', required: true}
+excelTemplate.ts:541 🔄 EXCEL PARSE: Processing row 13: (43) ['', 'multiSelectiveGrid', 'Grid & Matrix', 'Feature Usage', 'Which features do you use? (Multiple Selection per Row)', '', 'FALSE', '', 'Grid with checkbox groups - multiple selections allowed per row', 'grid-matrix', 2, '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', 'Mobile App,Web Platform,API Integration,Desktop Software,Browser Extension', 'Daily,Weekly,Monthly,Rarely,Never', '', '', '']
+excelTemplate.ts:570 ✅ EXCEL PARSE: Processed control 13: {id: 'imported-multiSelectiveGrid-1751254627612-6azbbl-012', type: 'multiSelectiveGrid', name: 'Feature Usage', sectionId: 'grid-matrix', required: false}
+excelTemplate.ts:541 🔄 EXCEL PARSE: Processing row 14: (43) ['', 'matrixQuestions', 'Grid & Matrix', 'Agreement Survey', 'Please indicate your level of agreement', '', 'TRUE', '', 'Multiple questions with same answer options', 'grid-matrix', 3, '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', 'I find the product easy to use,The product meets m…e price is reasonable,Customer support is helpful', 'Strongly Agree,Agree,Neutral,Disagree,Strongly Disagree', '']
+excelTemplate.ts:570 ✅ EXCEL PARSE: Processed control 14: {id: 'imported-matrixQuestions-1751254627612-tb3wt4-013', type: 'matrixQuestions', name: 'Agreement Survey', sectionId: 'grid-matrix', required: true}
+excelTemplate.ts:541 🔄 EXCEL PARSE: Processing row 15: (43) ['', 'rankingControl', 'Grid & Matrix', 'Priority Ranking', 'Rank these features by importance', '', 'FALSE', '', 'Drag and drop to rank items', 'grid-matrix', 4, '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', 'Performance,Security,User Interface,Customer Support,Price,Documentation']
+excelTemplate.ts:570 ✅ EXCEL PARSE: Processed control 15: {id: 'imported-rankingControl-1751254627612-h3xhtr-014', type: 'rankingControl', name: 'Priority Ranking', sectionId: 'grid-matrix', required: false}
+excelTemplate.ts:541 🔄 EXCEL PARSE: Processing row 16: (43) ['', 'fileUpload', 'File & Media', 'Resume Upload', 'Upload your Resume/CV', '', 'TRUE', '', 'File upload with type restrictions', 'file-media', 1, '', '', '', '', '', '', '.pdf,.doc,.docx', '', 10, '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+excelTemplate.ts:570 ✅ EXCEL PARSE: Processed control 16: {id: 'imported-fileUpload-1751254627613-z1u54j-015', type: 'fileUpload', name: 'Resume Upload', sectionId: 'file-media', required: true}
+excelTemplate.ts:541 🔄 EXCEL PARSE: Processing row 17: (43) ['', 'imageUpload', 'File & Media', 'Profile Photo', 'Profile Photo Upload', '', 'FALSE', '', 'Image upload with preview', 'file-media', 2, '', '', '', '', '', '', '.jpg,.jpeg,.png,.gif', '', 5, '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+excelTemplate.ts:570 ✅ EXCEL PARSE: Processed control 17: {id: 'imported-imageUpload-1751254627613-nkvcul-016', type: 'imageUpload', name: 'Profile Photo', sectionId: 'file-media', required: false}
+excelTemplate.ts:541 🔄 EXCEL PARSE: Processing row 18: (43) ['', 'signaturePad', 'File & Media', 'Digital Signature', 'Please provide your signature', '', 'TRUE', '', 'Digital signature capture', 'file-media', 3, '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', 400, 200, '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+excelTemplate.ts:570 ✅ EXCEL PARSE: Processed control 18: {id: 'imported-signaturePad-1751254627614-b3ogmv-017', type: 'signaturePad', name: 'Digital Signature', sectionId: 'file-media', required: true}
+excelTemplate.ts:541 🔄 EXCEL PARSE: Processing row 19: (43) ['', 'heading', 'Layout & Display', 'Section Title', 'Personal Information Section', '', 'FALSE', '', 'Text heading element', 'layout-display', 1, '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', 'Personal Information', 'h2', 'left', 'large', '#1F2937', '', '', '', '', '', '', '', '']
+excelTemplate.ts:570 ✅ EXCEL PARSE: Processed control 19: {id: 'imported-heading-1751254627614-k1ltvg-018', type: 'heading', name: 'Section Title', sectionId: 'layout-display', required: false}
+excelTemplate.ts:541 🔄 EXCEL PARSE: Processing row 20: (43) ['', 'sectionDivider', 'Layout & Display', 'Section Break', 'Visual Separator', '', 'FALSE', '', 'Visual separation lines', 'layout-display', 2, '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '#e5e7eb', 'solid', 1, 'medium', '', '', '', '', '']
+excelTemplate.ts:570 ✅ EXCEL PARSE: Processed control 20: {id: 'imported-sectionDivider-1751254627614-lxrdhj-019', type: 'sectionDivider', name: 'Section Break', sectionId: 'layout-display', required: false}
+excelTemplate.ts:541 🔄 EXCEL PARSE: Processing row 21: (43) ['', 'addressLookup', 'Address', 'Home Address', 'Home Address', '', 'TRUE', '', 'Address lookup with autocomplete', 'address', 1, '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+excelTemplate.ts:570 ✅ EXCEL PARSE: Processed control 21: {id: 'imported-addressLookup-1751254627615-hazrbu-020', type: 'addressLookup', name: 'Home Address', sectionId: 'address', required: true}
+excelTemplate.ts:541 🔄 EXCEL PARSE: Processing row 22: (43) ['', 'postalCode', 'Address', 'ZIP Code', 'ZIP/Postal Code', '12345', 'TRUE', '', 'Postal code with format validation', 'address', 2, '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+excelTemplate.ts:570 ✅ EXCEL PARSE: Processed control 22: {id: 'imported-postalCode-1751254627615-x2nm83-021', type: 'postalCode', name: 'ZIP Code', sectionId: 'address', required: true}
+excelTemplate.ts:541 🔄 EXCEL PARSE: Processing row 23: (43) ['', 'captcha', 'Validation & Security', 'Security Verification', 'Please verify you are human', '', 'TRUE', '', 'CAPTCHA verification', 'validation-security', 1, '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+excelTemplate.ts:570 ✅ EXCEL PARSE: Processed control 23: {id: 'imported-captcha-1751254627616-lw92f3-022', type: 'captcha', name: 'Security Verification', sectionId: 'validation-security', required: true}
+excelTemplate.ts:541 🔄 EXCEL PARSE: Processing row 24: (43) ['', 'consentCheckbox', 'Validation & Security', 'Privacy Consent', 'I agree to the privacy policy and terms of service', '', 'TRUE', '', 'Required consent checkbox', 'validation-security', 2, '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+excelTemplate.ts:570 ✅ EXCEL PARSE: Processed control 24: {id: 'imported-consentCheckbox-1751254627616-bmi5kd-023', type: 'consentCheckbox', name: 'Privacy Consent', sectionId: 'validation-security', required: true}
+excelTemplate.ts:581 ✅ EXCEL PARSE: ===== PARSING COMPLETED SUCCESSFULLY =====
+excelTemplate.ts:582 📊 EXCEL PARSE: Final results: {totalControls: 24, controlTypes: Array(24), sections: Array(8), requiredControls: 14}
+DirectImportModal.tsx:63 ✅ DIRECT IMPORT: Excel data parsed successfully for preview
+DirectImportModal.tsx:74 🚀 DIRECT IMPORT: Converting Excel data to controls...
+excelTemplate.ts:607 🔄 EXCEL CONVERT: ===== STARTING DATA CONVERSION =====
+ 📊 EXCEL CONVERT: Input data: {controlCount: 24, sampleControl: {…}}
+ 🔄 EXCEL CONVERT: Converting control 1: Full Name
+ ✅ EXCEL CONVERT: Converted control 1: {id: 'imported-textInput-1751254627607-w59q9b-000', type: 'textInput', name: 'Full Name', sectionId: 'core-inputs', propertyCount: 5}
+ 🔄 EXCEL CONVERT: Converting control 2: Description
+ ✅ EXCEL CONVERT: Converted control 2: {id: 'imported-textarea-1751254627608-5oadov-001', type: 'textarea', name: 'Description', sectionId: 'core-inputs', propertyCount: 6}
+ 🔄 EXCEL CONVERT: Converting control 3: Age
+ ✅ EXCEL CONVERT: Converted control 3: {id: 'imported-numberInput-1751254627608-tf1enf-002', type: 'numberInput', name: 'Age', sectionId: 'core-inputs', propertyCount: 6}
+ 🔄 EXCEL CONVERT: Converting control 4: Email Address
+excelTemplate.ts:655 ✅ EXCEL CONVERT: Converted control 4: {id: 'imported-emailInput-1751254627608-k65apz-003', type: 'emailInput', name: 'Email Address', sectionId: 'core-inputs', propertyCount: 4}
+excelTemplate.ts:618 🔄 EXCEL CONVERT: Converting control 5: Phone Number
+excelTemplate.ts:655 ✅ EXCEL CONVERT: Converted control 5: {id: 'imported-phoneInput-1751254627609-6q2ucb-004', type: 'phoneInput', name: 'Phone Number', sectionId: 'core-inputs', propertyCount: 4}
+excelTemplate.ts:618 🔄 EXCEL CONVERT: Converting control 6: Date of Birth
+excelTemplate.ts:655 ✅ EXCEL CONVERT: Converted control 6: {id: 'imported-datePicker-1751254627609-vvdjsy-005', type: 'datePicker', name: 'Date of Birth', sectionId: 'date-time', propertyCount: 4}
+excelTemplate.ts:618 🔄 EXCEL CONVERT: Converting control 7: Preferred Meeting Time
+excelTemplate.ts:655 ✅ EXCEL CONVERT: Converted control 7: {id: 'imported-timePicker-1751254627609-9bcdoy-006', type: 'timePicker', name: 'Preferred Meeting Time', sectionId: 'date-time', propertyCount: 5}
+excelTemplate.ts:618 🔄 EXCEL CONVERT: Converting control 8: Country
+excelTemplate.ts:655 ✅ EXCEL CONVERT: Converted control 8: {id: 'imported-dropdown-1751254627610-8k8kok-007', type: 'dropdown', name: 'Country', sectionId: 'selection-controls', propertyCount: 4}
+excelTemplate.ts:618 🔄 EXCEL CONVERT: Converting control 9: Experience Level
+excelTemplate.ts:655 ✅ EXCEL CONVERT: Converted control 9: {id: 'imported-radioGroup-1751254627610-tgzn0k-008', type: 'radioGroup', name: 'Experience Level', sectionId: 'selection-controls', propertyCount: 5}
+excelTemplate.ts:618 🔄 EXCEL CONVERT: Converting control 10: Interests
+excelTemplate.ts:655 ✅ EXCEL CONVERT: Converted control 10: {id: 'imported-checkboxGroup-1751254627611-c8iy2p-009', type: 'checkboxGroup', name: 'Interests', sectionId: 'selection-controls', propertyCount: 5}
+excelTemplate.ts:618 🔄 EXCEL CONVERT: Converting control 11: Satisfaction Rating
+excelTemplate.ts:655 ✅ EXCEL CONVERT: Converted control 11: {id: 'imported-ratingScale-1751254627611-v72zih-010', type: 'ratingScale', name: 'Satisfaction Rating', sectionId: 'selection-controls', propertyCount: 5}
+excelTemplate.ts:618 🔄 EXCEL CONVERT: Converting control 12: Service Quality Rating
+excelTemplate.ts:655 ✅ EXCEL CONVERT: Converted control 12: {id: 'imported-singleSelectiveGrid-1751254627611-dc93rj-011', type: 'singleSelectiveGrid', name: 'Service Quality Rating', sectionId: 'grid-matrix', propertyCount: 5}
+excelTemplate.ts:618 🔄 EXCEL CONVERT: Converting control 13: Feature Usage
+excelTemplate.ts:655 ✅ EXCEL CONVERT: Converted control 13: {id: 'imported-multiSelectiveGrid-1751254627612-6azbbl-012', type: 'multiSelectiveGrid', name: 'Feature Usage', sectionId: 'grid-matrix', propertyCount: 5}
+excelTemplate.ts:618 🔄 EXCEL CONVERT: Converting control 14: Agreement Survey
+excelTemplate.ts:655 ✅ EXCEL CONVERT: Converted control 14: {id: 'imported-matrixQuestions-1751254627612-tb3wt4-013', type: 'matrixQuestions', name: 'Agreement Survey', sectionId: 'grid-matrix', propertyCount: 5}
+excelTemplate.ts:618 🔄 EXCEL CONVERT: Converting control 15: Priority Ranking
+excelTemplate.ts:655 ✅ EXCEL CONVERT: Converted control 15: {id: 'imported-rankingControl-1751254627612-h3xhtr-014', type: 'rankingControl', name: 'Priority Ranking', sectionId: 'grid-matrix', propertyCount: 4}
+excelTemplate.ts:618 🔄 EXCEL CONVERT: Converting control 16: Resume Upload
+excelTemplate.ts:655 ✅ EXCEL CONVERT: Converted control 16: {id: 'imported-fileUpload-1751254627613-z1u54j-015', type: 'fileUpload', name: 'Resume Upload', sectionId: 'file-media', propertyCount: 5}
+excelTemplate.ts:618 🔄 EXCEL CONVERT: Converting control 17: Profile Photo
+excelTemplate.ts:655 ✅ EXCEL CONVERT: Converted control 17: {id: 'imported-imageUpload-1751254627613-nkvcul-016', type: 'imageUpload', name: 'Profile Photo', sectionId: 'file-media', propertyCount: 5}
+excelTemplate.ts:618 🔄 EXCEL CONVERT: Converting control 18: Digital Signature
+excelTemplate.ts:655 ✅ EXCEL CONVERT: Converted control 18: {id: 'imported-signaturePad-1751254627614-b3ogmv-017', type: 'signaturePad', name: 'Digital Signature', sectionId: 'file-media', propertyCount: 5}
+excelTemplate.ts:618 🔄 EXCEL CONVERT: Converting control 19: Section Title
+excelTemplate.ts:655 ✅ EXCEL CONVERT: Converted control 19: {id: 'imported-heading-1751254627614-k1ltvg-018', type: 'heading', name: 'Section Title', sectionId: 'layout-display', propertyCount: 8}
+excelTemplate.ts:618 🔄 EXCEL CONVERT: Converting control 20: Section Break
+excelTemplate.ts:655 ✅ EXCEL CONVERT: Converted control 20: {id: 'imported-sectionDivider-1751254627614-lxrdhj-019', type: 'sectionDivider', name: 'Section Break', sectionId: 'layout-display', propertyCount: 7}
+excelTemplate.ts:618 🔄 EXCEL CONVERT: Converting control 21: Home Address
+excelTemplate.ts:655 ✅ EXCEL CONVERT: Converted control 21: {id: 'imported-addressLookup-1751254627615-hazrbu-020', type: 'addressLookup', name: 'Home Address', sectionId: 'address', propertyCount: 3}
+excelTemplate.ts:618 🔄 EXCEL CONVERT: Converting control 22: ZIP Code
+excelTemplate.ts:655 ✅ EXCEL CONVERT: Converted control 22: {id: 'imported-postalCode-1751254627615-x2nm83-021', type: 'postalCode', name: 'ZIP Code', sectionId: 'address', propertyCount: 4}
+excelTemplate.ts:618 🔄 EXCEL CONVERT: Converting control 23: Security Verification
+excelTemplate.ts:655 ✅ EXCEL CONVERT: Converted control 23: {id: 'imported-captcha-1751254627616-lw92f3-022', type: 'captcha', name: 'Security Verification', sectionId: 'validation-security', propertyCount: 3}
+excelTemplate.ts:618 🔄 EXCEL CONVERT: Converting control 24: Privacy Consent
+excelTemplate.ts:655 ✅ EXCEL CONVERT: Converted control 24: {id: 'imported-consentCheckbox-1751254627616-bmi5kd-023', type: 'consentCheckbox', name: 'Privacy Consent', sectionId: 'validation-security', propertyCount: 3}
+excelTemplate.ts:666 ✅ EXCEL CONVERT: ===== CONVERSION COMPLETED =====
+excelTemplate.ts:667 📊 EXCEL CONVERT: Final results: {convertedCount: 24, sectionDistribution: {…}}
+DirectImportModal.tsx:76 ✅ DIRECT IMPORT: Controls converted, importing directly to UI...
+App.tsx:131 🚀 DIRECT UI: ===== STARTING DIRECT UI IMPORT =====
+App.tsx:132 📊 DIRECT UI: Import details: {controlCount: 24, directUIMode: true, timestamp: '2025-06-30T03:37:08.803Z'}
+App.tsx:142 📂 DIRECT UI: Creating sections for: (8) ['core-inputs', 'date-time', 'selection-controls', 'grid-matrix', 'file-media', 'layout-display', 'address', 'validation-security']
+App.tsx:168 ✅ DIRECT UI: Created sections: (8) ['Core Inputs', 'Date Time', 'Selection Controls', 'Grid Matrix', 'File Media', 'Layout Display', 'Address', 'Validation Security']
+App.tsx:173 🎯 DIRECT UI: Active section set to: core-inputs
+useDragDrop.ts:57 🚀 DIRECT IMPORT: ===== DIRECT UI IMPORT INITIATED =====
+useDragDrop.ts:58 📊 DIRECT IMPORT: Importing directly to UI state: {controlCount: 24, currentControlCount: 0, timestamp: '2025-06-30T03:37:08.806Z'}
+useDragDrop.ts:92 📝 DIRECT IMPORT: Processed controls for direct UI import:
+useDragDrop.ts:94    1. Full Name (textInput) - Section: core-inputs, ID: direct-import-1751254628806-0-ykgw4g
+useDragDrop.ts:94    2. Description (textarea) - Section: core-inputs, ID: direct-import-1751254628806-1-k875uz
+useDragDrop.ts:94    3. Age (numberInput) - Section: core-inputs, ID: direct-import-1751254628806-2-iosv1w
+useDragDrop.ts:94    4. Email Address (emailInput) - Section: core-inputs, ID: direct-import-1751254628806-3-kqr9vj
+useDragDrop.ts:94    5. Phone Number (phoneInput) - Section: core-inputs, ID: direct-import-1751254628807-4-bu7pnu
+useDragDrop.ts:94    6. Date of Birth (datePicker) - Section: date-time, ID: direct-import-1751254628807-5-vywyjy
+useDragDrop.ts:94    7. Preferred Meeting Time (timePicker) - Section: date-time, ID: direct-import-1751254628807-6-b7xo1d
+useDragDrop.ts:94    8. Country (dropdown) - Section: selection-controls, ID: direct-import-1751254628807-7-vgfyex
+useDragDrop.ts:94    9. Experience Level (radioGroup) - Section: selection-controls, ID: direct-import-1751254628807-8-0mxv1r
+useDragDrop.ts:94    10. Interests (checkboxGroup) - Section: selection-controls, ID: direct-import-1751254628807-9-usbenq
+useDragDrop.ts:94    11. Satisfaction Rating (ratingScale) - Section: selection-controls, ID: direct-import-1751254628807-10-3aibs9
+useDragDrop.ts:94    12. Service Quality Rating (singleSelectiveGrid) - Section: grid-matrix, ID: direct-import-1751254628807-11-cpzcd3
+useDragDrop.ts:94    13. Feature Usage (multiSelectiveGrid) - Section: grid-matrix, ID: direct-import-1751254628807-12-zzr4za
+useDragDrop.ts:94    14. Agreement Survey (matrixQuestions) - Section: grid-matrix, ID: direct-import-1751254628807-13-9f838f
+useDragDrop.ts:94    15. Priority Ranking (rankingControl) - Section: grid-matrix, ID: direct-import-1751254628807-14-zgivs6
+useDragDrop.ts:94    16. Resume Upload (fileUpload) - Section: file-media, ID: direct-import-1751254628807-15-wdcxb3
+useDragDrop.ts:94    17. Profile Photo (imageUpload) - Section: file-media, ID: direct-import-1751254628807-16-ld8mbv
+useDragDrop.ts:94    18. Digital Signature (signaturePad) - Section: file-media, ID: direct-import-1751254628807-17-dz2ek7
+useDragDrop.ts:94    19. Section Title (heading) - Section: layout-display, ID: direct-import-1751254628807-18-h2q22i
+useDragDrop.ts:94    20. Section Break (sectionDivider) - Section: layout-display, ID: direct-import-1751254628807-19-48w9an
+useDragDrop.ts:94    21. Home Address (addressLookup) - Section: address, ID: direct-import-1751254628807-20-ctyiaz
+useDragDrop.ts:94    22. ZIP Code (postalCode) - Section: address, ID: direct-import-1751254628807-21-u10zhc
+useDragDrop.ts:94    23. Security Verification (captcha) - Section: validation-security, ID: direct-import-1751254628807-22-j3h43x
+useDragDrop.ts:94    24. Privacy Consent (consentCheckbox) - Section: validation-security, ID: direct-import-1751254628807-23-og29eu
+useDragDrop.ts:100 ✅ DIRECT IMPORT: ===== DIRECT UI IMPORT COMPLETED =====
+useDragDrop.ts:101 📊 DIRECT IMPORT: Final state: {importedControlCount: 24, directImportMode: true, timestamp: '2025-06-30T03:37:08.812Z'}
+App.tsx:182 ✅ DIRECT UI: Controls imported directly to UI state
+App.tsx:183 🎉 DIRECT UI: ===== DIRECT UI IMPORT COMPLETED SUCCESSFULLY =====
+DirectImportModal.tsx:82 🎉 DIRECT IMPORT: Direct UI import completed successfully!
+chunk-PJEEZAML.js?v=4af276a5:521 Warning: validateDOMNesting(...): <button> cannot appear as a descendant of <button>.
+    at button
+    at div
+    at button
+    at div
+    at div
+    at div
+    at SectionManager (https://eb1ca215-ffbc-40f3-806c-49b2dd787ace-00-36639bz858j3h.worf.replit.dev/src/components/SectionManager.tsx:22:3)
+    at div
+    at div
+    at div
+    at div
+    at DndProvider2 (https://eb1ca215-ffbc-40f3-806c-49b2dd787ace-00-36639bz858j3h.worf.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/react-dnd.js?v=4af276a5:1507:9)
+    at App (https://eb1ca215-ffbc-40f3-806c-49b2dd787ace-00-36639bz858j3h.worf.replit.dev/src/App.tsx?v=7lC9HS_1kFqBSZxjIFkim:46:41)
+printWarning @ chunk-PJEEZAML.js?v=4af276a5:521
+error @ chunk-PJEEZAML.js?v=4af276a5:505
+validateDOMNesting @ chunk-PJEEZAML.js?v=4af276a5:8256
+createInstance @ chunk-PJEEZAML.js?v=4af276a5:8328
+completeWork @ chunk-PJEEZAML.js?v=4af276a5:16290
+completeUnitOfWork @ chunk-PJEEZAML.js?v=4af276a5:19224
+performUnitOfWork @ chunk-PJEEZAML.js?v=4af276a5:19206
+workLoopSync @ chunk-PJEEZAML.js?v=4af276a5:19137
+renderRootSync @ chunk-PJEEZAML.js?v=4af276a5:19116
+performSyncWorkOnRoot @ chunk-PJEEZAML.js?v=4af276a5:18874
+flushSyncCallbacks @ chunk-PJEEZAML.js?v=4af276a5:9119
+(anonymous) @ chunk-PJEEZAML.js?v=4af276a5:18627
+useDragDrop.ts:434 📊 useDragDrop: Current state: {controlCount: 24, selectedControlId: undefined, isLoading: false, refreshKey: 0, directImportMode: true, …}
+useDragDrop.ts:444 📝 useDragDrop: First 3 controls:
+useDragDrop.ts:446    1. Full Name (textInput) - Section: core-inputs
+useDragDrop.ts:446    2. Description (textarea) - Section: core-inputs
+useDragDrop.ts:446    3. Age (numberInput) - Section: core-inputs
+App.tsx:500 🔄 DIALOG: ===== DIALOG CLOSE WITH VERIFICATION =====
+PreviewMode.tsx:1621 Rendering top tabs with theme: cleanMinimal sections: 8
+PreviewMode.tsx:1621 Rendering top tabs with theme: cleanMinimal sections: 8
+PreviewMode.tsx:249 Tab layout changed to: cleanMinimal
+PreviewMode.tsx:249 Tab layout changed to: cleanMinimal
+PreviewMode.tsx:1621 Rendering top tabs with theme: cleanMinimal sections: 8
+PreviewMode.tsx:1621 Rendering top tabs with theme: cleanMinimal sections: 8
+PreviewMode.tsx:1585 Rendering LEFT tabs with theme: cleanMinimal alignment: left
+PreviewMode.tsx:1585 Rendering LEFT tabs with theme: cleanMinimal alignment: left
+PreviewMode.tsx:1585 Rendering LEFT tabs with theme: cleanMinimal alignment: left
+PreviewMode.tsx:1585 Rendering LEFT tabs with theme: cleanMinimal alignment: left
+PreviewMode.tsx:1585 Rendering LEFT tabs with theme: cleanMinimal alignment: left
+PreviewMode.tsx:1585 Rendering LEFT tabs with theme: cleanMinimal alignment: left

@@ -246,9 +246,20 @@ export const PreviewMode: React.FC<PreviewModeProps> = ({
 
   // Force re-render when tab layout changes
   useEffect(() => {
-    console.log('Tab layout changed to:', selectedTabLayout);
+    console.log('🔄 Tab layout changed to:', selectedTabLayout);
+    console.log('🔄 Available themes:', Object.keys(TAB_LAYOUT_THEMES));
     setForceRender(prev => prev + 1);
   }, [selectedTabLayout]);
+
+  // Debug initial state
+  useEffect(() => {
+    console.log('🎯 PreviewMode initial state:', {
+      selectedTabLayout,
+      tabAlignment,
+      sections: sections.length,
+      showTabLayoutSelector
+    });
+  }, []);
 
   const handleInputChange = (controlId: string, value: any) => {
     setFormData(prev => ({ ...prev, [controlId]: value }));
@@ -1437,6 +1448,17 @@ export const PreviewMode: React.FC<PreviewModeProps> = ({
             <Layout className="w-4 h-4" />
             <span>Current: {TAB_LAYOUT_THEMES[selectedTabLayout].name}</span>
           </div>
+          
+          {/* Debug test button */}
+          <button 
+            onClick={() => {
+              console.log('🧪 TEST: Direct theme change to iconText');
+              setSelectedTabLayout('iconText');
+            }}
+            className="mt-2 px-3 py-1 bg-yellow-500 text-white text-xs rounded"
+          >
+            TEST: Switch to Icon & Text
+          </button>
         </div>
 
         {/* Tab Alignment Settings */}
