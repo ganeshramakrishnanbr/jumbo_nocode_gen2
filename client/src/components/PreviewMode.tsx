@@ -37,7 +37,7 @@ const TAB_LAYOUT_THEMES = {
     name: 'Icon & Text',
     description: 'Tabs with icons and descriptive labels',
     renderTabs: (sections: Section[], activeSection: number, setActiveSection: (index: number) => void) => (
-      <div className="flex space-x-1 mb-8 bg-gray-100 dark:bg-gray-800 p-1 rounded-lg">
+      <div className="flex space-x-2 mb-8 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 p-3 rounded-xl shadow-lg">
         {sections.map((section, index) => {
           const icons = [Home, User, Settings, Bell];
           const IconComponent = icons[index % icons.length];
@@ -45,14 +45,14 @@ const TAB_LAYOUT_THEMES = {
             <button
               key={section.id}
               onClick={() => setActiveSection(index)}
-              className={`flex items-center space-x-2 px-4 py-2 rounded-md transition-all ${
+              className={`flex items-center space-x-3 px-6 py-3 rounded-xl transition-all duration-300 transform ${
                 activeSection === index
-                  ? 'bg-white dark:bg-gray-700 text-blue-600 dark:text-blue-400 shadow-sm'
-                  : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
+                  ? 'bg-white dark:bg-gray-800 text-blue-600 dark:text-blue-400 shadow-xl scale-105 border-2 border-blue-200 dark:border-blue-700'
+                  : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-white/50 dark:hover:bg-gray-800/50'
               }`}
             >
-              <IconComponent className="w-4 h-4" />
-              <span className="text-sm font-medium">{section.name}</span>
+              <IconComponent className="w-5 h-5" />
+              <span className="text-sm font-semibold">{section.name}</span>
             </button>
           );
         })}
@@ -89,24 +89,26 @@ const TAB_LAYOUT_THEMES = {
     name: 'Underline Style',
     description: 'Tabs with colored underline indicator',
     renderTabs: (sections: Section[], activeSection: number, setActiveSection: (index: number) => void) => (
-      <div className="flex space-x-8 mb-8">
+      <div className="flex space-x-6 mb-8 border-b-4 border-gradient-to-r from-purple-200 to-pink-200 dark:from-purple-800 dark:to-pink-800 pb-4">
         {sections.map((section, index) => {
           const icons = [Palette, BarChart3, Settings, Sparkles];
+          const colors = ['text-purple-600', 'text-pink-600', 'text-indigo-600', 'text-blue-600'];
+          const underlineColors = ['bg-purple-600', 'bg-pink-600', 'bg-indigo-600', 'bg-blue-600'];
           const IconComponent = icons[index % icons.length];
           return (
             <button
               key={section.id}
               onClick={() => setActiveSection(index)}
-              className={`flex items-center space-x-2 pb-3 relative transition-colors ${
+              className={`flex items-center space-x-3 pb-3 relative transition-all duration-300 transform ${
                 activeSection === index
-                  ? 'text-purple-600 dark:text-purple-400'
-                  : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
+                  ? `${colors[index % colors.length]} dark:text-white scale-110 font-bold`
+                  : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:scale-105'
               }`}
             >
-              <IconComponent className="w-4 h-4" />
+              <IconComponent className="w-5 h-5" />
               <span className="text-sm font-medium">{section.name}</span>
               {activeSection === index && (
-                <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-purple-600 dark:bg-purple-400 rounded-full" />
+                <div className={`absolute bottom-0 left-0 right-0 h-1 ${underlineColors[index % underlineColors.length]} rounded-full shadow-lg`} />
               )}
             </button>
           );
@@ -118,22 +120,25 @@ const TAB_LAYOUT_THEMES = {
     name: 'Card Selection',
     description: 'Card-based selection with icons',
     renderTabs: (sections: Section[], activeSection: number, setActiveSection: (index: number) => void) => (
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         {sections.map((section, index) => {
           const icons = [Smartphone, Monitor, Tablet, Watch];
+          const cardColors = ['from-emerald-400 to-emerald-600', 'from-orange-400 to-orange-600', 'from-violet-400 to-violet-600', 'from-rose-400 to-rose-600'];
           const IconComponent = icons[index % icons.length];
           return (
             <button
               key={section.id}
               onClick={() => setActiveSection(index)}
-              className={`p-4 rounded-lg border-2 transition-all ${
+              className={`p-6 rounded-2xl border-2 transition-all duration-300 transform hover:scale-105 ${
                 activeSection === index
-                  ? 'border-purple-500 bg-purple-50 dark:bg-purple-900/20 text-purple-600 dark:text-purple-400'
-                  : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 hover:border-gray-300 dark:hover:border-gray-600'
+                  ? `border-transparent bg-gradient-to-br ${cardColors[index % cardColors.length]} text-white shadow-2xl scale-105`
+                  : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 hover:border-gray-300 dark:hover:border-gray-600 hover:shadow-lg'
               }`}
             >
-              <IconComponent className="w-8 h-8 mx-auto mb-2" />
-              <div className="text-sm font-medium">{section.name}</div>
+              <IconComponent className={`w-10 h-10 mx-auto mb-3 ${activeSection === index ? 'text-white' : 'text-gray-600 dark:text-gray-400'}`} />
+              <div className={`text-sm font-semibold text-center ${activeSection === index ? 'text-white' : 'text-gray-800 dark:text-gray-200'}`}>
+                {section.name}
+              </div>
             </button>
           );
         })}
@@ -1449,16 +1454,7 @@ export const PreviewMode: React.FC<PreviewModeProps> = ({
             <span>Current: {TAB_LAYOUT_THEMES[selectedTabLayout].name}</span>
           </div>
           
-          {/* Debug test button */}
-          <button 
-            onClick={() => {
-              console.log('🧪 TEST: Direct theme change to iconText');
-              setSelectedTabLayout('iconText');
-            }}
-            className="mt-2 px-3 py-1 bg-yellow-500 text-white text-xs rounded"
-          >
-            TEST: Switch to Icon & Text
-          </button>
+
         </div>
 
         {/* Tab Alignment Settings */}
