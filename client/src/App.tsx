@@ -612,16 +612,7 @@ function App() {
                 droppedControls={droppedControls}
               />
             </div>
-            
-            {/* Properties Panel - Always visible on medium screens and up with proper sizing */}
-            <div className="hidden md:flex w-80 xl:w-96 flex-shrink-0">
-              <PropertiesPanel
-                selectedControl={selectedControl}
-                onUpdateControl={handleControlUpdate}
-                sections={sections}
-                droppedControls={droppedControls}
-              />
-            </div>
+
           </div>
         );
       
