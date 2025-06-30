@@ -108,6 +108,7 @@ Changelog:
 - June 29, 2025. Enhanced PDF Preview with form value display, logo upload, custom footer notes, and section page break settings
 - June 29, 2025. Implemented comprehensive responsive design for web, tablet, and mobile devices with mobile-first approach
 - June 30, 2025. Added Dashboard Designer module with template selection, theme customization, live preview, and separate JSON export configuration
+- June 30, 2025. Fixed Preview tab to display real form controls from Design tab instead of demo content, implemented working tab theme system with 6 different layouts
 ```
 
 ## User Preferences
