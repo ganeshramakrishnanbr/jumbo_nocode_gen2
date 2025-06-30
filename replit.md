@@ -109,6 +109,9 @@ Changelog:
 - June 29, 2025. Implemented comprehensive responsive design for web, tablet, and mobile devices with mobile-first approach
 - June 30, 2025. Added Dashboard Designer module with template selection, theme customization, live preview, and separate JSON export configuration
 - June 30, 2025. Fixed Preview tab to display real form controls from Design tab instead of demo content, implemented working tab theme system with 6 different layouts
+- June 30, 2025. Fixed Design tab three-panel layout with proper Control Library, Design Canvas, Properties Panel structure
+- June 30, 2025. Enhanced Design Canvas with always-visible scrollbars and proper drag-and-drop reordering functionality
+- June 30, 2025. Added comprehensive project documentation with Requirements.md and Prompts.md in docs/ folder
 ```
 
 ## User Preferences
