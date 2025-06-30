@@ -1510,9 +1510,9 @@ export const PreviewMode: React.FC<PreviewModeProps> = ({
                 
                 const displaySections = sections.length > 0 ? sections : demoSections;
                 
-                // Render tabs using the selected tab layout theme
-                if (displaySections.length > 1 && selectedTabLayout !== 'leftSidebar') {
-                  return TAB_LAYOUT_THEMES[selectedTabLayout].renderTabs(displaySections as any, activeSection, setActiveSection);
+                // Always render tabs to showcase themes (use demo sections if needed)
+                if (selectedTabLayout !== 'leftSidebar') {
+                  return TAB_LAYOUT_THEMES[selectedTabLayout].renderTabs(demoSections as any, activeSection, setActiveSection);
                 }
                 return null;
               })()}
@@ -1530,8 +1530,8 @@ export const PreviewMode: React.FC<PreviewModeProps> = ({
                   
                   const displaySections = sections.length > 0 ? sections : demoSections;
                   
-                  if (selectedTabLayout === 'leftSidebar' && displaySections.length > 1) {
-                    return TAB_LAYOUT_THEMES[selectedTabLayout].renderTabs(displaySections as any, activeSection, setActiveSection);
+                  if (selectedTabLayout === 'leftSidebar') {
+                    return TAB_LAYOUT_THEMES[selectedTabLayout].renderTabs(demoSections as any, activeSection, setActiveSection);
                   }
                   return null;
                 })()}
