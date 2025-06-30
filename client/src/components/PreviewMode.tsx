@@ -1413,7 +1413,11 @@ export const PreviewMode: React.FC<PreviewModeProps> = ({
               {Object.entries(TAB_LAYOUT_THEMES).map(([key, theme]) => (
                 <button
                   key={key}
-                  onClick={() => setSelectedTabLayout(key as keyof typeof TAB_LAYOUT_THEMES)}
+                  onClick={() => {
+                    console.log('🎨 Tab theme button clicked:', key);
+                    setSelectedTabLayout(key as keyof typeof TAB_LAYOUT_THEMES);
+                    console.log('🎨 Tab theme should be set to:', key);
+                  }}
                   className={`w-full p-3 rounded-lg text-left transition-all ${
                     selectedTabLayout === key
                       ? 'bg-blue-50 dark:bg-blue-900/20 border-2 border-blue-300 dark:border-blue-600'
