@@ -1500,7 +1500,6 @@ export const PreviewMode: React.FC<PreviewModeProps> = ({
           <div className="p-4 md:p-8 min-h-full">
             {/* Dynamic Layout using selected tab theme with alignment */}
             <div className="w-full max-w-none" key={`${selectedTabLayout}-${tabAlignment}`}>
-              {/* Render tabs based on theme */}
               {(() => {
                 // Use real sections if available, otherwise demo sections for theme preview
                 const demoSections = [
@@ -1515,67 +1514,89 @@ export const PreviewMode: React.FC<PreviewModeProps> = ({
                 const setCurrentActiveTab = sections.length > 0 ? setActiveSection : setDemoActiveTab;
                 const currentSection = displaySections[currentActiveTab];
                 
+                // Content component
+                const FormContent = () => (
+                  <div className="bg-white dark:bg-gray-900 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 p-6 lg:p-8">
+                    <div className="mb-6 lg:mb-8">
+                      <h1 className="text-2xl lg:text-3xl font-bold text-gray-900 dark:text-white mb-2">
+                        {currentSection?.name || 'Overview'}
+                      </h1>
+                      <p className="text-gray-600 dark:text-gray-300">
+                        {currentSection?.description || 'Basic information'}
+                      </p>
+                    </div>
+                    
+                    {sections.length > 0 ? (
+                      (() => {
+                        const sectionControls = droppedControls.filter(c => c.sectionId === currentSection?.id);
+                        return sectionControls.length === 0 ? (
+                          <div className="text-center py-16">
+                            <Circle className="w-16 h-16 text-gray-400 dark:text-gray-500 mx-auto mb-4" />
+                            <h3 className="text-xl font-medium text-gray-600 dark:text-gray-300 mb-2">No controls in this section</h3>
+                            <p className="text-gray-500 dark:text-gray-400">Add form controls to see the preview</p>
+                          </div>
+                        ) : (
+                          <div className="space-y-6">
+                            {sectionControls
+                              .sort((a, b) => a.y - b.y || a.x - b.x)
+                              .map(control => (
+                                <div key={control.id} className="relative group">
+                                  <div className="space-y-2">
+                                    {control.properties.label && (
+                                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                        {control.properties.required && (
+                                          <span className="text-red-500 mr-1">*</span>
+                                        )}
+                                        {control.properties.label}
+                                      </label>
+                                    )}
+                                    <div className="w-full">
+                                      {renderThemedControl(control, FORM_THEMES[selectedTheme])}
+                                    </div>
+                                  </div>
+                                </div>
+                              ))}
+                          </div>
+                        );
+                      })()
+                    ) : (
+                      <div className="text-center py-16">
+                        <Circle className="w-16 h-16 text-gray-400 dark:text-gray-500 mx-auto mb-4" />
+                        <h3 className="text-xl font-medium text-gray-600 dark:text-gray-300 mb-2">Tab Theme Demo</h3>
+                        <p className="text-gray-500 dark:text-gray-400">Add form controls in the Design tab to see them here with the {TAB_LAYOUT_THEMES[selectedTabLayout].name} theme</p>
+                      </div>
+                    )}
+                  </div>
+                );
+                
+                // Layout based on alignment and theme
                 if (selectedTabLayout === 'leftSidebar' || tabAlignment === 'left') {
                   return (
                     <div className="flex gap-4 lg:gap-8">
-                      <div className="flex-shrink-0">
-                        {TAB_LAYOUT_THEMES[selectedTabLayout === 'leftSidebar' ? 'leftSidebar' : selectedTabLayout].renderTabs(displaySections as any, currentActiveTab, setCurrentActiveTab)}
+                      <div className="flex-shrink-0 w-64">
+                        {selectedTabLayout === 'leftSidebar' ? (
+                          TAB_LAYOUT_THEMES.leftSidebar.renderTabs(displaySections as any, currentActiveTab, setCurrentActiveTab)
+                        ) : (
+                          <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg p-4 space-y-2">
+                            {displaySections.map((section, index) => (
+                              <button
+                                key={section.id}
+                                onClick={() => setCurrentActiveTab(index)}
+                                className={`w-full flex items-center space-x-3 px-3 py-2 rounded-md text-left transition-all ${
+                                  currentActiveTab === index
+                                    ? 'bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white'
+                                    : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800'
+                                }`}
+                              >
+                                <span className="text-sm">{section.name}</span>
+                              </button>
+                            ))}
+                          </div>
+                        )}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <div className="w-full max-w-4xl mx-auto">
-                          <div className="bg-white dark:bg-gray-900 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 p-6 lg:p-8">
-                            {/* Section content */}
-                            <div className="mb-6 lg:mb-8">
-                              <h1 className="text-2xl lg:text-3xl font-bold text-gray-900 dark:text-white mb-2">
-                                {currentSection?.name || 'Overview'}
-                              </h1>
-                              <p className="text-gray-600 dark:text-gray-300">
-                                {currentSection?.description || 'Basic information'}
-                              </p>
-                            </div>
-                            
-                            {/* Form controls for real sections, demo message for demo sections */}
-                            {sections.length > 0 ? (
-                              (() => {
-                                const sectionControls = droppedControls.filter(c => c.sectionId === currentSection?.id);
-                                return sectionControls.length === 0 ? (
-                                  <div className="text-center py-16">
-                                    <Circle className="w-16 h-16 text-gray-400 dark:text-gray-500 mx-auto mb-4" />
-                                    <h3 className="text-xl font-medium text-gray-600 dark:text-gray-300 mb-2">No controls in this section</h3>
-                                    <p className="text-gray-500 dark:text-gray-400">Add form controls to see the preview</p>
-                                  </div>
-                                ) : (
-                                  <div className="space-y-6">
-                                    {sectionControls
-                                      .sort((a, b) => a.y - b.y || a.x - b.x)
-                                      .map(control => (
-                                        <div key={control.id} className="relative group">
-                                          <div className="space-y-2">
-                                            {control.properties.label && (
-                                              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                                {control.properties.required && (
-                                                  <span className="text-red-500 mr-1">*</span>
-                                                )}
-                                                {control.properties.label}
-                                              </label>
-                                            )}
-                                            <div className="w-full">
-                                              {renderThemedControl(control, FORM_THEMES[selectedTheme])}
-                                            </div>
-                                          </div>
-                                        </div>
-                                      ))}
-                                  </div>
-                                );
-                              })()
-                            ) : (
-                              <div className="text-center py-16">
-                                <Circle className="w-16 h-16 text-gray-400 dark:text-gray-500 mx-auto mb-4" />
-                                <h3 className="text-xl font-medium text-gray-600 dark:text-gray-300 mb-2">Tab Theme Demo</h3>
-                                <p className="text-gray-500 dark:text-gray-400">Add form controls in the Design tab to see them here with the {TAB_LAYOUT_THEMES[selectedTabLayout].name} theme</p>
-                              </div>
-                            )}
-                          </div>
+                        <div className="w-full max-w-4xl">
+                          <FormContent />
                         </div>
                       </div>
                     </div>
@@ -1583,128 +1604,40 @@ export const PreviewMode: React.FC<PreviewModeProps> = ({
                 } else if (tabAlignment === 'right') {
                   return (
                     <div className="flex flex-row-reverse gap-4 lg:gap-8">
-                      <div className="flex-shrink-0">
-                        {TAB_LAYOUT_THEMES[selectedTabLayout].renderTabs(displaySections as any, currentActiveTab, setCurrentActiveTab)}
+                      <div className="flex-shrink-0 w-64">
+                        <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg p-4 space-y-2">
+                          {displaySections.map((section, index) => (
+                            <button
+                              key={section.id}
+                              onClick={() => setCurrentActiveTab(index)}
+                              className={`w-full flex items-center space-x-3 px-3 py-2 rounded-md text-left transition-all ${
+                                currentActiveTab === index
+                                  ? 'bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white'
+                                  : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800'
+                              }`}
+                            >
+                              <span className="text-sm">{section.name}</span>
+                            </button>
+                          ))}
+                        </div>
                       </div>
                       <div className="flex-1 min-w-0">
-                        <div className="w-full max-w-4xl mx-auto">
-                          <div className="bg-white dark:bg-gray-900 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 p-6 lg:p-8">
-                            {/* Section content */}
-                            <div className="mb-6 lg:mb-8">
-                              <h1 className="text-2xl lg:text-3xl font-bold text-gray-900 dark:text-white mb-2">
-                                {currentSection?.name || 'Overview'}
-                              </h1>
-                              <p className="text-gray-600 dark:text-gray-300">
-                                {currentSection?.description || 'Basic information'}
-                              </p>
-                            </div>
-                            
-                            {/* Form controls for real sections, demo message for demo sections */}
-                            {sections.length > 0 ? (
-                              (() => {
-                                const sectionControls = droppedControls.filter(c => c.sectionId === currentSection?.id);
-                                return sectionControls.length === 0 ? (
-                                  <div className="text-center py-16">
-                                    <Circle className="w-16 h-16 text-gray-400 dark:text-gray-500 mx-auto mb-4" />
-                                    <h3 className="text-xl font-medium text-gray-600 dark:text-gray-300 mb-2">No controls in this section</h3>
-                                    <p className="text-gray-500 dark:text-gray-400">Add form controls to see the preview</p>
-                                  </div>
-                                ) : (
-                                  <div className="space-y-6">
-                                    {sectionControls
-                                      .sort((a, b) => a.y - b.y || a.x - b.x)
-                                      .map(control => (
-                                        <div key={control.id} className="relative group">
-                                          <div className="space-y-2">
-                                            {control.properties.label && (
-                                              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                                {control.properties.required && (
-                                                  <span className="text-red-500 mr-1">*</span>
-                                                )}
-                                                {control.properties.label}
-                                              </label>
-                                            )}
-                                            <div className="w-full">
-                                              {renderThemedControl(control, FORM_THEMES[selectedTheme])}
-                                            </div>
-                                          </div>
-                                        </div>
-                                      ))}
-                                  </div>
-                                );
-                              })()
-                            ) : (
-                              <div className="text-center py-16">
-                                <Circle className="w-16 h-16 text-gray-400 dark:text-gray-500 mx-auto mb-4" />
-                                <h3 className="text-xl font-medium text-gray-600 dark:text-gray-300 mb-2">Tab Theme Demo</h3>
-                                <p className="text-gray-500 dark:text-gray-400">Add form controls in the Design tab to see them here with the {TAB_LAYOUT_THEMES[selectedTabLayout].name} theme</p>
-                              </div>
-                            )}
-                          </div>
+                        <div className="w-full max-w-4xl">
+                          <FormContent />
                         </div>
                       </div>
                     </div>
                   );
                 } else {
                   return (
-                    <>
-                      {TAB_LAYOUT_THEMES[selectedTabLayout].renderTabs(displaySections as any, currentActiveTab, setCurrentActiveTab)}
-                      <div className="w-full max-w-4xl mx-auto">
-                        <div className="bg-white dark:bg-gray-900 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 p-6 lg:p-8">
-                          {/* Section content */}
-                          <div className="mb-6 lg:mb-8">
-                            <h1 className="text-2xl lg:text-3xl font-bold text-gray-900 dark:text-white mb-2">
-                              {currentSection?.name || 'Overview'}
-                            </h1>
-                            <p className="text-gray-600 dark:text-gray-300">
-                              {currentSection?.description || 'Basic information'}
-                            </p>
-                          </div>
-                          
-                          {/* Form controls for real sections, demo message for demo sections */}
-                          {sections.length > 0 ? (
-                            (() => {
-                              const sectionControls = droppedControls.filter(c => c.sectionId === currentSection?.id);
-                              return sectionControls.length === 0 ? (
-                                <div className="text-center py-16">
-                                  <Circle className="w-16 h-16 text-gray-400 dark:text-gray-500 mx-auto mb-4" />
-                                  <h3 className="text-xl font-medium text-gray-600 dark:text-gray-300 mb-2">No controls in this section</h3>
-                                  <p className="text-gray-500 dark:text-gray-400">Add form controls to see the preview</p>
-                                </div>
-                              ) : (
-                                <div className="space-y-6">
-                                  {sectionControls
-                                    .sort((a, b) => a.y - b.y || a.x - b.x)
-                                    .map(control => (
-                                      <div key={control.id} className="relative group">
-                                        <div className="space-y-2">
-                                          {control.properties.label && (
-                                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                              {control.properties.required && (
-                                                <span className="text-red-500 mr-1">*</span>
-                                              )}
-                                              {control.properties.label}
-                                            </label>
-                                          )}
-                                          <div className="w-full">
-                                            {renderThemedControl(control, FORM_THEMES[selectedTheme])}
-                                          </div>
-                                        </div>
-                                      </div>
-                                    ))}
-                                </div>
-                              );
-                            })()
-                          ) : (
-                            <div className="text-center py-16">
-                              <Circle className="w-16 h-16 text-gray-400 dark:text-gray-500 mx-auto mb-4" />
-                              <h3 className="text-xl font-medium text-gray-600 dark:text-gray-300 mb-2">Tab Theme Demo</h3>
-                              <p className="text-gray-500 dark:text-gray-400">Add form controls in the Design tab to see them here with the {TAB_LAYOUT_THEMES[selectedTabLayout].name} theme</p>
-                            </div>
-                          )}
-                        </div>
+                    <div className="w-full">
+                      <div className="mb-6">
+                        {TAB_LAYOUT_THEMES[selectedTabLayout].renderTabs(displaySections as any, currentActiveTab, setCurrentActiveTab)}
                       </div>
-                    </>
+                      <div className="w-full max-w-4xl mx-auto">
+                        <FormContent />
+                      </div>
+                    </div>
                   );
                 }
               })()}
