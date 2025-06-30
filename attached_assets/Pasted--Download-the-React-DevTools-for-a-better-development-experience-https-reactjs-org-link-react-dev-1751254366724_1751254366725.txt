@@ -1,0 +1,199 @@
+ Download the React DevTools for a better development experience: https://reactjs.org/link/react-devtools
+ 📊 useDragDrop: Current state: Object
+ 🚀 APP: Initializing application...
+ Initializing localStorage-based database
+ Mock DB execute: INSERT OR IGNORE INTO questionnaires (id, name, description, purpose, category, status, tier) 
+          VALUES (?, ?, ?, ?, ?, ?, ?)
+ 📊 useDragDrop: Current state: Object
+ 🚀 APP: Initializing application...
+ Mock DB execute: INSERT OR IGNORE INTO sections (id, questionnaire_id, name, description, color, icon, section_order, required) 
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+ ✅ APP: Database initialized successfully
+ Mock DB execute: SELECT * FROM sections WHERE questionnaire_id = ? ORDER BY section_order
+ Database initialized successfully
+ 📂 APP: Loaded sections: 0
+ ✅ APP: Database initialized successfully
+ Mock DB execute: SELECT * FROM sections WHERE questionnaire_id = ? ORDER BY section_order
+ 📂 APP: Loaded sections: 0
+ 🔄 useDragDrop: Loading controls from database
+ Mock DB execute: SELECT * FROM controls WHERE questionnaire_id = ? ORDER BY y, x
+ 📊 useDragDrop: Database query results: Object
+ ✅ useDragDrop: Controls loaded successfully
+ 📊 useDragDrop: Current state: Object
+ 🚀 DIRECT IMPORT: Starting direct UI import process...
+ 🔄 EXCEL PARSE: ===== STARTING EXCEL FILE PARSING =====
+ 📊 EXCEL PARSE: File details: Object
+ 📖 EXCEL PARSE: File read successfully, parsing workbook...
+ 📊 EXCEL PARSE: Workbook details: Object
+ ✅ EXCEL PARSE: Found Design sheet: Design
+ 📊 EXCEL PARSE: Raw sheet data: Object
+ 📊 EXCEL PARSE: Data structure: Object
+ 🔄 EXCEL PARSE: Processing row 1: Array(43)
+ ✅ EXCEL PARSE: Processed control 1: Object
+ 🔄 EXCEL PARSE: Processing row 2: Array(43)
+ ✅ EXCEL PARSE: Processed control 2: Object
+ 🔄 EXCEL PARSE: Processing row 3: Array(43)
+ ✅ EXCEL PARSE: Processed control 3: Object
+ 🔄 EXCEL PARSE: Processing row 4: Array(43)
+ ✅ EXCEL PARSE: Processed control 4: Object
+ 🔄 EXCEL PARSE: Processing row 5: Array(43)
+ ✅ EXCEL PARSE: Processed control 5: Object
+ 🔄 EXCEL PARSE: Processing row 6: Array(43)
+ ✅ EXCEL PARSE: Processed control 6: Object
+ 🔄 EXCEL PARSE: Processing row 7: Array(43)
+ ✅ EXCEL PARSE: Processed control 7: Object
+ 🔄 EXCEL PARSE: Processing row 8: Array(43)
+ ✅ EXCEL PARSE: Processed control 8: Object
+ 🔄 EXCEL PARSE: Processing row 9: Array(43)
+ ✅ EXCEL PARSE: Processed control 9: Object
+ 🔄 EXCEL PARSE: Processing row 10: Array(43)
+ ✅ EXCEL PARSE: Processed control 10: Object
+ 🔄 EXCEL PARSE: Processing row 11: Array(43)
+ ✅ EXCEL PARSE: Processed control 11: Object
+ 🔄 EXCEL PARSE: Processing row 12: Array(43)
+ ✅ EXCEL PARSE: Processed control 12: Object
+ 🔄 EXCEL PARSE: Processing row 13: Array(43)
+ ✅ EXCEL PARSE: Processed control 13: Object
+ 🔄 EXCEL PARSE: Processing row 14: Array(43)
+ ✅ EXCEL PARSE: Processed control 14: Object
+ 🔄 EXCEL PARSE: Processing row 15: Array(43)
+ ✅ EXCEL PARSE: Processed control 15: Object
+ 🔄 EXCEL PARSE: Processing row 16: Array(43)
+ ✅ EXCEL PARSE: Processed control 16: Object
+ 🔄 EXCEL PARSE: Processing row 17: Array(43)
+ ✅ EXCEL PARSE: Processed control 17: Object
+ 🔄 EXCEL PARSE: Processing row 18: Array(43)
+ ✅ EXCEL PARSE: Processed control 18: Object
+ 🔄 EXCEL PARSE: Processing row 19: Array(43)
+ ✅ EXCEL PARSE: Processed control 19: Object
+ 🔄 EXCEL PARSE: Processing row 20: Array(43)
+ ✅ EXCEL PARSE: Processed control 20: Object
+ 🔄 EXCEL PARSE: Processing row 21: Array(43)
+ ✅ EXCEL PARSE: Processed control 21: Object
+ 🔄 EXCEL PARSE: Processing row 22: Array(43)
+ ✅ EXCEL PARSE: Processed control 22: Object
+ 🔄 EXCEL PARSE: Processing row 23: Array(43)
+ ✅ EXCEL PARSE: Processed control 23: Object
+ 🔄 EXCEL PARSE: Processing row 24: Array(43)
+ ✅ EXCEL PARSE: Processed control 24: Object
+ ✅ EXCEL PARSE: ===== PARSING COMPLETED SUCCESSFULLY =====
+ 📊 EXCEL PARSE: Final results: Object
+ ✅ DIRECT IMPORT: Excel data parsed successfully for preview
+ 🚀 DIRECT IMPORT: Converting Excel data to controls...
+ 🔄 EXCEL CONVERT: ===== STARTING DATA CONVERSION =====
+ 📊 EXCEL CONVERT: Input data: Object
+ 🔄 EXCEL CONVERT: Converting control 1: Full Name
+ ✅ EXCEL CONVERT: Converted control 1: Object
+ 🔄 EXCEL CONVERT: Converting control 2: Description
+ ✅ EXCEL CONVERT: Converted control 2: Object
+ 🔄 EXCEL CONVERT: Converting control 3: Age
+ ✅ EXCEL CONVERT: Converted control 3: Object
+ 🔄 EXCEL CONVERT: Converting control 4: Email Address
+ ✅ EXCEL CONVERT: Converted control 4: Object
+ 🔄 EXCEL CONVERT: Converting control 5: Phone Number
+ ✅ EXCEL CONVERT: Converted control 5: Object
+ 🔄 EXCEL CONVERT: Converting control 6: Date of Birth
+ ✅ EXCEL CONVERT: Converted control 6: Object
+ 🔄 EXCEL CONVERT: Converting control 7: Preferred Meeting Time
+excelTemplate.ts:655 ✅ EXCEL CONVERT: Converted control 7: Object
+excelTemplate.ts:618 🔄 EXCEL CONVERT: Converting control 8: Country
+excelTemplate.ts:655 ✅ EXCEL CONVERT: Converted control 8: Object
+excelTemplate.ts:618 🔄 EXCEL CONVERT: Converting control 9: Experience Level
+excelTemplate.ts:655 ✅ EXCEL CONVERT: Converted control 9: Object
+excelTemplate.ts:618 🔄 EXCEL CONVERT: Converting control 10: Interests
+excelTemplate.ts:655 ✅ EXCEL CONVERT: Converted control 10: Object
+excelTemplate.ts:618 🔄 EXCEL CONVERT: Converting control 11: Satisfaction Rating
+excelTemplate.ts:655 ✅ EXCEL CONVERT: Converted control 11: Object
+excelTemplate.ts:618 🔄 EXCEL CONVERT: Converting control 12: Service Quality Rating
+excelTemplate.ts:655 ✅ EXCEL CONVERT: Converted control 12: Object
+excelTemplate.ts:618 🔄 EXCEL CONVERT: Converting control 13: Feature Usage
+excelTemplate.ts:655 ✅ EXCEL CONVERT: Converted control 13: Object
+excelTemplate.ts:618 🔄 EXCEL CONVERT: Converting control 14: Agreement Survey
+excelTemplate.ts:655 ✅ EXCEL CONVERT: Converted control 14: Object
+excelTemplate.ts:618 🔄 EXCEL CONVERT: Converting control 15: Priority Ranking
+excelTemplate.ts:655 ✅ EXCEL CONVERT: Converted control 15: Object
+excelTemplate.ts:618 🔄 EXCEL CONVERT: Converting control 16: Resume Upload
+excelTemplate.ts:655 ✅ EXCEL CONVERT: Converted control 16: Object
+excelTemplate.ts:618 🔄 EXCEL CONVERT: Converting control 17: Profile Photo
+excelTemplate.ts:655 ✅ EXCEL CONVERT: Converted control 17: Object
+excelTemplate.ts:618 🔄 EXCEL CONVERT: Converting control 18: Digital Signature
+excelTemplate.ts:655 ✅ EXCEL CONVERT: Converted control 18: Object
+excelTemplate.ts:618 🔄 EXCEL CONVERT: Converting control 19: Section Title
+excelTemplate.ts:655 ✅ EXCEL CONVERT: Converted control 19: Object
+excelTemplate.ts:618 🔄 EXCEL CONVERT: Converting control 20: Section Break
+excelTemplate.ts:655 ✅ EXCEL CONVERT: Converted control 20: Object
+excelTemplate.ts:618 🔄 EXCEL CONVERT: Converting control 21: Home Address
+excelTemplate.ts:655 ✅ EXCEL CONVERT: Converted control 21: Object
+excelTemplate.ts:618 🔄 EXCEL CONVERT: Converting control 22: ZIP Code
+excelTemplate.ts:655 ✅ EXCEL CONVERT: Converted control 22: Object
+excelTemplate.ts:618 🔄 EXCEL CONVERT: Converting control 23: Security Verification
+excelTemplate.ts:655 ✅ EXCEL CONVERT: Converted control 23: Object
+excelTemplate.ts:618 🔄 EXCEL CONVERT: Converting control 24: Privacy Consent
+excelTemplate.ts:655 ✅ EXCEL CONVERT: Converted control 24: Object
+excelTemplate.ts:666 ✅ EXCEL CONVERT: ===== CONVERSION COMPLETED =====
+excelTemplate.ts:667 📊 EXCEL CONVERT: Final results: Object
+DirectImportModal.tsx:76 ✅ DIRECT IMPORT: Controls converted, importing directly to UI...
+App.tsx:131 🚀 DIRECT UI: ===== STARTING DIRECT UI IMPORT =====
+App.tsx:132 📊 DIRECT UI: Import details: Object
+App.tsx:142 📂 DIRECT UI: Creating sections for: Array(8)
+App.tsx:168 ✅ DIRECT UI: Created sections: Array(8)
+App.tsx:173 🎯 DIRECT UI: Active section set to: core-inputs
+useDragDrop.ts:57 🚀 DIRECT IMPORT: ===== DIRECT UI IMPORT INITIATED =====
+useDragDrop.ts:58 📊 DIRECT IMPORT: Importing directly to UI state: Object
+useDragDrop.ts:92 📝 DIRECT IMPORT: Processed controls for direct UI import:
+useDragDrop.ts:94    1. Full Name (textInput) - Section: core-inputs, ID: direct-import-1751254329354-0-fm9zbm
+useDragDrop.ts:94    2. Description (textarea) - Section: core-inputs, ID: direct-import-1751254329354-1-ysigyl
+useDragDrop.ts:94    3. Age (numberInput) - Section: core-inputs, ID: direct-import-1751254329354-2-rd81ee
+useDragDrop.ts:94    4. Email Address (emailInput) - Section: core-inputs, ID: direct-import-1751254329354-3-i65jjb
+useDragDrop.ts:94    5. Phone Number (phoneInput) - Section: core-inputs, ID: direct-import-1751254329354-4-jer75c
+useDragDrop.ts:94    6. Date of Birth (datePicker) - Section: date-time, ID: direct-import-1751254329354-5-u9vvos
+useDragDrop.ts:94    7. Preferred Meeting Time (timePicker) - Section: date-time, ID: direct-import-1751254329354-6-1s77b1
+useDragDrop.ts:94    8. Country (dropdown) - Section: selection-controls, ID: direct-import-1751254329354-7-rks0zw
+useDragDrop.ts:94    9. Experience Level (radioGroup) - Section: selection-controls, ID: direct-import-1751254329354-8-lrc9am
+useDragDrop.ts:94    10. Interests (checkboxGroup) - Section: selection-controls, ID: direct-import-1751254329354-9-hxr453
+useDragDrop.ts:94    11. Satisfaction Rating (ratingScale) - Section: selection-controls, ID: direct-import-1751254329354-10-ea7vqy
+useDragDrop.ts:94    12. Service Quality Rating (singleSelectiveGrid) - Section: grid-matrix, ID: direct-import-1751254329354-11-96bn44
+useDragDrop.ts:94    13. Feature Usage (multiSelectiveGrid) - Section: grid-matrix, ID: direct-import-1751254329354-12-1vq9mu
+useDragDrop.ts:94    14. Agreement Survey (matrixQuestions) - Section: grid-matrix, ID: direct-import-1751254329354-13-jpqke7
+useDragDrop.ts:94    15. Priority Ranking (rankingControl) - Section: grid-matrix, ID: direct-import-1751254329354-14-46ygkw
+useDragDrop.ts:94    16. Resume Upload (fileUpload) - Section: file-media, ID: direct-import-1751254329354-15-ixdot7
+useDragDrop.ts:94    17. Profile Photo (imageUpload) - Section: file-media, ID: direct-import-1751254329354-16-yybses
+useDragDrop.ts:94    18. Digital Signature (signaturePad) - Section: file-media, ID: direct-import-1751254329354-17-db5em2
+useDragDrop.ts:94    19. Section Title (heading) - Section: layout-display, ID: direct-import-1751254329354-18-zvmxhp
+useDragDrop.ts:94    20. Section Break (sectionDivider) - Section: layout-display, ID: direct-import-1751254329354-19-wdpvf4
+useDragDrop.ts:94    21. Home Address (addressLookup) - Section: address, ID: direct-import-1751254329354-20-8ebpy0
+useDragDrop.ts:94    22. ZIP Code (postalCode) - Section: address, ID: direct-import-1751254329354-21-mp5ud7
+useDragDrop.ts:94    23. Security Verification (captcha) - Section: validation-security, ID: direct-import-1751254329354-22-tt8ffm
+useDragDrop.ts:94    24. Privacy Consent (consentCheckbox) - Section: validation-security, ID: direct-import-1751254329354-23-n4bhzq
+useDragDrop.ts:100 ✅ DIRECT IMPORT: ===== DIRECT UI IMPORT COMPLETED =====
+useDragDrop.ts:101 📊 DIRECT IMPORT: Final state: Object
+App.tsx:182 ✅ DIRECT UI: Controls imported directly to UI state
+App.tsx:183 🎉 DIRECT UI: ===== DIRECT UI IMPORT COMPLETED SUCCESSFULLY =====
+DirectImportModal.tsx:82 🎉 DIRECT IMPORT: Direct UI import completed successfully!
+chunk-PJEEZAML.js?v=4af276a5:521 Warning: validateDOMNesting(...): <button> cannot appear as a descendant of <button>.
+    at button
+    at div
+    at button
+    at div
+    at div
+    at div
+    at SectionManager (https://eb1ca215-ffbc-40f3-806c-49b2dd787ace-00-36639bz858j3h.worf.replit.dev/src/components/SectionManager.tsx:22:3)
+    at div
+    at div
+    at div
+    at div
+    at DndProvider2 (https://eb1ca215-ffbc-40f3-806c-49b2dd787ace-00-36639bz858j3h.worf.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/react-dnd.js?v=4af276a5:1507:9)
+    at App (https://eb1ca215-ffbc-40f3-806c-49b2dd787ace-00-36639bz858j3h.worf.replit.dev/src/App.tsx?v=hZYWM3Xq5yN5auQJzRgiJ:46:41)
+printWarning @ chunk-PJEEZAML.js?v=4af276a5:521
+useDragDrop.ts:434 📊 useDragDrop: Current state: Object
+useDragDrop.ts:444 📝 useDragDrop: First 3 controls:
+useDragDrop.ts:446    1. Full Name (textInput) - Section: core-inputs
+useDragDrop.ts:446    2. Description (textarea) - Section: core-inputs
+useDragDrop.ts:446    3. Age (numberInput) - Section: core-inputs
+App.tsx:500 🔄 DIALOG: ===== DIALOG CLOSE WITH VERIFICATION =====
+PreviewMode.tsx:1615 Rendering top tabs with theme: cleanMinimal sections: 8
+PreviewMode.tsx:1615 Rendering top tabs with theme: cleanMinimal sections: 8
+PreviewMode.tsx:249 Tab layout changed to: cleanMinimal
+PreviewMode.tsx:249 Tab layout changed to: cleanMinimal
+PreviewMode.tsx:1615 Rendering top tabs with theme: cleanMinimal sections: 8
+PreviewMode.tsx:1615 Rendering top tabs with theme: cleanMinimal sections: 8

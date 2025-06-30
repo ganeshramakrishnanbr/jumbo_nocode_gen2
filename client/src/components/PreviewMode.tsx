@@ -1578,6 +1578,7 @@ export const PreviewMode: React.FC<PreviewModeProps> = ({
                 
                 // Layout based on alignment and theme
                 if (selectedTabLayout === 'leftSidebar' || tabAlignment === 'left') {
+                  console.log('Rendering LEFT tabs with theme:', selectedTabLayout, 'alignment:', tabAlignment);
                   return (
                     <div className="flex gap-4 lg:gap-8" key={`left-${selectedTabLayout}`}>
                       <div className="flex-shrink-0 w-64">
@@ -1597,6 +1598,7 @@ export const PreviewMode: React.FC<PreviewModeProps> = ({
                     </div>
                   );
                 } else if (tabAlignment === 'right') {
+                  console.log('Rendering RIGHT tabs with theme:', selectedTabLayout, 'alignment:', tabAlignment);
                   return (
                     <div className="flex flex-row-reverse gap-4 lg:gap-8" key={`right-${selectedTabLayout}`}>
                       <div className="flex-shrink-0 w-64">
