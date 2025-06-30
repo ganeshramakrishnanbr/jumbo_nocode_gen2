@@ -1106,6 +1106,14 @@ export const PreviewMode: React.FC<PreviewModeProps> = ({
 
 
 
+  // Define variables first, before any early returns
+  const currentSection = sections[activeSection];
+  const sectionControls = droppedControls
+    .filter(c => c.sectionId === currentSection?.id)
+    .filter(isControlVisible); // Apply visibility filter
+
+  const currentTheme = FORM_THEMES[selectedTheme];
+
   if (sections.length === 0) {
     return (
       <div className="flex-1 bg-gray-50 dark:bg-gray-800 flex items-center justify-center transition-colors">
@@ -1117,13 +1125,6 @@ export const PreviewMode: React.FC<PreviewModeProps> = ({
       </div>
     );
   }
-
-  const currentSection = sections[activeSection];
-  const sectionControls = droppedControls
-    .filter(c => c.sectionId === currentSection?.id)
-    .filter(isControlVisible); // Apply visibility filter
-
-  const currentTheme = FORM_THEMES[selectedTheme];
 
   return (
     <div className="flex-1 bg-gray-50 dark:bg-gray-800 flex h-full transition-colors">
