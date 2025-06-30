@@ -84,7 +84,7 @@ function App() {
     forceReload,
     nuclearReset,
     directImportControls
-  } = useDragDrop(currentQuestionnaire, isDbInitialized, refreshKey);
+  } = useDragDrop(currentQuestionnaire, isDbInitialized, refreshKey, activeSection);
 
   // Initialize database and load sections
   useEffect(() => {

@@ -9,7 +9,7 @@ import {
   verifyControlsInDatabase
 } from '../lib/db';
 
-export const useDragDrop = (questionnaireId: string = 'default-questionnaire', isDbInitialized: boolean = false, refreshKey: number = 0) => {
+export const useDragDrop = (questionnaireId: string = 'default-questionnaire', isDbInitialized: boolean = false, refreshKey: number = 0, activeSection: string = 'default') => {
   const [droppedControls, setDroppedControls] = useState<DroppedControl[]>([]);
   const [selectedControl, setSelectedControl] = useState<DroppedControl | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -394,32 +394,49 @@ export const useDragDrop = (questionnaireId: string = 'default-questionnaire', i
   }, [droppedControls, questionnaireId, isDbInitialized, directImportMode]);
 
   const reorderControl = useCallback(async (dragIndex: number, hoverIndex: number) => {
+    console.log('🔄 REORDER: Starting reorder operation', { dragIndex, hoverIndex, controlCount: droppedControls.length });
+    
+    // Work directly with all controls and reorder by index
+    if (dragIndex >= droppedControls.length || hoverIndex >= droppedControls.length || dragIndex < 0 || hoverIndex < 0) {
+      console.error('❌ REORDER: Invalid indices', { dragIndex, hoverIndex, controlCount: droppedControls.length });
+      return;
+    }
+    
     const newControls = [...droppedControls];
     const draggedControl = newControls[dragIndex];
     
+    // Perform the reorder
     newControls.splice(dragIndex, 1);
     newControls.splice(hoverIndex, 0, draggedControl);
     
-    const reorderedControls = newControls.map((control, index) => ({
+    // Update y positions based on new order
+    const allReorderedControls = newControls.map((control, index) => ({
       ...control,
       y: index
     }));
 
+    console.log('📝 REORDER: Reordered controls', { 
+      draggedControl: draggedControl.name, 
+      fromIndex: dragIndex, 
+      toIndex: hoverIndex,
+      totalControls: allReorderedControls.length
+    });
+
     if (directImportMode) {
       // Direct UI update
-      setDroppedControls(reorderedControls);
-      console.log('✅ useDragDrop: Controls reordered directly in UI');
+      setDroppedControls(allReorderedControls);
+      console.log('✅ REORDER: Controls reordered directly in UI');
     } else if (isDbInitialized) {
       // Database + UI update
       try {
-        await reorderControls(reorderedControls);
-        setDroppedControls(reorderedControls);
-        console.log('✅ useDragDrop: Controls reordered in database and UI');
+        await reorderControls(allReorderedControls);
+        setDroppedControls(allReorderedControls);
+        console.log('✅ REORDER: Controls reordered in database and UI');
       } catch (error) {
-        console.error('❌ useDragDrop: Failed to reorder control:', error);
+        console.error('❌ REORDER: Failed to reorder control:', error);
       }
     }
-  }, [droppedControls, questionnaireId, isDbInitialized, directImportMode]);
+  }, [droppedControls, activeSection, isDbInitialized, directImportMode]);
 
   const selectControl = useCallback((control: DroppedControl) => {
     setSelectedControl(control);
