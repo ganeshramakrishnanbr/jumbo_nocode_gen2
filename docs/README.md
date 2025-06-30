@@ -29,6 +29,14 @@ Complete VS Code development setup and launch instructions:
 - Step-by-step launch procedures
 - Development workflow and debugging guide
 
+### ⚙️ [technical.md](./technical.md)
+Detailed technical architecture and application launch sequence:
+- Step-by-step application startup flow
+- Backend and frontend initialization sequence
+- Component loading order and dependencies
+- File execution paths and references
+- State management and data flow patterns
+
 ### 📚 [ORIGINAL_FEATURES.md](./ORIGINAL_FEATURES.md)
 Documentation of original Bolt.new features and migration details:
 - Original feature set from Bolt platform

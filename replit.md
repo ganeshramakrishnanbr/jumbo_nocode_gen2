@@ -113,6 +113,7 @@ Changelog:
 - June 30, 2025. Enhanced Design Canvas with always-visible scrollbars and proper drag-and-drop reordering functionality
 - June 30, 2025. Added comprehensive project documentation with Requirements.md and Prompts.md in docs/ folder
 - June 30, 2025. Created launch.md with complete VS Code development setup and launch instructions
+- June 30, 2025. Added technical.md with detailed application launch sequence, component loading order, and file execution flow
 ```
 
 ## User Preferences
