@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { DroppedControl, Section } from '../types';
-import { CheckCircle, AlertCircle, Circle, ChevronRight, Trash2, Palette, Layout, Maximize2, Grid3X3, AlignLeft, Sparkles, BarChart3, Settings, ArrowUp, ArrowDown, ArrowLeft, ArrowRight } from 'lucide-react';
+import { CheckCircle, AlertCircle, Circle, ChevronRight, Trash2, Palette, Layout, Maximize2, Grid3X3, AlignLeft, Sparkles, BarChart3, Settings, ArrowUp, ArrowDown, ArrowLeft, ArrowRight, Home, User, Bell, HelpCircle, Monitor, Tablet, Smartphone, Watch } from 'lucide-react';
 
 interface PreviewModeProps {
   droppedControls: DroppedControl[];
@@ -9,6 +9,159 @@ interface PreviewModeProps {
   formValues?: { [controlId: string]: any };
   onFormValueChange?: (controlId: string, value: any) => void;
 }
+
+// Tab Layout Themes based on design patterns
+const TAB_LAYOUT_THEMES = {
+  cleanMinimal: {
+    name: 'Clean Minimal',
+    description: 'Simple text tabs with clean spacing',
+    renderTabs: (sections: Section[], activeSection: number, setActiveSection: (index: number) => void) => (
+      <div className="flex space-x-8 mb-8 border-b border-gray-200 dark:border-gray-700">
+        {sections.map((section, index) => (
+          <button
+            key={section.id}
+            onClick={() => setActiveSection(index)}
+            className={`pb-3 px-1 text-sm font-medium transition-colors ${
+              activeSection === index
+                ? 'text-gray-900 dark:text-white border-b-2 border-gray-900 dark:border-white'
+                : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
+            }`}
+          >
+            {section.name}
+          </button>
+        ))}
+      </div>
+    )
+  },
+  iconText: {
+    name: 'Icon & Text',
+    description: 'Tabs with icons and descriptive labels',
+    renderTabs: (sections: Section[], activeSection: number, setActiveSection: (index: number) => void) => (
+      <div className="flex space-x-1 mb-8 bg-gray-100 dark:bg-gray-800 p-1 rounded-lg">
+        {sections.map((section, index) => {
+          const icons = [Home, User, Settings, Bell];
+          const IconComponent = icons[index % icons.length];
+          return (
+            <button
+              key={section.id}
+              onClick={() => setActiveSection(index)}
+              className={`flex items-center space-x-2 px-4 py-2 rounded-md transition-all ${
+                activeSection === index
+                  ? 'bg-white dark:bg-gray-700 text-blue-600 dark:text-blue-400 shadow-sm'
+                  : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
+              }`}
+            >
+              <IconComponent className="w-4 h-4" />
+              <span className="text-sm font-medium">{section.name}</span>
+            </button>
+          );
+        })}
+      </div>
+    )
+  },
+  leftSidebar: {
+    name: 'Left Sidebar',
+    description: 'Vertical navigation with icons',
+    renderTabs: (sections: Section[], activeSection: number, setActiveSection: (index: number) => void) => (
+      <div className="flex-shrink-0 w-56 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg p-4 space-y-2">
+        {sections.map((section, index) => {
+          const icons = [Settings, User, Bell, HelpCircle];
+          const IconComponent = icons[index % icons.length];
+          return (
+            <button
+              key={section.id}
+              onClick={() => setActiveSection(index)}
+              className={`w-full flex items-center space-x-3 px-3 py-2 rounded-md text-left transition-all ${
+                activeSection === index
+                  ? 'bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white'
+                  : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800'
+              }`}
+            >
+              <IconComponent className="w-4 h-4" />
+              <span className="text-sm">{section.name}</span>
+            </button>
+          );
+        })}
+      </div>
+    )
+  },
+  underlineStyle: {
+    name: 'Underline Style',
+    description: 'Tabs with colored underline indicator',
+    renderTabs: (sections: Section[], activeSection: number, setActiveSection: (index: number) => void) => (
+      <div className="flex space-x-8 mb-8">
+        {sections.map((section, index) => {
+          const icons = [Palette, BarChart3, Settings, Sparkles];
+          const IconComponent = icons[index % icons.length];
+          return (
+            <button
+              key={section.id}
+              onClick={() => setActiveSection(index)}
+              className={`flex items-center space-x-2 pb-3 relative transition-colors ${
+                activeSection === index
+                  ? 'text-purple-600 dark:text-purple-400'
+                  : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
+              }`}
+            >
+              <IconComponent className="w-4 h-4" />
+              <span className="text-sm font-medium">{section.name}</span>
+              {activeSection === index && (
+                <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-purple-600 dark:bg-purple-400 rounded-full" />
+              )}
+            </button>
+          );
+        })}
+      </div>
+    )
+  },
+  cardSelection: {
+    name: 'Card Selection',
+    description: 'Card-based selection with icons',
+    renderTabs: (sections: Section[], activeSection: number, setActiveSection: (index: number) => void) => (
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        {sections.map((section, index) => {
+          const icons = [Smartphone, Monitor, Tablet, Watch];
+          const IconComponent = icons[index % icons.length];
+          return (
+            <button
+              key={section.id}
+              onClick={() => setActiveSection(index)}
+              className={`p-4 rounded-lg border-2 transition-all ${
+                activeSection === index
+                  ? 'border-purple-500 bg-purple-50 dark:bg-purple-900/20 text-purple-600 dark:text-purple-400'
+                  : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 hover:border-gray-300 dark:hover:border-gray-600'
+              }`}
+            >
+              <IconComponent className="w-8 h-8 mx-auto mb-2" />
+              <div className="text-sm font-medium">{section.name}</div>
+            </button>
+          );
+        })}
+      </div>
+    )
+  },
+  buttonStyle: {
+    name: 'Button Style',
+    description: 'Full-width button tabs with background',
+    renderTabs: (sections: Section[], activeSection: number, setActiveSection: (index: number) => void) => (
+      <div className="flex rounded-lg bg-gray-100 dark:bg-gray-800 p-1 mb-8">
+        {sections.map((section, index) => (
+          <button
+            key={section.id}
+            onClick={() => setActiveSection(index)}
+            className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-all ${
+              activeSection === index
+                ? 'bg-purple-600 text-white shadow-sm'
+                : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
+            }`}
+          >
+            {section.name}
+          </button>
+        ))}
+      </div>
+    )
+  }
+};
 
 // Theme definitions for modern layouts
 const FORM_THEMES = {
@@ -86,6 +239,8 @@ export const PreviewMode: React.FC<PreviewModeProps> = ({
   const [selectedTheme, setSelectedTheme] = useState<keyof typeof FORM_THEMES>('classic');
   const [showThemeSelector, setShowThemeSelector] = useState(false);
   const [tabAlignment, setTabAlignment] = useState<'top' | 'left' | 'right'>('top');
+  const [selectedTabLayout, setSelectedTabLayout] = useState<keyof typeof TAB_LAYOUT_THEMES>('cleanMinimal');
+  const [showTabLayoutSelector, setShowTabLayoutSelector] = useState(false);
 
   const handleInputChange = (controlId: string, value: any) => {
     setFormData(prev => ({ ...prev, [controlId]: value }));
@@ -1232,10 +1387,50 @@ export const PreviewMode: React.FC<PreviewModeProps> = ({
           })()}
         </div>
 
+        {/* Tab Layout Themes */}
+        <div className="p-4 border-b border-gray-200 dark:border-gray-700 flex-shrink-0">
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="font-medium text-gray-900 dark:text-white transition-colors">Tab Themes</h3>
+            <button
+              onClick={() => setShowTabLayoutSelector(!showTabLayoutSelector)}
+              className="p-2 bg-gray-100 dark:bg-gray-800 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+              title="Toggle Tab Theme Selector"
+            >
+              <Layout className="w-4 h-4 text-gray-600 dark:text-gray-400" />
+            </button>
+          </div>
+          
+          {showTabLayoutSelector && (
+            <div className="space-y-2 max-h-64 overflow-y-auto">
+              {Object.entries(TAB_LAYOUT_THEMES).map(([key, theme]) => (
+                <button
+                  key={key}
+                  onClick={() => setSelectedTabLayout(key as keyof typeof TAB_LAYOUT_THEMES)}
+                  className={`w-full p-3 rounded-lg text-left transition-all ${
+                    selectedTabLayout === key
+                      ? 'bg-blue-50 dark:bg-blue-900/20 border-2 border-blue-300 dark:border-blue-600'
+                      : 'bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 border-2 border-gray-200 dark:border-gray-700'
+                  }`}
+                >
+                  <div className="space-y-1">
+                    <p className="font-medium text-gray-900 dark:text-white text-sm">{theme.name}</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">{theme.description}</p>
+                  </div>
+                </button>
+              ))}
+            </div>
+          )}
+          
+          <div className="flex items-center space-x-2 text-sm text-gray-600 dark:text-gray-400 mt-3">
+            <Layout className="w-4 h-4" />
+            <span>Current: {TAB_LAYOUT_THEMES[selectedTabLayout].name}</span>
+          </div>
+        </div>
+
         {/* Tab Alignment Settings */}
         <div className="p-4 border-b border-gray-200 dark:border-gray-700 flex-shrink-0">
           <div className="flex items-center justify-between mb-3">
-            <h3 className="font-medium text-gray-900 dark:text-white transition-colors">Tab Layout</h3>
+            <h3 className="font-medium text-gray-900 dark:text-white transition-colors">Tab Position</h3>
             <Settings className="w-4 h-4 text-gray-600 dark:text-gray-400" />
           </div>
           
@@ -1302,56 +1497,22 @@ export const PreviewMode: React.FC<PreviewModeProps> = ({
       <div className="flex-1 flex flex-col h-full overflow-hidden">
         <div className="flex-1 overflow-y-auto">
           <div className="p-4 md:p-8 min-h-full">
-            {/* Dynamic Layout based on tab alignment - Ensure proper containment */}
+            {/* Dynamic Layout using selected tab theme */}
             <div className="w-full max-w-none">
-              {/* Section Tabs - Top alignment */}
-              {tabAlignment === 'top' && sections.length > 1 && (
-                <div className="flex flex-wrap gap-1 mb-8 bg-gray-100 dark:bg-gray-800 p-1 rounded-lg overflow-x-auto">
-                  {sections.map((section, index) => (
-                    <button
-                      key={section.id}
-                      onClick={() => setActiveSection(index)}
-                      className={`px-4 py-2 rounded-md whitespace-nowrap flex-shrink-0 transition-colors ${
-                        activeSection === index 
-                          ? 'bg-white dark:bg-gray-700 text-blue-600 dark:text-blue-400 font-medium shadow-sm' 
-                          : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
-                      }`}
-                    >
-                      {section.name}
-                    </button>
-                  ))}
-                </div>
+              {/* Render tabs using the selected tab layout theme */}
+              {sections.length > 1 && selectedTabLayout !== 'leftSidebar' && (
+                TAB_LAYOUT_THEMES[selectedTabLayout].renderTabs(sections, activeSection, setActiveSection)
               )}
 
               {/* Main content area with proper overflow handling */}
-              <div className={`${tabAlignment !== 'top' ? 'flex gap-4 lg:gap-8' : ''} ${tabAlignment === 'right' ? 'flex-row-reverse' : 'flex-row'}`}>
-                {/* Section Tabs Sidebar - Left/Right alignment */}
-                {tabAlignment !== 'top' && sections.length > 1 && (
-                  <div className="flex-shrink-0 w-48 lg:w-64 space-y-2">
-                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Sections</h3>
-                    {sections.map((section, index) => (
-                      <button
-                        key={section.id}
-                        onClick={() => setActiveSection(index)}
-                        className={`w-full text-left p-3 lg:p-4 rounded-lg transition-all ${
-                          activeSection === index
-                            ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg'
-                            : 'bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-600'
-                        }`}
-                      >
-                        <div className="font-medium text-sm lg:text-base">{section.name}</div>
-                        {section.description && (
-                          <div className={`text-xs lg:text-sm mt-1 ${activeSection === index ? 'text-blue-100' : 'text-gray-500 dark:text-gray-400'}`}>
-                            {section.description}
-                          </div>
-                        )}
-                      </button>
-                    ))}
-                  </div>
+              <div className={selectedTabLayout === 'leftSidebar' ? 'flex gap-4 lg:gap-8' : ''}>
+                {/* Left Sidebar for leftSidebar theme */}
+                {selectedTabLayout === 'leftSidebar' && sections.length > 1 && (
+                  TAB_LAYOUT_THEMES[selectedTabLayout].renderTabs(sections, activeSection, setActiveSection)
                 )}
 
                 {/* Form Content - Properly contained */}
-                <div className={`${tabAlignment !== 'top' ? 'flex-1 min-w-0' : 'w-full'} max-w-4xl mx-auto`}>
+                <div className={`${selectedTabLayout === 'leftSidebar' ? 'flex-1 min-w-0' : 'w-full'} max-w-4xl mx-auto`}>
                   <div className="bg-white dark:bg-gray-900 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 p-6 lg:p-8">
                     {/* Form Title */}
                     {currentSection && (
