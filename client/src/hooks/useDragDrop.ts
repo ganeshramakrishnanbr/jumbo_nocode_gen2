@@ -394,31 +394,45 @@ export const useDragDrop = (questionnaireId: string = 'default-questionnaire', i
   }, [droppedControls, questionnaireId, isDbInitialized, directImportMode]);
 
   const reorderControl = useCallback(async (dragIndex: number, hoverIndex: number) => {
-    console.log('🔄 REORDER: Starting reorder operation', { dragIndex, hoverIndex, controlCount: droppedControls.length });
+    console.log('🔄 REORDER: Starting reorder operation', { dragIndex, hoverIndex, activeSection, controlCount: droppedControls.length });
     
-    // Work directly with all controls and reorder by index
-    if (dragIndex >= droppedControls.length || hoverIndex >= droppedControls.length || dragIndex < 0 || hoverIndex < 0) {
-      console.error('❌ REORDER: Invalid indices', { dragIndex, hoverIndex, controlCount: droppedControls.length });
+    // Get controls for the current section
+    const currentSectionControls = droppedControls.filter(control => 
+      (control.sectionId || 'default') === activeSection
+    );
+    
+    // Validate indices against section controls
+    if (dragIndex >= currentSectionControls.length || hoverIndex >= currentSectionControls.length || dragIndex < 0 || hoverIndex < 0) {
+      console.error('❌ REORDER: Invalid indices', { dragIndex, hoverIndex, sectionControlCount: currentSectionControls.length });
       return;
     }
     
-    const newControls = [...droppedControls];
-    const draggedControl = newControls[dragIndex];
+    // Perform reorder within section
+    const reorderedSectionControls = [...currentSectionControls];
+    const draggedControl = reorderedSectionControls[dragIndex];
     
-    // Perform the reorder
-    newControls.splice(dragIndex, 1);
-    newControls.splice(hoverIndex, 0, draggedControl);
+    reorderedSectionControls.splice(dragIndex, 1);
+    reorderedSectionControls.splice(hoverIndex, 0, draggedControl);
     
-    // Update y positions based on new order
-    const allReorderedControls = newControls.map((control, index) => ({
+    // Update y positions for section controls
+    const updatedSectionControls = reorderedSectionControls.map((control, index) => ({
       ...control,
       y: index
     }));
+    
+    // Merge with controls from other sections
+    const otherSectionControls = droppedControls.filter(control => 
+      (control.sectionId || 'default') !== activeSection
+    );
+    
+    const allReorderedControls = [...otherSectionControls, ...updatedSectionControls];
 
     console.log('📝 REORDER: Reordered controls', { 
       draggedControl: draggedControl.name, 
       fromIndex: dragIndex, 
       toIndex: hoverIndex,
+      activeSection,
+      sectionControlCount: updatedSectionControls.length,
       totalControls: allReorderedControls.length
     });
 
