@@ -21,6 +21,14 @@ Comprehensive AI-assisted development prompts for recreating the project:
 - Best practices and coding standards
 - Extension and customization prompts
 
+### 💻 [launch.md](./launch.md)
+Complete VS Code development setup and launch instructions:
+- Prerequisites and software requirements
+- VS Code configuration and extensions
+- Database setup and environment configuration
+- Step-by-step launch procedures
+- Development workflow and debugging guide
+
 ### 📚 [ORIGINAL_FEATURES.md](./ORIGINAL_FEATURES.md)
 Documentation of original Bolt.new features and migration details:
 - Original feature set from Bolt platform
