@@ -553,6 +553,13 @@ function App() {
     }
 
     switch (activeTab) {
+      case 'dashboardDesigner':
+        return (
+          <DashboardDesigner 
+            onConfigChange={setDashboardConfig}
+          />
+        );
+
       case 'dashboard':
         return (
           <Dashboard
@@ -645,6 +652,7 @@ function App() {
               filledCount: droppedControls.filter(c => c.properties.value).length,
               totalCount: droppedControls.length
             }}
+            dashboardConfig={dashboardConfig}
           />
         );
       

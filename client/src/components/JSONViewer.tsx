@@ -14,6 +14,26 @@ interface JSONViewerProps {
     filledCount: number;
     totalCount: number;
   };
+  dashboardConfig?: {
+    template: string;
+    theme: string;
+    customColors: {
+      primary: string;
+      secondary: string;
+      accent: string;
+    };
+    appearance: 'light' | 'dark';
+    layout: {
+      sidebar: boolean;
+      header: boolean;
+      footer: boolean;
+    };
+    branding: {
+      logo?: string;
+      title: string;
+      subtitle: string;
+    };
+  };
 }
 
 export const JSONViewer: React.FC<JSONViewerProps> = ({
@@ -22,10 +42,12 @@ export const JSONViewer: React.FC<JSONViewerProps> = ({
   sections,
   selectedTheme = 'classic',
   tabAlignment = 'top',
-  formProgress = { overall: 0, required: 0, filledCount: 0, totalCount: 0 }
+  formProgress = { overall: 0, required: 0, filledCount: 0, totalCount: 0 },
+  dashboardConfig
 }) => {
   const [designerExpanded, setDesignerExpanded] = useState(true);
   const [experienceExpanded, setExperienceExpanded] = useState(false);
+  const [dashboardExpanded, setDashboardExpanded] = useState(false);
   const generateDesignerJSON = () => {
     return {
       formDefinition: {
@@ -217,8 +239,137 @@ export const JSONViewer: React.FC<JSONViewerProps> = ({
     };
   };
 
+  const generateDashboardJSON = () => {
+    if (!dashboardConfig) {
+      return {
+        dashboardDesigner: {
+          id: `dashboard-${Date.now()}`,
+          name: "Dashboard Configuration",
+          version: "1.0.0",
+          created: new Date().toISOString(),
+          note: "No dashboard configuration available"
+        }
+      };
+    }
+
+    return {
+      dashboardDesigner: {
+        id: `dashboard-${Date.now()}`,
+        name: "Dashboard Configuration",
+        version: "1.0.0",
+        created: new Date().toISOString(),
+        
+        // Template Configuration
+        templateSettings: {
+          selectedTemplate: dashboardConfig.template,
+          templateType: dashboardConfig.template,
+          layoutProperties: {
+            structure: dashboardConfig.template === 'grid' ? 'flexible-grid' :
+                      dashboardConfig.template === 'sidebar' ? 'fixed-sidebar' :
+                      dashboardConfig.template === 'card' ? 'card-based' : 'minimal-layout',
+            responsiveBreakpoints: {
+              mobile: '768px',
+              tablet: '1024px',
+              desktop: '1200px'
+            }
+          }
+        },
+
+        // Theme and Appearance
+        themeConfiguration: {
+          selectedTheme: dashboardConfig.theme,
+          appearance: dashboardConfig.appearance,
+          colorPalette: {
+            primary: dashboardConfig.customColors.primary,
+            secondary: dashboardConfig.customColors.secondary,
+            accent: dashboardConfig.customColors.accent
+          },
+          darkModeSupport: true,
+          themeVariants: {
+            light: {
+              background: '#ffffff',
+              surface: '#f8fafc',
+              text: '#1f2937'
+            },
+            dark: {
+              background: '#111827',
+              surface: '#1f2937', 
+              text: '#f9fafb'
+            }
+          }
+        },
+
+        // Layout Configuration
+        layoutSettings: {
+          sidebar: {
+            enabled: dashboardConfig.layout.sidebar,
+            position: 'left',
+            collapsible: true,
+            width: '256px'
+          },
+          header: {
+            enabled: dashboardConfig.layout.header,
+            height: '64px',
+            sticky: true
+          },
+          footer: {
+            enabled: dashboardConfig.layout.footer,
+            height: 'auto'
+          }
+        },
+
+        // Branding Configuration
+        brandingSettings: {
+          title: dashboardConfig.branding.title,
+          subtitle: dashboardConfig.branding.subtitle,
+          logo: dashboardConfig.branding.logo || null,
+          favicon: null,
+          customStyling: {
+            logoPosition: 'left',
+            titleAlignment: 'left',
+            headerStyle: 'modern'
+          }
+        },
+
+        // Component Library
+        availableComponents: {
+          charts: ['line', 'bar', 'pie', 'area', 'scatter'],
+          widgets: ['metric-card', 'progress-bar', 'gauge', 'counter'],
+          tables: ['data-table', 'comparison-table', 'summary-table'],
+          navigation: ['breadcrumbs', 'tabs', 'pagination'],
+          display: ['alerts', 'badges', 'cards', 'avatars']
+        },
+
+        // Integration Settings
+        integrationCapabilities: {
+          dataConnections: {
+            apis: true,
+            databases: true,
+            realTime: true
+          },
+          exportFormats: ['JSON', 'PDF', 'PNG', 'SVG'],
+          sharingOptions: ['public-link', 'embed-code', 'download'],
+          deployment: {
+            platforms: ['web', 'mobile-responsive'],
+            hosting: 'cloud-ready'
+          }
+        }
+      },
+
+      // Metadata
+      metadata: {
+        generatedAt: new Date().toISOString(),
+        schemaVersion: "1.0.0",
+        source: "Jumbo No-Code Form Builder - Dashboard Designer",
+        purpose: "Dashboard Configuration Export",
+        compatibleWith: ["React", "Vue", "Angular", "Vanilla JS"]
+      }
+    };
+  };
+
   const designerJsonString = JSON.stringify(generateDesignerJSON(), null, 2);
   const experienceJsonString = JSON.stringify(generateUserExperienceJSON(), null, 2);
+  const dashboardJsonString = JSON.stringify(generateDashboardJSON(), null, 2);
 
   const copyToClipboard = (jsonType: 'designer' | 'experience') => {
     const jsonString = jsonType === 'designer' ? designerJsonString : experienceJsonString;
