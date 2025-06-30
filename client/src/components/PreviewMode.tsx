@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { DroppedControl, Section } from '../types';
 import { CheckCircle, AlertCircle, Circle, ChevronRight, Trash2, Palette, Layout, Maximize2, Grid3X3, AlignLeft, Sparkles, BarChart3, Settings, ArrowUp, ArrowDown, ArrowLeft, ArrowRight, Home, User, Bell, HelpCircle, Monitor, Tablet, Smartphone, Watch } from 'lucide-react';
 
@@ -242,6 +242,13 @@ export const PreviewMode: React.FC<PreviewModeProps> = ({
   const [selectedTabLayout, setSelectedTabLayout] = useState<keyof typeof TAB_LAYOUT_THEMES>('cleanMinimal');
   const [showTabLayoutSelector, setShowTabLayoutSelector] = useState(false);
   const [demoActiveTab, setDemoActiveTab] = useState(0); // Index-based for demo sections
+  const [forceRender, setForceRender] = useState(0); // Force re-render trigger
+
+  // Force re-render when tab layout changes
+  useEffect(() => {
+    console.log('Tab layout changed to:', selectedTabLayout);
+    setForceRender(prev => prev + 1);
+  }, [selectedTabLayout]);
 
   const handleInputChange = (controlId: string, value: any) => {
     setFormData(prev => ({ ...prev, [controlId]: value }));
@@ -1499,7 +1506,7 @@ export const PreviewMode: React.FC<PreviewModeProps> = ({
         <div className="flex-1 overflow-y-auto">
           <div className="p-4 md:p-8 min-h-full">
             {/* Dynamic Layout using selected tab theme with alignment */}
-            <div className="w-full max-w-none" key={`${selectedTabLayout}-${tabAlignment}`}>
+            <div className="w-full max-w-none" key={`${selectedTabLayout}-${tabAlignment}-${forceRender}`}>
               {(() => {
                 // Use real sections if available, otherwise demo sections for theme preview
                 const demoSections = [
@@ -1572,7 +1579,7 @@ export const PreviewMode: React.FC<PreviewModeProps> = ({
                 // Layout based on alignment and theme
                 if (selectedTabLayout === 'leftSidebar' || tabAlignment === 'left') {
                   return (
-                    <div className="flex gap-4 lg:gap-8">
+                    <div className="flex gap-4 lg:gap-8" key={`left-${selectedTabLayout}`}>
                       <div className="flex-shrink-0 w-64">
                         {selectedTabLayout === 'leftSidebar' ? (
                           TAB_LAYOUT_THEMES.leftSidebar.renderTabs(displaySections as any, currentActiveTab, setCurrentActiveTab)
@@ -1591,7 +1598,7 @@ export const PreviewMode: React.FC<PreviewModeProps> = ({
                   );
                 } else if (tabAlignment === 'right') {
                   return (
-                    <div className="flex flex-row-reverse gap-4 lg:gap-8">
+                    <div className="flex flex-row-reverse gap-4 lg:gap-8" key={`right-${selectedTabLayout}`}>
                       <div className="flex-shrink-0 w-64">
                         <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg p-4">
                           {TAB_LAYOUT_THEMES[selectedTabLayout].renderTabs(displaySections as any, currentActiveTab, setCurrentActiveTab)}
@@ -1606,7 +1613,7 @@ export const PreviewMode: React.FC<PreviewModeProps> = ({
                   );
                 } else {
                   return (
-                    <div className="w-full">
+                    <div className="w-full" key={selectedTabLayout}>
                       <div className="mb-6">
                         {TAB_LAYOUT_THEMES[selectedTabLayout].renderTabs(displaySections as any, currentActiveTab, setCurrentActiveTab)}
                       </div>
