@@ -91,7 +91,7 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
   const isFirstControl = selectedControl.y === 0;
 
   return (
-    <div className="w-full md:w-80 bg-white dark:bg-gray-900 border-t md:border-t-0 md:border-l border-gray-200 dark:border-gray-700 flex flex-col transition-colors">
+    <div className="w-full h-full bg-white dark:bg-gray-900 border-t md:border-t-0 md:border-l border-gray-200 dark:border-gray-700 flex flex-col transition-colors overflow-hidden">
       {/* Header */}
       <div className="p-4 border-b border-gray-200 dark:border-gray-700">
         <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-1 transition-colors">Properties Panel</h2>

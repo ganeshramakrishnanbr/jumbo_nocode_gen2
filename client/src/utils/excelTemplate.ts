@@ -119,7 +119,7 @@ export const generateExcelTemplate = () => {
   ];
 
   const sampleData: ExcelControlData[] = [
-    // Personal Information Section
+    // Core Input Section - All basic input types
     {
       id: '', // ALWAYS EMPTY for auto-generation
       type: 'textInput',
@@ -129,9 +129,37 @@ export const generateExcelTemplate = () => {
       placeholder: 'Enter your complete legal name',
       required: true,
       description: 'Required for identification purposes',
-      sectionId: 'personal-info',
+      sectionId: 'core-inputs',
       order: 1,
       maxLength: 100
+    },
+    {
+      id: '', // ALWAYS EMPTY for auto-generation
+      type: 'textarea',
+      category: 'Core Input',
+      name: 'Description',
+      label: 'Tell us about yourself',
+      placeholder: 'Provide a detailed description...',
+      required: false,
+      description: 'Multi-line text input example',
+      sectionId: 'core-inputs',
+      order: 2,
+      rows: 4,
+      maxLength: 500
+    },
+    {
+      id: '', // ALWAYS EMPTY for auto-generation
+      type: 'numberInput',
+      category: 'Core Input',
+      name: 'Age',
+      label: 'Age',
+      required: true,
+      description: 'Numeric input with validation',
+      sectionId: 'core-inputs',
+      order: 3,
+      min: 18,
+      max: 100,
+      step: 1
     },
     {
       id: '', // ALWAYS EMPTY for auto-generation
@@ -142,8 +170,8 @@ export const generateExcelTemplate = () => {
       placeholder: 'your.email@example.com',
       required: true,
       description: 'Primary contact email - required for account creation',
-      sectionId: 'personal-info',
-      order: 2
+      sectionId: 'core-inputs',
+      order: 4
     },
     {
       id: '', // ALWAYS EMPTY for auto-generation
@@ -154,9 +182,49 @@ export const generateExcelTemplate = () => {
       placeholder: '(555) 123-4567',
       required: false,
       description: 'Optional backup contact method',
-      sectionId: 'personal-info',
-      order: 3
+      sectionId: 'core-inputs',
+      order: 5
     },
+    {
+      id: '', // ALWAYS EMPTY for auto-generation
+      type: 'urlInput',
+      category: 'Core Input',
+      name: 'Website',
+      label: 'Personal Website',
+      placeholder: 'https://yourwebsite.com',
+      required: false,
+      description: 'URL input with validation',
+      sectionId: 'core-inputs',
+      order: 6
+    },
+    {
+      id: '', // ALWAYS EMPTY for auto-generation
+      type: 'passwordInput',
+      category: 'Core Input',
+      name: 'Password',
+      label: 'Create Password',
+      placeholder: 'Enter secure password...',
+      required: true,
+      description: 'Password with strength validation',
+      sectionId: 'core-inputs',
+      order: 7,
+      minLength: 8
+    },
+    {
+      id: '', // ALWAYS EMPTY for auto-generation
+      type: 'richTextEditor',
+      category: 'Core Input',
+      name: 'Bio',
+      label: 'Professional Bio',
+      placeholder: 'Enter formatted biography...',
+      required: false,
+      description: 'Rich text editor with formatting options',
+      sectionId: 'core-inputs',
+      order: 8,
+      maxLength: 1000
+    },
+
+    // Date & Time Section - All date/time controls
     {
       id: '', // ALWAYS EMPTY for auto-generation
       type: 'datePicker',
@@ -166,10 +234,548 @@ export const generateExcelTemplate = () => {
       required: true,
       format: 'YYYY-MM-DD',
       description: 'Required for age verification',
-      sectionId: 'personal-info',
+      sectionId: 'date-time',
+      order: 1
+    },
+    {
+      id: '', // ALWAYS EMPTY for auto-generation
+      type: 'timePicker',
+      category: 'Date & Time',
+      name: 'Preferred Meeting Time',
+      label: 'Best Meeting Time',
+      required: false,
+      format: '24h',
+      description: 'Time selection input',
+      sectionId: 'date-time',
+      order: 2,
+      step: 15
+    },
+    {
+      id: '', // ALWAYS EMPTY for auto-generation
+      type: 'dateRangePicker',
+      category: 'Date & Time',
+      name: 'Availability',
+      label: 'Available Date Range',
+      required: false,
+      format: 'YYYY-MM-DD',
+      description: 'Start and end date selection',
+      sectionId: 'date-time',
+      order: 3,
+      maxRange: 365
+    },
+
+    // Selection Section - All selection controls
+    {
+      id: '', // ALWAYS EMPTY for auto-generation
+      type: 'dropdown',
+      category: 'Selection',
+      name: 'Country',
+      label: 'Country of Residence',
+      required: true,
+      options: 'United States,Canada,United Kingdom,Australia,Germany,France,Japan,Other',
+      description: 'Single selection dropdown',
+      sectionId: 'selection-controls',
+      order: 1
+    },
+    {
+      id: '', // ALWAYS EMPTY for auto-generation
+      type: 'multiSelectDropdown',
+      category: 'Selection',
+      name: 'Skills',
+      label: 'Technical Skills',
+      required: false,
+      options: 'JavaScript,Python,React,Node.js,SQL,Docker,AWS,Machine Learning',
+      description: 'Multiple selection dropdown',
+      sectionId: 'selection-controls',
+      order: 2,
+      maxSelections: 5
+    },
+    {
+      id: '', // ALWAYS EMPTY for auto-generation
+      type: 'radioGroup',
+      category: 'Selection',
+      name: 'Experience Level',
+      label: 'Experience Level',
+      required: true,
+      options: 'Beginner,Intermediate,Advanced,Expert',
+      description: 'Single selection radio buttons',
+      sectionId: 'selection-controls',
+      order: 3,
+      layout: 'vertical'
+    },
+    {
+      id: '', // ALWAYS EMPTY for auto-generation
+      type: 'checkboxGroup',
+      category: 'Selection',
+      name: 'Interests',
+      label: 'Areas of Interest',
+      required: false,
+      options: 'Technology,Sports,Music,Travel,Reading,Cooking,Photography,Art',
+      description: 'Multiple selection checkboxes',
+      sectionId: 'selection-controls',
+      order: 4,
+      layout: 'vertical',
+      maxSelections: 3
+    },
+    {
+      id: '', // ALWAYS EMPTY for auto-generation
+      type: 'buttonGroup',
+      category: 'Selection',
+      name: 'Preferred Contact',
+      label: 'Preferred Contact Method',
+      required: true,
+      options: 'Email,Phone,SMS,Video Call',
+      description: 'Styled buttons for selection',
+      sectionId: 'selection-controls',
+      order: 5
+    },
+    {
+      id: '', // ALWAYS EMPTY for auto-generation
+      type: 'ratingScale',
+      category: 'Selection',
+      name: 'Satisfaction Rating',
+      label: 'Rate your experience',
+      required: false,
+      description: 'Star rating scale',
+      sectionId: 'selection-controls',
+      order: 6,
+      scaleType: 'stars',
+      maxValue: 5
+    },
+    {
+      id: '', // ALWAYS EMPTY for auto-generation
+      type: 'slider',
+      category: 'Selection',
+      name: 'Budget Range',
+      label: 'Budget Range ($)',
+      required: false,
+      description: 'Range slider for numeric input',
+      sectionId: 'selection-controls',
+      order: 7,
+      min: 0,
+      max: 10000,
+      step: 100,
+      defaultValue: 5000
+    },
+    {
+      id: '', // ALWAYS EMPTY for auto-generation
+      type: 'toggleSwitch',
+      category: 'Selection',
+      name: 'Newsletter',
+      label: 'Newsletter Subscription',
+      required: false,
+      description: 'Binary choice control',
+      sectionId: 'selection-controls',
+      order: 8,
+      onLabel: 'Subscribe',
+      offLabel: 'Unsubscribe'
+    },
+    {
+      id: '', // ALWAYS EMPTY for auto-generation
+      type: 'imageSelection',
+      category: 'Selection',
+      name: 'Avatar',
+      label: 'Choose Profile Avatar',
+      required: false,
+      description: 'Choose from image options',
+      sectionId: 'selection-controls',
+      order: 9
+    },
+    {
+      id: '', // ALWAYS EMPTY for auto-generation
+      type: 'tagInput',
+      category: 'Selection',
+      name: 'Keywords',
+      label: 'Keywords/Tags',
+      required: false,
+      description: 'Add/remove tags dynamically',
+      sectionId: 'selection-controls',
+      order: 10,
+      maxTags: 10
+    },
+
+    // Grid & Matrix Section - THE MISSING CONTROLS THE USER REQUESTED
+    {
+      id: '', // ALWAYS EMPTY for auto-generation
+      type: 'singleSelectiveGrid',
+      category: 'Grid & Matrix',
+      name: 'Service Quality Rating',
+      label: 'Rate our services (Single Selection per Row)',
+      required: true,
+      description: 'Grid with radio button groups - single selection per row',
+      sectionId: 'grid-matrix',
+      order: 1,
+      rowLabels: 'Customer Service,Product Quality,Delivery Speed,Website Experience,Overall Satisfaction',
+      columnOptions: 'Excellent,Good,Average,Poor,Very Poor'
+    },
+    {
+      id: '', // ALWAYS EMPTY for auto-generation
+      type: 'multiSelectiveGrid',
+      category: 'Grid & Matrix',
+      name: 'Feature Usage',
+      label: 'Which features do you use? (Multiple Selection per Row)',
+      required: false,
+      description: 'Grid with checkbox groups - multiple selections allowed per row',
+      sectionId: 'grid-matrix',
+      order: 2,
+      rowLabels: 'Mobile App,Web Platform,API Integration,Desktop Software,Browser Extension',
+      columnOptions: 'Daily,Weekly,Monthly,Rarely,Never'
+    },
+    {
+      id: '', // ALWAYS EMPTY for auto-generation
+      type: 'matrixQuestions',
+      category: 'Grid & Matrix',
+      name: 'Agreement Survey',
+      label: 'Please indicate your level of agreement',
+      required: true,
+      description: 'Multiple questions with same answer options',
+      sectionId: 'grid-matrix',
+      order: 3,
+      questions: 'I find the product easy to use,The product meets my needs,I would recommend this product,The price is reasonable,Customer support is helpful',
+      answers: 'Strongly Agree,Agree,Neutral,Disagree,Strongly Disagree'
+    },
+    {
+      id: '', // ALWAYS EMPTY for auto-generation
+      type: 'rankingControl',
+      category: 'Grid & Matrix',
+      name: 'Priority Ranking',
+      label: 'Rank these features by importance',
+      required: false,
+      description: 'Drag and drop to rank items',
+      sectionId: 'grid-matrix',
+      order: 4,
+      items: 'Performance,Security,User Interface,Customer Support,Price,Documentation'
+    },
+
+    // File & Media Section - All file and media controls
+    {
+      id: '', // ALWAYS EMPTY for auto-generation
+      type: 'fileUpload',
+      category: 'File & Media',
+      name: 'Resume Upload',
+      label: 'Upload your Resume/CV',
+      required: true,
+      description: 'File upload with type restrictions',
+      sectionId: 'file-media',
+      order: 1,
+      accept: '.pdf,.doc,.docx',
+      maxSize: 10
+    },
+    {
+      id: '', // ALWAYS EMPTY for auto-generation
+      type: 'imageUpload',
+      category: 'File & Media',
+      name: 'Profile Photo',
+      label: 'Profile Photo Upload',
+      required: false,
+      description: 'Image upload with preview',
+      sectionId: 'file-media',
+      order: 2,
+      accept: '.jpg,.jpeg,.png,.gif',
+      maxSize: 5
+    },
+    {
+      id: '', // ALWAYS EMPTY for auto-generation
+      type: 'signaturePad',
+      category: 'File & Media',
+      name: 'Digital Signature',
+      label: 'Please provide your signature',
+      required: true,
+      description: 'Digital signature capture',
+      sectionId: 'file-media',
+      order: 3,
+      canvasWidth: 400,
+      canvasHeight: 200
+    },
+    {
+      id: '', // ALWAYS EMPTY for auto-generation
+      type: 'colorPicker',
+      category: 'File & Media',
+      name: 'Brand Color',
+      label: 'Select your brand color',
+      required: false,
+      description: 'Visual color selection',
+      sectionId: 'file-media',
+      order: 4,
+      defaultColor: '#3B82F6',
+      format: 'hex'
+    },
+
+    // Advanced Input Section - All advanced input controls
+    {
+      id: '', // ALWAYS EMPTY for auto-generation
+      type: 'patternInput',
+      category: 'Advanced Input',
+      name: 'Product Code',
+      label: 'Product Code',
+      placeholder: 'ABC-123-XYZ',
+      required: true,
+      description: 'Input with pattern validation',
+      sectionId: 'advanced-input',
+      order: 1
+    },
+    {
+      id: '', // ALWAYS EMPTY for auto-generation
+      type: 'calculatedField',
+      category: 'Advanced Input',
+      name: 'Total Cost',
+      label: 'Total Cost Calculation',
+      required: false,
+      description: 'Auto-calculated field based on other inputs',
+      sectionId: 'advanced-input',
+      order: 2
+    },
+    {
+      id: '', // ALWAYS EMPTY for auto-generation
+      type: 'conditionalLogic',
+      category: 'Advanced Input',
+      name: 'Additional Info',
+      label: 'Additional Information',
+      required: false,
+      description: 'Field that shows/hides based on conditions',
+      sectionId: 'advanced-input',
+      order: 3
+    },
+    {
+      id: '', // ALWAYS EMPTY for auto-generation
+      type: 'jsonInput',
+      category: 'Advanced Input',
+      name: 'API Configuration',
+      label: 'JSON Configuration',
+      placeholder: '{"key": "value"}',
+      required: false,
+      description: 'JSON input with syntax validation',
+      sectionId: 'advanced-input',
       order: 4
     },
     {
+      id: '', // ALWAYS EMPTY for auto-generation
+      type: 'codeEditor',
+      category: 'Advanced Input',
+      name: 'Custom Script',
+      label: 'JavaScript Code',
+      required: false,
+      description: 'Code editor with syntax highlighting',
+      sectionId: 'advanced-input',
+      order: 5
+    },
+    {
+      id: '', // ALWAYS EMPTY for auto-generation
+      type: 'searchableSelect',
+      category: 'Advanced Input',
+      name: 'City Search',
+      label: 'Search and select city',
+      required: false,
+      description: 'Searchable dropdown with large dataset',
+      sectionId: 'advanced-input',
+      order: 6
+    },
+
+    // Address Section - All address-related controls
+    {
+      id: '', // ALWAYS EMPTY for auto-generation
+      type: 'addressLookup',
+      category: 'Address',
+      name: 'Home Address',
+      label: 'Home Address',
+      required: true,
+      description: 'Address lookup with autocomplete',
+      sectionId: 'address',
+      order: 1
+    },
+    {
+      id: '', // ALWAYS EMPTY for auto-generation
+      type: 'geolocation',
+      category: 'Address',
+      name: 'Current Location',
+      label: 'Current Location',
+      required: false,
+      description: 'Capture GPS coordinates',
+      sectionId: 'address',
+      order: 2
+    },
+    {
+      id: '', // ALWAYS EMPTY for auto-generation
+      type: 'mapSelector',
+      category: 'Address',
+      name: 'Meeting Location',
+      label: 'Select meeting location on map',
+      required: false,
+      description: 'Interactive map for location selection',
+      sectionId: 'address',
+      order: 3
+    },
+    {
+      id: '', // ALWAYS EMPTY for auto-generation
+      type: 'countrySelect',
+      category: 'Address',
+      name: 'Shipping Country',
+      label: 'Shipping Country',
+      required: true,
+      description: 'Country selection with flags',
+      sectionId: 'address',
+      order: 4
+    },
+    {
+      id: '', // ALWAYS EMPTY for auto-generation
+      type: 'postalCode',
+      category: 'Address',
+      name: 'ZIP Code',
+      label: 'ZIP/Postal Code',
+      placeholder: '12345',
+      required: true,
+      description: 'Postal code with format validation',
+      sectionId: 'address',
+      order: 5
+    },
+
+    // Layout & Display Section - All layout controls
+    {
+      id: '', // ALWAYS EMPTY for auto-generation
+      type: 'heading',
+      category: 'Layout & Display',
+      name: 'Section Title',
+      label: 'Personal Information Section',
+      required: false,
+      description: 'Text heading element',
+      sectionId: 'layout-display',
+      order: 1,
+      text: 'Personal Information',
+      level: 'h2',
+      alignment: 'left',
+      fontSize: 'large',
+      color: '#1F2937'
+    },
+    {
+      id: '', // ALWAYS EMPTY for auto-generation
+      type: 'sectionDivider',
+      category: 'Layout & Display',
+      name: 'Section Break',
+      label: 'Visual Separator',
+      required: false,
+      description: 'Visual separation lines',
+      sectionId: 'layout-display',
+      order: 2,
+      style: 'solid',
+      thickness: 1,
+      color: '#e5e7eb',
+      spacing: 'medium'
+    },
+    {
+      id: '', // ALWAYS EMPTY for auto-generation
+      type: 'progressBar',
+      category: 'Layout & Display',
+      name: 'Form Progress',
+      label: 'Completion Progress',
+      required: false,
+      description: 'Form completion indicator',
+      sectionId: 'layout-display',
+      order: 3
+    },
+    {
+      id: '', // ALWAYS EMPTY for auto-generation
+      type: 'accordionPanel',
+      category: 'Layout & Display',
+      name: 'Collapsible Section',
+      label: 'Additional Details',
+      required: false,
+      description: 'Collapsible content panel',
+      sectionId: 'layout-display',
+      order: 4
+    },
+    {
+      id: '', // ALWAYS EMPTY for auto-generation
+      type: 'tabContainer',
+      category: 'Layout & Display',
+      name: 'Tabbed Content',
+      label: 'Information Tabs',
+      required: false,
+      description: 'Tabbed content organization',
+      sectionId: 'layout-display',
+      order: 5
+    },
+    {
+      id: '', // ALWAYS EMPTY for auto-generation
+      type: 'infoBox',
+      category: 'Layout & Display',
+      name: 'Help Information',
+      label: 'Important Notice',
+      required: false,
+      description: 'Information display box',
+      sectionId: 'layout-display',
+      order: 6,
+      text: 'Please ensure all information is accurate before submitting.'
+    },
+
+    // Validation & Security Section - All validation controls
+    {
+      id: '', // ALWAYS EMPTY for auto-generation
+      type: 'captcha',
+      category: 'Validation & Security',
+      name: 'Security Verification',
+      label: 'Please verify you are human',
+      required: true,
+      description: 'CAPTCHA verification',
+      sectionId: 'validation-security',
+      order: 1
+    },
+    {
+      id: '', // ALWAYS EMPTY for auto-generation
+      type: 'twoFactorAuth',
+      category: 'Validation & Security',
+      name: '2FA Code',
+      label: 'Two-Factor Authentication Code',
+      placeholder: '000000',
+      required: true,
+      description: 'Two-factor authentication input',
+      sectionId: 'validation-security',
+      order: 2
+    },
+    {
+      id: '', // ALWAYS EMPTY for auto-generation
+      type: 'biometricAuth',
+      category: 'Validation & Security',
+      name: 'Biometric Verification',
+      label: 'Fingerprint/Face ID',
+      required: false,
+      description: 'Biometric authentication',
+      sectionId: 'validation-security',
+      order: 3
+    },
+    {
+      id: '', // ALWAYS EMPTY for auto-generation
+      type: 'consentCheckbox',
+      category: 'Validation & Security',
+      name: 'Privacy Consent',
+      label: 'I agree to the privacy policy and terms of service',
+      required: true,
+      description: 'Required consent checkbox',
+      sectionId: 'validation-security',
+      order: 4
+    },
+    {
+      id: '', // ALWAYS EMPTY for auto-generation
+      type: 'ageVerification',
+      category: 'Validation & Security',
+      name: 'Age Confirmation',
+      label: 'I confirm I am 18 years or older',
+      required: true,
+      description: 'Age verification checkbox',
+      sectionId: 'validation-security',
+      order: 5
+    },
+    {
+      id: '', // ALWAYS EMPTY for auto-generation
+      type: 'dataRetention',
+      category: 'Validation & Security',
+      name: 'Data Retention',
+      label: 'Data retention preferences',
+      required: false,
+      description: 'Data retention settings',
+      sectionId: 'validation-security',
+      order: 6
+    }
+  ];
       id: '', // ALWAYS EMPTY for auto-generation
       type: 'radioGroup',
       category: 'Selection',
