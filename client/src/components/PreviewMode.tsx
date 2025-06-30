@@ -1577,20 +1577,8 @@ export const PreviewMode: React.FC<PreviewModeProps> = ({
                         {selectedTabLayout === 'leftSidebar' ? (
                           TAB_LAYOUT_THEMES.leftSidebar.renderTabs(displaySections as any, currentActiveTab, setCurrentActiveTab)
                         ) : (
-                          <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg p-4 space-y-2">
-                            {displaySections.map((section, index) => (
-                              <button
-                                key={section.id}
-                                onClick={() => setCurrentActiveTab(index)}
-                                className={`w-full flex items-center space-x-3 px-3 py-2 rounded-md text-left transition-all ${
-                                  currentActiveTab === index
-                                    ? 'bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white'
-                                    : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800'
-                                }`}
-                              >
-                                <span className="text-sm">{section.name}</span>
-                              </button>
-                            ))}
+                          <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+                            {TAB_LAYOUT_THEMES[selectedTabLayout].renderTabs(displaySections as any, currentActiveTab, setCurrentActiveTab)}
                           </div>
                         )}
                       </div>
@@ -1605,20 +1593,8 @@ export const PreviewMode: React.FC<PreviewModeProps> = ({
                   return (
                     <div className="flex flex-row-reverse gap-4 lg:gap-8">
                       <div className="flex-shrink-0 w-64">
-                        <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg p-4 space-y-2">
-                          {displaySections.map((section, index) => (
-                            <button
-                              key={section.id}
-                              onClick={() => setCurrentActiveTab(index)}
-                              className={`w-full flex items-center space-x-3 px-3 py-2 rounded-md text-left transition-all ${
-                                currentActiveTab === index
-                                  ? 'bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white'
-                                  : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800'
-                              }`}
-                            >
-                              <span className="text-sm">{section.name}</span>
-                            </button>
-                          ))}
+                        <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+                          {TAB_LAYOUT_THEMES[selectedTabLayout].renderTabs(displaySections as any, currentActiveTab, setCurrentActiveTab)}
                         </div>
                       </div>
                       <div className="flex-1 min-w-0">
