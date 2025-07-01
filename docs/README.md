@@ -45,6 +45,14 @@ Complete AI-assisted recreation prompts for the entire application:
 - Comprehensive prompt collection covering all major features
 - Step-by-step implementation guidance for each component
 
+### 📁 [REVERSEPROMPTING/](./REVERSEPROMPTING/)
+Individual implementation prompts organized by feature:
+- **18 separate prompt files** for modular implementation
+- **Complete visual design specifications** for each component
+- **Copy-paste ready code examples** with exact styling requirements
+- **Sequential implementation guide** from setup to advanced features
+- **Professional UI/UX standards** with accessibility compliance
+
 ### 📚 [ORIGINAL_FEATURES.md](./ORIGINAL_FEATURES.md)
 Documentation of original Bolt.new features and migration details:
 - Original feature set from Bolt platform
