@@ -37,6 +37,14 @@ Detailed technical architecture and application launch sequence:
 - File execution paths and references
 - State management and data flow patterns
 
+### 🔄 [ReversePrompting.md](./ReversePrompting.md)
+Complete AI-assisted recreation prompts for the entire application:
+- Master creation prompt for full application recreation
+- Individual feature-specific prompts with complete code examples
+- Copy-paste ready prompts for AI development assistants
+- Comprehensive prompt collection covering all major features
+- Step-by-step implementation guidance for each component
+
 ### 📚 [ORIGINAL_FEATURES.md](./ORIGINAL_FEATURES.md)
 Documentation of original Bolt.new features and migration details:
 - Original feature set from Bolt platform
@@ -63,6 +71,12 @@ Technical details of the migration from Bolt to Replit:
 3. Follow the step-by-step implementation guide
 4. Refer to migration docs for platform-specific considerations
 
+### For AI Recreation
+1. Use [ReversePrompting.md](./ReversePrompting.md) for complete application recreation
+2. Start with the Master Creation Prompt for full implementation
+3. Use individual feature prompts for specific functionality
+4. Follow the comprehensive code examples and implementation guidance
+
 ### For Project Managers
 1. Review [Requirements.md](./Requirements.md) for complete feature scope
 2. Use requirements for project planning and estimation
@@ -88,6 +102,9 @@ jumbo-form-builder/
 ├── docs/                   # Documentation (this folder)
 │   ├── Requirements.md     # Complete requirements spec
 │   ├── Prompts.md          # Development prompts
+│   ├── ReversePrompting.md # AI recreation prompts
+│   ├── launch.md           # VS Code setup guide
+│   ├── technical.md        # Technical architecture
 │   ├── ORIGINAL_FEATURES.md # Original feature documentation
 │   └── BOLT_MIGRATION.md   # Migration documentation
 └── replit.md               # Project overview and changelog
@@ -172,14 +189,18 @@ jumbo-form-builder/
 When contributing to this project:
 1. Follow the architectural patterns established in the codebase
 2. Use the development prompts in [Prompts.md](./Prompts.md) for new features
-3. Maintain compatibility with existing functionality
-4. Add comprehensive tests for new features
-5. Update documentation for significant changes
+3. Use [ReversePrompting.md](./ReversePrompting.md) for AI-assisted development
+4. Maintain compatibility with existing functionality
+5. Add comprehensive tests for new features
+6. Update documentation for significant changes
 
 ## Support and Resources
 
 - **Requirements**: Reference [Requirements.md](./Requirements.md) for complete specifications
 - **Development**: Use [Prompts.md](./Prompts.md) for AI-assisted development
+- **AI Recreation**: Use [ReversePrompting.md](./ReversePrompting.md) for complete recreation
+- **Setup**: Check [launch.md](./launch.md) for VS Code development setup
+- **Architecture**: Review [technical.md](./technical.md) for system architecture
 - **Migration**: Check [BOLT_MIGRATION.md](./BOLT_MIGRATION.md) for platform-specific notes
 - **Features**: Review [ORIGINAL_FEATURES.md](./ORIGINAL_FEATURES.md) for feature heritage
 
