@@ -15,13 +15,13 @@ This folder contains individual implementation prompts that can be used separate
 - **[06-properties-validation.md](./06-properties-validation.md)** - Control properties and validation system
 
 ### Data Management
-- **[07-import-export.md](./07-import-export.md)** - Excel import and JSON export functionality
-- **[08-pdf-generation.md](./08-pdf-generation.md)** - PDF generation with custom templates
-- **[09-preview-system.md](./09-preview-system.md)** - Live form preview and testing
+- **[07-preview-pdf.md](./07-preview-pdf.md)** - Preview mode and PDF generation with templates
+- **[08-section-management.md](./08-section-management.md)** - Section creation and organization system
+- **[09-json-export.md](./09-json-export.md)** - JSON export with configurable data options
 
 ### Advanced Features
-- **[10-customer-tiers.md](./10-customer-tiers.md)** - Customer tier system with feature restrictions
-- **[11-dashboard-designer.md](./11-dashboard-designer.md)** - Dashboard template and theme system
+- **[10-excel-import.md](./10-excel-import.md)** - Excel import with template generation
+- **[11-customer-tiers.md](./11-customer-tiers.md)** - Customer tier system with feature gating
 - **[12-responsive-design.md](./12-responsive-design.md)** - Mobile-first responsive implementation
 
 ### UI/UX Enhancement
@@ -30,9 +30,9 @@ This folder contains individual implementation prompts that can be used separate
 - **[15-animations.md](./15-animations.md)** - Animations and interactive elements
 
 ### Performance & Quality
-- **[16-performance.md](./16-performance.md)** - Performance optimizations and bundle management
-- **[17-testing.md](./17-testing.md)** - Testing strategies and implementation
-- **[18-security.md](./18-security.md)** - Security measures and best practices
+- **[16-dashboard-analytics.md](./16-dashboard-analytics.md)** - Dashboard analytics with real-time metrics
+- **[17-testing-validation.md](./17-testing-validation.md)** - Testing framework and form validation
+- **[18-deployment-optimization.md](./18-deployment-optimization.md)** - Deployment and performance optimization
 
 ## Usage Instructions
 
